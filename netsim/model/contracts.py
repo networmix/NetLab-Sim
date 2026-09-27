@@ -190,8 +190,10 @@ class AgentNode:
     """A device's agent as the tree sees it (``DeviceState.agents[name]``).
 
     ``state`` and ``srdb_view`` are opaque and identity-compared; ``rng``
-    is the committed ``random.Random`` state (an immutable tuple) or
-    ``None`` before the first run; ``initialized`` becomes true once
+    is the committed ``Prng`` v1 state: a sorted tuple of (64-bit stream id,
+    64-bit counter) pairs for drawn streams, or ``None`` before any draw
+    (including before the first run). Idle publications reuse its identity;
+    rejected runs preserve the pre-run object. ``initialized`` becomes true once
     ``on_init`` has been published; ``generation`` changes on reset.
     """
 
@@ -857,7 +859,7 @@ class AgentContext(Protocol):
 
     Nothing here is a handle, a view over the whole tree or a runtime
     object; every attribute is a frozen record, a tuple, a ``PMap`` or a
-    scalar, except ``rng`` (a private ``random.Random`` seeded from the
+    scalar, except ``rng`` (an invocation-local ``Prng`` restored from the
     committed state) and ``stats`` (a buffer the runtime drains).
     """
 
@@ -944,7 +946,21 @@ class AgentContext(Protocol):
     def causes(self) -> tuple[Cause, ...]: ...
 
     @property
-    def rng(self) -> Any: ...
+    def rng(self) -> Any:
+        """Versioned ``netsim.model.prng.Prng`` with independent named streams.
+
+        The base key hashes (network seed, device seed, agent name, generation)
+        with BLAKE2b and canonical bytes. ``stream(name)`` isolates module draws
+        across runs, returning the same private handle for repeated names in
+        an invocation. Supports random, uniform, randrange, randint, choice,
+        sample, shuffle (invocation-local lists), getrandbits and getstate.
+        Other random.Random methods raise AttributeError; no distribution
+        caches are kept. reset_agent starts fresh counters for a new generation.
+        Only successful publication commits drawn counters; idle/rejected runs
+        preserve the committed object's identity. Values differ from the old
+        Mersenne Twister sequence; the v1 algorithm is interpreter-independent.
+        """
+        ...
 
     @property
     def stats(self) -> AgentStats: ...
