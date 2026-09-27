@@ -1,0 +1,54 @@
+[
+  {
+    "ipv6": false,
+    "locators": 0,
+    "sizes": [
+      64,
+      128
+    ],
+    "visits": [
+      188,
+      380
+    ],
+    "contains_calls_at_128": 0
+  },
+  {
+    "ipv6": true,
+    "locators": 0,
+    "sizes": [
+      64,
+      128
+    ],
+    "visits": [
+      188,
+      380
+    ],
+    "contains_calls_at_128": 0
+  },
+  {
+    "ipv6": false,
+    "locators": 3,
+    "sizes": [
+      64,
+      128
+    ],
+    "visits": [
+      188,
+      380
+    ],
+    "contains_calls_at_128": 0
+  },
+  {
+    "ipv6": true,
+    "locators": 3,
+    "sizes": [
+      64,
+      128
+    ],
+    "visits": [
+      188,
+      380
+    ],
+    "contains_calls_at_128": 384
+  }
+]
