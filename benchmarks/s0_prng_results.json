@@ -1,0 +1,1002 @@
+{
+  "baseline": "0e5b299225372f394dd3505a09cd92127b33dfa7",
+  "status": "provisional timings; retention accepted by integrator",
+  "selection": "Chronological old/new/old: attempt 2 old1, attempt 2 new, attempt 3 old1. No intervening measured leg. These are discarded because of competing host workloads.",
+  "load_snapshot": {
+    "captured_utc": "2026-09-27T15:51:52.758684+00:00",
+    "load_1_5_15_minutes": [
+      4.400390625,
+      3.76123046875,
+      4.03466796875
+    ],
+    "cpu_count": 14,
+    "scope": "Handoff-time snapshot, NOT retrospectively attributed to timed runs. Load averages were not captured during the runs."
+  },
+  "measurement_load_averages": null,
+  "results": {
+    "old1": {
+      "label": "old1",
+      "runtime_ref": "0e5b299225372f394dd3505a09cd92127b33dfa7",
+      "python": "3.14.5",
+      "gil": true,
+      "machine": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+      "agents": 500,
+      "ticks": 5,
+      "runs": 2500,
+      "median_us_per_run": 192.1938999556005,
+      "samples_us_per_run": [
+        191.87571676447988,
+        193.5911332257092,
+        192.42406683042645,
+        190.13421684503555,
+        192.1938999556005
+      ],
+      "retained_bytes": 66965782,
+      "bytes_per_run": 26786.3128,
+      "timeline_records": 8,
+      "largest_allocations": [
+        {
+          "site": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/random.py:178",
+          "bytes": 62782964,
+          "objects": 1567292
+        },
+        {
+          "site": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py:1812",
+          "bytes": 1000520,
+          "objects": 7505
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:236",
+          "bytes": 525280,
+          "objects": 5010
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1086",
+          "bytes": 517800,
+          "objects": 10000
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1003",
+          "bytes": 420840,
+          "objects": 7515
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/runtime/timeline.py:508",
+          "bytes": 358860,
+          "objects": 3715
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1040",
+          "bytes": 259520,
+          "objects": 5
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1021",
+          "bytes": 160128,
+          "objects": 2503
+        }
+      ]
+    },
+    "new": {
+      "label": "new",
+      "runtime_ref": null,
+      "python": "3.14.5",
+      "gil": true,
+      "machine": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+      "agents": 500,
+      "ticks": 5,
+      "runs": 2500,
+      "median_us_per_run": 152.5790668092668,
+      "samples_us_per_run": [
+        156.3638168387115,
+        152.5790668092668,
+        150.78378356993198,
+        151.76985003054142,
+        153.53666683658957
+      ],
+      "retained_bytes": 4175614,
+      "bytes_per_run": 1670.2456,
+      "timeline_records": 8,
+      "largest_allocations": [
+        {
+          "site": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py:1812",
+          "bytes": 1000520,
+          "objects": 7505
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:236",
+          "bytes": 525280,
+          "objects": 5010
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1086",
+          "bytes": 517800,
+          "objects": 10000
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1003",
+          "bytes": 420840,
+          "objects": 7515
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/runtime/timeline.py:508",
+          "bytes": 352544,
+          "objects": 3517
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1040",
+          "bytes": 259520,
+          "objects": 5
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1021",
+          "bytes": 160128,
+          "objects": 2503
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1018",
+          "bytes": 140280,
+          "objects": 2505
+        }
+      ]
+    },
+    "old2": {
+      "label": "old1",
+      "runtime_ref": "0e5b299225372f394dd3505a09cd92127b33dfa7",
+      "python": "3.14.5",
+      "gil": true,
+      "machine": "macOS-26.6.1-arm64-arm-64bit-Mach-O",
+      "agents": 500,
+      "ticks": 5,
+      "runs": 2500,
+      "median_us_per_run": 189.16564993560314,
+      "samples_us_per_run": [
+        188.57298316434026,
+        189.16564993560314,
+        188.92884999513626,
+        191.38324996456504,
+        189.74303361028433
+      ],
+      "retained_bytes": 66965782,
+      "bytes_per_run": 26786.3128,
+      "timeline_records": 8,
+      "largest_allocations": [
+        {
+          "site": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/random.py:178",
+          "bytes": 62782964,
+          "objects": 1567292
+        },
+        {
+          "site": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py:1812",
+          "bytes": 1000520,
+          "objects": 7505
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:236",
+          "bytes": 525280,
+          "objects": 5010
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1086",
+          "bytes": 517800,
+          "objects": 10000
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1003",
+          "bytes": 420840,
+          "objects": 7515
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/runtime/timeline.py:508",
+          "bytes": 358860,
+          "objects": 3715
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1040",
+          "bytes": 259520,
+          "objects": 5
+        },
+        {
+          "site": "/Users/networmix/.superset/worktrees/NetSim/s0/prng/netsim/model/state.py:1021",
+          "bytes": 160128,
+          "objects": 2503
+        }
+      ]
+    }
+  },
+  "activity": [
+    {
+      "label": "old1",
+      "time": 1790523922.1739159,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 43.8,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 41.6,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523923.2388961,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 43.4,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523924.277378,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.6,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523925.3152509,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 43.4,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 842,
+          "cpu": 21.5,
+          "command": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds_stores"
+        },
+        {
+          "pid": 70968,
+          "cpu": 20.5,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523926.352951,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.6,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 20.5,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523927.3870158,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 45.7,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 21666,
+          "cpu": 36.3,
+          "command": "/Users/networmix/.local/bin/claude"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523928.427016,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.1,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523929.462045,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 43.2,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 28.4,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        },
+        {
+          "pid": 99939,
+          "cpu": 20.3,
+          "command": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523930.4983418,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.5,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523931.5353642,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 45.0,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523932.57315,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.0,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523933.610819,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 43.0,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 20.1,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523934.64848,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 43.5,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523935.686518,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.5,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 20.7,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523936.721566,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.6,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523937.75975,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523938.799585,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523939.842755,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.8,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523940.883996,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.5,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523941.922316,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.6,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790523942.9651551,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.7,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523947.236202,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 40.2,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523948.302985,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 45.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 21666,
+          "cpu": 21.5,
+          "command": "/Users/networmix/.local/bin/claude"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523949.344488,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.5,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523950.386199,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.1,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523951.422843,
+      "external": [
+        {
+          "pid": 2947,
+          "cpu": 72.6,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 47.1,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523952.461507,
+      "external": [
+        {
+          "pid": 2947,
+          "cpu": 98.2,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 47.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 24.1,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523953.5031512,
+      "external": [
+        {
+          "pid": 2947,
+          "cpu": 98.7,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 49.4,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523954.545986,
+      "external": [
+        {
+          "pid": 2947,
+          "cpu": 99.9,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 48.0,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523955.588695,
+      "external": [
+        {
+          "pid": 2947,
+          "cpu": 99.1,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 46.2,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523956.630135,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523957.67241,
+      "external": [
+        {
+          "pid": 3069,
+          "cpu": 96.0,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 46.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "new",
+      "time": 1790523958.7160058,
+      "external": [
+        {
+          "pid": 3069,
+          "cpu": 99.0,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 46.7,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524050.332948,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 40.7,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524051.40797,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 42.8,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524052.447016,
+      "external": [
+        {
+          "pid": 69239,
+          "cpu": 125.7,
+          "command": "/usr/libexec/PerfPowerServices"
+        },
+        {
+          "pid": 590,
+          "cpu": 48.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 594,
+          "cpu": 20.0,
+          "command": "/usr/libexec/runningboardd"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524053.480768,
+      "external": [
+        {
+          "pid": 594,
+          "cpu": 54.4,
+          "command": "/usr/libexec/runningboardd"
+        },
+        {
+          "pid": 590,
+          "cpu": 47.6,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 69239,
+          "cpu": 38.7,
+          "command": "/usr/libexec/PerfPowerServices"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524054.523689,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 45.8,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524055.5663328,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.4,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 70968,
+          "cpu": 38.3,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524056.606952,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.1,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524057.647559,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524058.689538,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 44.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524059.722427,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.5,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524060.765074,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.4,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524061.806859,
+      "external": [
+        {
+          "pid": 70968,
+          "cpu": 62.6,
+          "command": "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)"
+        },
+        {
+          "pid": 590,
+          "cpu": 46.7,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524062.839403,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524063.873576,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.8,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524064.910801,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 47.2,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524065.943715,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 48.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524066.981729,
+      "external": [
+        {
+          "pid": 590,
+          "cpu": 46.7,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 8167,
+          "cpu": 27.5,
+          "command": "/Users/networmix/.local/state/fnm_multishells/70983_1790458684558/bin/node"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524068.026329,
+      "external": [
+        {
+          "pid": 8167,
+          "cpu": 207.7,
+          "command": "/Users/networmix/.local/state/fnm_multishells/70983_1790458684558/bin/node"
+        },
+        {
+          "pid": 590,
+          "cpu": 47.6,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524069.066752,
+      "external": [
+        {
+          "pid": 8167,
+          "cpu": 161.8,
+          "command": "/Users/networmix/.local/state/fnm_multishells/70983_1790458684558/bin/node"
+        },
+        {
+          "pid": 590,
+          "cpu": 47.3,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524070.111435,
+      "external": [
+        {
+          "pid": 8461,
+          "cpu": 89.7,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 46.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    },
+    {
+      "label": "old1",
+      "time": 1790524071.154356,
+      "external": [
+        {
+          "pid": 8461,
+          "cpu": 98.6,
+          "command": "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "pid": 590,
+          "cpu": 46.9,
+          "command": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        }
+      ]
+    }
+  ],
+  "discarded_attempts": [
+    {
+      "attempt": 1,
+      "medians_us": {
+        "old1": 191.75211675465107
+      },
+      "competing_processes": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+      ]
+    },
+    {
+      "attempt": 2,
+      "medians_us": {
+        "old1": 192.1938999556005,
+        "new": 152.5790668092668
+      },
+      "competing_processes": [
+        "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python"
+      ]
+    },
+    {
+      "attempt": 3,
+      "medians_us": {
+        "old1": 189.16564993560314
+      },
+      "competing_processes": [
+        "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "/Users/networmix/.local/state/fnm_multishells/70983_1790458684558/bin/node",
+        "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "/usr/libexec/PerfPowerServices"
+      ]
+    },
+    {
+      "attempt": 4,
+      "medians_us": {
+        "old1": 189.9757499806583
+      },
+      "competing_processes": [
+        "/Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "/System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XprotectService.xpc/Contents/MacOS/XprotectService",
+        "/usr/libexec/duetexpertd",
+        "/usr/libexec/searchpartyuseragent"
+      ]
+    },
+    {
+      "attempt": 5,
+      "medians_us": {
+        "old1": 192.57228365167975
+      },
+      "competing_processes": [
+        "/usr/libexec/searchpartyuseragent"
+      ]
+    }
+  ]
+}
