@@ -55,7 +55,6 @@ records and message payloads still undergo transitive validation.
 from __future__ import annotations
 
 import math
-import random
 from collections import deque
 from dataclasses import dataclass, fields, replace
 from typing import TYPE_CHECKING, Any
@@ -64,6 +63,7 @@ from netsim.model import contracts as c
 from netsim.model import derive, interfaces, nht, routing, srv6
 from netsim.model.addressing import MacAddress
 from netsim.model.network import mark_published
+from netsim.model.prng import Prng
 from netsim.model.state import (
     NetworkState,
     PMap,
@@ -109,7 +109,7 @@ class Context:
     connections: PMap[int, c.ConnectionView]
     timers: PMap[str, float]
     causes: tuple[c.Cause, ...]
-    rng: random.Random
+    rng: Prng
     stats: c.AgentStats
     _rows: PMap[int, tuple[c.RouteView, ...]]
     _fibs: PMap[int, Any]
@@ -568,13 +568,9 @@ class AgentRuntime:
                     counters.get('messages', 0),
                     counters.get('bytes', 0),
                 )
-        rng = random.Random()
-        if node.rng is None:
-            rng.seed(
-                f'{self.sim.network.seed}:{dev.config.seed}:{name}:{node.generation}'
-            )
-        else:
-            rng.setstate(node.rng)
+        rng = Prng.for_agent(
+            self.sim.network.seed, dev.config.seed, name, node.generation, node.rng
+        )
         return Context(
             now,
             device,
@@ -789,7 +785,7 @@ class AgentRuntime:
                     node,
                     state=output.state,
                     srdb_view=output.srdb_view,
-                    rng=ctx.rng.getstate(),
+                    rng=ctx.rng.getstate(),  # Reuses node.rng when no draws occurred.
                     receipt=receipt,
                     runs=node.runs + 1,
                     initialized=True,
