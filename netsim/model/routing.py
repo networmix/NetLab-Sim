@@ -335,7 +335,7 @@ def rib_apply(
             tables[plen] = table
         else:
             tables.pop(plen, None)
-    prefixes = FrozenPrefixTable._owned(rib.prefixes.bits, tables, rib.prefixes._masks)
+    prefixes = FrozenPrefixTable._owned(rib.prefixes.bits, tables)
     cb = rib.clients.builder()
     for client, b in client_builders.items():
         rows = b.build()

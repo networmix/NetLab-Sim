@@ -449,7 +449,7 @@ def test_bounded_prefix_probes_on_large_rib(diamond):
             return key in self.data
 
     tables = {length: Probes(table) for length, table in rib.prefixes._tables.items()}
-    indexed = FrozenPrefixTable._owned(32, tables, rib.prefixes._masks)
+    indexed = FrozenPrefixTable._owned(32, tables)
     rib = replace(rib, prefixes=indexed)
     state = replace(
         net.state,

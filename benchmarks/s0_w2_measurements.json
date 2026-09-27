@@ -1,0 +1,1077 @@
+{
+  "baseline": "0e5b299225372f394dd3505a09cd92127b33dfa7",
+  "python": "3.14.5 (main, May 10 2026, 10:21:34) [Clang 21.0.0 (clang-2100.0.123.102)]",
+  "runs": [
+    {
+      "case": "lookup",
+      "label": "old-1",
+      "uptime_before": "16:45  up 47 days, 21:21, 3 users, load averages: 3.10 3.74 4.20",
+      "uptime_after": "16:45  up 47 days, 21:21, 3 users, load averages: 3.09 3.73 4.19",
+      "processes_before": [
+        " 2517  98.9       00:04 /opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "  590  47.7 47-21:20:06 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70968  31.3    18:07:47 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942  10.3    18:07:48 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "57287   6.4       28:55 /Users/networmix/.local/bin/codex",
+        "99939   5.9       20:50 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "70969   3.8    18:07:47 /Applications/Superset.app/Contents/MacOS/Superset",
+        "36870   3.0    01:39:01 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "36779   2.0    01:39:03 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "  652   1.7 47-21:20:05 /usr/libexec/syspolicyd",
+        "95942   1.7 07-03:58:51 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+        "21666   1.7    16:57:21 /Users/networmix/.local/bin/claude"
+      ],
+      "processes_after": [
+        " 2517  98.2       00:09 /opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "  590  49.1 47-21:20:11 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        " 3036  18.6       00:00 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        " 3037  15.6       00:00 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "70968  14.6    18:07:52 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942  10.8    18:07:53 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        " 1402   7.1 47-21:19:27 /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ATS.framework/Support/fontd",
+        "95916   6.1 07-03:58:57 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "36779   4.5    01:39:08 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "99939   4.4       20:55 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "21666   4.2    16:57:26 /Users/networmix/.local/bin/claude",
+        "36870   2.7    01:39:06 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+      ],
+      "source": "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/__init__.py",
+      "data": {
+        "ipv4/host/lookup": {
+          "median_ns": 208.53265380859375,
+          "samples_ns": [
+            208.2503662109375,
+            208.34795379638672,
+            208.6051254272461,
+            209.26189422607422,
+            210.28741455078125,
+            208.0510482788086,
+            208.27230072021484,
+            208.53265380859375,
+            208.75135803222656
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            32
+          ]
+        },
+        "ipv4/host/lookup_iter": {
+          "median_ns": 203.95565032958984,
+          "samples_ns": [
+            204.38162231445312,
+            203.6765365600586,
+            205.16649627685547,
+            203.17713165283203,
+            204.14797973632812,
+            204.12063598632812,
+            203.95565032958984,
+            203.643798828125,
+            203.73979949951172
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            32
+          ]
+        },
+        "ipv4/mixed/lookup": {
+          "median_ns": 379.78617095947266,
+          "samples_ns": [
+            385.52347564697266,
+            379.8532485961914,
+            377.471923828125,
+            376.35357666015625,
+            380.71791076660156,
+            376.89844512939453,
+            392.41981506347656,
+            377.7481689453125,
+            379.78617095947266
+          ],
+          "matches": 131072,
+          "prefixes": 860,
+          "lengths": [
+            32,
+            24,
+            16,
+            8,
+            0
+          ]
+        },
+        "ipv4/mixed/lookup_iter": {
+          "median_ns": 470.95584869384766,
+          "samples_ns": [
+            461.40415954589844,
+            467.91680908203125,
+            471.6698303222656,
+            470.95584869384766,
+            474.3887634277344,
+            471.83927154541016,
+            469.6966781616211,
+            474.1382598876953,
+            466.3070068359375
+          ],
+          "matches": 240512,
+          "prefixes": 860,
+          "lengths": [
+            32,
+            24,
+            16,
+            8,
+            0
+          ]
+        },
+        "ipv4/miss/lookup": {
+          "median_ns": 383.7887420654297,
+          "samples_ns": [
+            377.3543014526367,
+            383.23497772216797,
+            387.9680633544922,
+            384.1390609741211,
+            383.7887420654297,
+            383.39678955078125,
+            377.9792785644531,
+            384.30340576171875,
+            385.18333435058594
+          ],
+          "matches": 0,
+          "prefixes": 859,
+          "lengths": [
+            32,
+            24,
+            16,
+            8
+          ]
+        },
+        "ipv4/miss/lookup_iter": {
+          "median_ns": 349.93712615966797,
+          "samples_ns": [
+            348.7984313964844,
+            351.05228424072266,
+            349.4291305541992,
+            350.87744140625,
+            354.4635772705078,
+            349.93712615966797,
+            348.2344970703125,
+            350.24515533447266,
+            347.2550735473633
+          ],
+          "matches": 0,
+          "prefixes": 859,
+          "lengths": [
+            32,
+            24,
+            16,
+            8
+          ]
+        },
+        "ipv6/host/lookup": {
+          "median_ns": 220.6719741821289,
+          "samples_ns": [
+            220.6719741821289,
+            219.8975830078125,
+            220.4106674194336,
+            219.86453247070312,
+            219.29105377197266,
+            221.19998931884766,
+            223.85342407226562,
+            222.89498138427734,
+            225.47118377685547
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            128
+          ]
+        },
+        "ipv6/host/lookup_iter": {
+          "median_ns": 211.40129852294922,
+          "samples_ns": [
+            212.06982421875,
+            208.43950653076172,
+            211.38954162597656,
+            210.66348266601562,
+            214.35546875,
+            212.34703063964844,
+            213.29498291015625,
+            210.33795928955078,
+            211.40129852294922
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            128
+          ]
+        },
+        "ipv6/mixed/lookup": {
+          "median_ns": 402.1905212402344,
+          "samples_ns": [
+            405.6685791015625,
+            405.28519439697266,
+            401.67872619628906,
+            401.9314422607422,
+            404.9355239868164,
+            401.7569274902344,
+            403.1607360839844,
+            401.3710021972656,
+            402.1905212402344
+          ],
+          "matches": 131072,
+          "prefixes": 1025,
+          "lengths": [
+            128,
+            64,
+            48,
+            32,
+            0
+          ]
+        },
+        "ipv6/mixed/lookup_iter": {
+          "median_ns": 478.63228607177734,
+          "samples_ns": [
+            478.63228607177734,
+            487.35840606689453,
+            478.8074493408203,
+            478.21744537353516,
+            478.6252975463867,
+            479.7964096069336,
+            475.97566986083984,
+            475.98775482177734,
+            478.973388671875
+          ],
+          "matches": 196608,
+          "prefixes": 1025,
+          "lengths": [
+            128,
+            64,
+            48,
+            32,
+            0
+          ]
+        },
+        "ipv6/miss/lookup": {
+          "median_ns": 395.42738342285156,
+          "samples_ns": [
+            393.70059967041016,
+            397.9457244873047,
+            394.40187072753906,
+            395.17943572998047,
+            395.45281982421875,
+            395.8101272583008,
+            395.42738342285156,
+            393.52735137939453,
+            395.4289779663086
+          ],
+          "matches": 0,
+          "prefixes": 1024,
+          "lengths": [
+            128,
+            64,
+            48,
+            32
+          ]
+        },
+        "ipv6/miss/lookup_iter": {
+          "median_ns": 360.7654571533203,
+          "samples_ns": [
+            360.13062286376953,
+            360.6685028076172,
+            360.5979309082031,
+            362.0560989379883,
+            358.9290008544922,
+            362.7646789550781,
+            363.8331069946289,
+            361.5605010986328,
+            360.7654571533203
+          ],
+          "matches": 0,
+          "prefixes": 1024,
+          "lengths": [
+            128,
+            64,
+            48,
+            32
+          ]
+        }
+      }
+    },
+    {
+      "case": "lookup",
+      "label": "new",
+      "uptime_before": "16:45  up 47 days, 21:21, 3 users, load averages: 3.09 3.73 4.19",
+      "uptime_after": "16:46  up 47 days, 21:21, 3 users, load averages: 3.08 3.71 4.18",
+      "processes_before": [
+        " 2517  98.2       00:09 /opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python",
+        "  590  49.1 47-21:20:11 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        " 3036  18.6       00:00 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        " 3037  15.6       00:00 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "70968  14.6    18:07:52 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942  10.8    18:07:53 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        " 1402   7.1 47-21:19:27 /System/Library/Frameworks/ApplicationServices.framework/Frameworks/ATS.framework/Support/fontd",
+        "95916   6.1 07-03:58:57 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "36779   4.5    01:39:08 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "99939   4.4       20:55 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "21666   4.2    16:57:26 /Users/networmix/.local/bin/claude",
+        "36870   2.7    01:39:06 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+      ],
+      "processes_after": [
+        "  590  40.9 47-21:20:16 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "    1  18.3 47-21:21:14 /sbin/launchd",
+        "70968  15.7    18:07:57 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942  10.5    18:07:58 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.7       21:00 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "70969   3.7    18:07:57 /Applications/Superset.app/Contents/MacOS/Superset",
+        "36779   2.8    01:39:13 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "36870   2.4    01:39:11 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "95942   1.8 07-03:59:01 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+        "21666   1.4    16:57:31 /Users/networmix/.local/bin/claude",
+        "  705   1.1 47-21:20:14 /System/Library/DriverExtensions/com.apple.DriverKit-AppleBCMWLAN.dext/com.apple.DriverKit-AppleBCMWLAN",
+        "57287   1.0       29:05 /Users/networmix/.local/bin/codex"
+      ],
+      "source": "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/__init__.py",
+      "data": {
+        "ipv4/host/lookup": {
+          "median_ns": 131.61404418945312,
+          "samples_ns": [
+            130.66673278808594,
+            132.78929138183594,
+            131.82290649414062,
+            131.47767639160156,
+            131.86136627197266,
+            131.24370574951172,
+            131.61404418945312,
+            130.50206756591797,
+            131.8492889404297
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            32
+          ]
+        },
+        "ipv4/host/lookup_iter": {
+          "median_ns": 179.73899841308594,
+          "samples_ns": [
+            178.76529693603516,
+            179.09622192382812,
+            179.51043701171875,
+            179.73899841308594,
+            178.9143829345703,
+            179.95071411132812,
+            179.86328887939453,
+            180.43804168701172,
+            180.89167022705078
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            32
+          ]
+        },
+        "ipv4/mixed/lookup": {
+          "median_ns": 302.2712097167969,
+          "samples_ns": [
+            303.8927764892578,
+            299.70613861083984,
+            302.2712097167969,
+            301.58329010009766,
+            301.0880126953125,
+            303.33995819091797,
+            299.38634490966797,
+            302.7458190917969,
+            308.8083267211914
+          ],
+          "matches": 131072,
+          "prefixes": 860,
+          "lengths": [
+            32,
+            24,
+            16,
+            8,
+            0
+          ]
+        },
+        "ipv4/mixed/lookup_iter": {
+          "median_ns": 456.16595458984375,
+          "samples_ns": [
+            457.43529510498047,
+            458.2837448120117,
+            454.4623718261719,
+            456.16595458984375,
+            456.8179397583008,
+            455.62998962402344,
+            457.60377502441406,
+            455.46277618408203,
+            452.1166458129883
+          ],
+          "matches": 240512,
+          "prefixes": 860,
+          "lengths": [
+            32,
+            24,
+            16,
+            8,
+            0
+          ]
+        },
+        "ipv4/miss/lookup": {
+          "median_ns": 307.82222747802734,
+          "samples_ns": [
+            304.80448150634766,
+            307.4487075805664,
+            308.0946578979492,
+            307.82222747802734,
+            308.0705032348633,
+            305.59571838378906,
+            304.8957214355469,
+            308.71327209472656,
+            309.3589172363281
+          ],
+          "matches": 0,
+          "prefixes": 859,
+          "lengths": [
+            32,
+            24,
+            16,
+            8
+          ]
+        },
+        "ipv4/miss/lookup_iter": {
+          "median_ns": 334.98636627197266,
+          "samples_ns": [
+            334.98636627197266,
+            334.2606201171875,
+            334.85889434814453,
+            334.31371307373047,
+            338.98004150390625,
+            336.40258026123047,
+            338.0711898803711,
+            335.2950439453125,
+            331.62467193603516
+          ],
+          "matches": 0,
+          "prefixes": 859,
+          "lengths": [
+            32,
+            24,
+            16,
+            8
+          ]
+        },
+        "ipv6/host/lookup": {
+          "median_ns": 141.9979705810547,
+          "samples_ns": [
+            141.04747772216797,
+            140.72544860839844,
+            139.87381744384766,
+            138.98340606689453,
+            141.9979705810547,
+            145.0936050415039,
+            143.5384750366211,
+            143.00282287597656,
+            143.66563415527344
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            128
+          ]
+        },
+        "ipv6/host/lookup_iter": {
+          "median_ns": 190.77332305908203,
+          "samples_ns": [
+            191.40020751953125,
+            201.82640838623047,
+            189.7748260498047,
+            190.77332305908203,
+            189.83777618408203,
+            190.6855926513672,
+            190.90938568115234,
+            190.54794311523438,
+            192.11610412597656
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            128
+          ]
+        },
+        "ipv6/mixed/lookup": {
+          "median_ns": 339.5366668701172,
+          "samples_ns": [
+            339.5509719848633,
+            339.5366668701172,
+            339.494384765625,
+            339.59102630615234,
+            340.1654586791992,
+            340.6651840209961,
+            337.4341354370117,
+            338.8710021972656,
+            337.07618713378906
+          ],
+          "matches": 131072,
+          "prefixes": 1025,
+          "lengths": [
+            128,
+            64,
+            48,
+            32,
+            0
+          ]
+        },
+        "ipv6/mixed/lookup_iter": {
+          "median_ns": 494.73094940185547,
+          "samples_ns": [
+            493.97945404052734,
+            495.91636657714844,
+            497.03343963623047,
+            497.0315246582031,
+            498.14351654052734,
+            494.73094940185547,
+            492.5661087036133,
+            492.231689453125,
+            492.77337646484375
+          ],
+          "matches": 196608,
+          "prefixes": 1025,
+          "lengths": [
+            128,
+            64,
+            48,
+            32,
+            0
+          ]
+        },
+        "ipv6/miss/lookup": {
+          "median_ns": 329.07804107666016,
+          "samples_ns": [
+            328.1841278076172,
+            331.49305725097656,
+            329.07804107666016,
+            328.25597381591797,
+            332.45149993896484,
+            331.5858840942383,
+            328.89652252197266,
+            329.3635025024414,
+            328.6202697753906
+          ],
+          "matches": 0,
+          "prefixes": 1024,
+          "lengths": [
+            128,
+            64,
+            48,
+            32
+          ]
+        },
+        "ipv6/miss/lookup_iter": {
+          "median_ns": 367.5495834350586,
+          "samples_ns": [
+            369.3040237426758,
+            368.82654571533203,
+            369.6015625,
+            368.2842254638672,
+            366.6111602783203,
+            366.0389633178711,
+            367.5495834350586,
+            366.7780532836914,
+            367.27491760253906
+          ],
+          "matches": 0,
+          "prefixes": 1024,
+          "lengths": [
+            128,
+            64,
+            48,
+            32
+          ]
+        }
+      }
+    },
+    {
+      "case": "lookup",
+      "label": "old-2",
+      "uptime_before": "16:46  up 47 days, 21:21, 3 users, load averages: 3.08 3.71 4.18",
+      "uptime_after": "16:46  up 47 days, 21:21, 3 users, load averages: 2.92 3.67 4.16",
+      "processes_before": [
+        "  590  40.9 47-21:20:16 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "    1  18.3 47-21:21:14 /sbin/launchd",
+        "70968  16.1    18:07:57 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942  10.6    18:07:58 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.8       21:00 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "70969   2.9    18:07:57 /Applications/Superset.app/Contents/MacOS/Superset",
+        "36779   2.4    01:39:13 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "36870   2.4    01:39:11 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "95942   1.8 07-03:59:01 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+        "  705   1.1 47-21:20:14 /System/Library/DriverExtensions/com.apple.DriverKit-AppleBCMWLAN.dext/com.apple.DriverKit-AppleBCMWLAN",
+        "21666   1.0    16:57:31 /Users/networmix/.local/bin/claude",
+        "68572   1.0       28:24 /Users/networmix/.local/bin/codex"
+      ],
+      "processes_after": [
+        " 3379  88.2       00:00 venv/bin/python",
+        "  590  40.9 47-21:20:21 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70969  32.2    18:08:02 /Applications/Superset.app/Contents/MacOS/Superset",
+        "70968  10.7    18:08:02 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942   6.6    18:08:03 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.5       21:05 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "36870   2.8    01:39:16 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "  554   2.1 47-21:20:21 /usr/libexec/opendirectoryd",
+        "36779   2.0    01:39:18 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "21666   2.0    16:57:36 /Users/networmix/.local/bin/claude",
+        "95942   1.8 07-03:59:06 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+        "70087   1.6    18:08:30 /Applications/iTerm.app/Contents/MacOS/iTerm2"
+      ],
+      "source": "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/__init__.py",
+      "data": {
+        "ipv4/host/lookup": {
+          "median_ns": 214.51219177246094,
+          "samples_ns": [
+            214.51219177246094,
+            214.7420196533203,
+            216.45227813720703,
+            215.3339385986328,
+            215.5736312866211,
+            213.78358459472656,
+            212.77681732177734,
+            210.19109344482422,
+            211.0595703125
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            32
+          ]
+        },
+        "ipv4/host/lookup_iter": {
+          "median_ns": 201.9977569580078,
+          "samples_ns": [
+            202.13540649414062,
+            201.6604766845703,
+            204.5418472290039,
+            201.8890380859375,
+            201.97296142578125,
+            204.34284210205078,
+            202.22759246826172,
+            201.9977569580078,
+            201.0478973388672
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            32
+          ]
+        },
+        "ipv4/mixed/lookup": {
+          "median_ns": 382.19261169433594,
+          "samples_ns": [
+            383.95182037353516,
+            376.9528045654297,
+            383.8624954223633,
+            382.19261169433594,
+            383.2120895385742,
+            377.41343688964844,
+            382.4478759765625,
+            377.37560272216797,
+            380.1476135253906
+          ],
+          "matches": 131072,
+          "prefixes": 860,
+          "lengths": [
+            32,
+            24,
+            16,
+            8,
+            0
+          ]
+        },
+        "ipv4/mixed/lookup_iter": {
+          "median_ns": 471.52042388916016,
+          "samples_ns": [
+            472.52782440185547,
+            470.08069610595703,
+            468.88987731933594,
+            469.2201614379883,
+            469.635009765625,
+            471.52042388916016,
+            476.00682830810547,
+            472.98526763916016,
+            475.5140914916992
+          ],
+          "matches": 240512,
+          "prefixes": 860,
+          "lengths": [
+            32,
+            24,
+            16,
+            8,
+            0
+          ]
+        },
+        "ipv4/miss/lookup": {
+          "median_ns": 379.35289001464844,
+          "samples_ns": [
+            379.37355041503906,
+            378.00121307373047,
+            375.38973236083984,
+            379.5757293701172,
+            378.6274642944336,
+            379.35289001464844,
+            376.77860260009766,
+            379.6879425048828,
+            380.4877624511719
+          ],
+          "matches": 0,
+          "prefixes": 859,
+          "lengths": [
+            32,
+            24,
+            16,
+            8
+          ]
+        },
+        "ipv4/miss/lookup_iter": {
+          "median_ns": 346.36083984375,
+          "samples_ns": [
+            346.44063568115234,
+            348.2974395751953,
+            345.0625686645508,
+            345.72601318359375,
+            345.89418029785156,
+            345.31085205078125,
+            346.36083984375,
+            354.8587188720703,
+            353.1634063720703
+          ],
+          "matches": 0,
+          "prefixes": 859,
+          "lengths": [
+            32,
+            24,
+            16,
+            8
+          ]
+        },
+        "ipv6/host/lookup": {
+          "median_ns": 223.0717315673828,
+          "samples_ns": [
+            224.13699340820312,
+            224.76800537109375,
+            223.0717315673828,
+            223.30347442626953,
+            222.8129653930664,
+            223.02786254882812,
+            223.21128845214844,
+            222.6292266845703,
+            220.98001098632812
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            128
+          ]
+        },
+        "ipv6/host/lookup_iter": {
+          "median_ns": 210.87360382080078,
+          "samples_ns": [
+            210.4924545288086,
+            211.92105865478516,
+            210.59608459472656,
+            211.2124786376953,
+            211.15684509277344,
+            210.87360382080078,
+            210.28995513916016,
+            208.80603790283203,
+            210.98741149902344
+          ],
+          "matches": 131072,
+          "prefixes": 1024,
+          "lengths": [
+            128
+          ]
+        },
+        "ipv6/mixed/lookup": {
+          "median_ns": 416.4222106933594,
+          "samples_ns": [
+            416.22161865234375,
+            416.32080078125,
+            416.4222106933594,
+            414.30823516845703,
+            417.0211181640625,
+            418.2284698486328,
+            420.9760055541992,
+            417.0414581298828,
+            415.35028076171875
+          ],
+          "matches": 131072,
+          "prefixes": 1025,
+          "lengths": [
+            128,
+            64,
+            48,
+            32,
+            0
+          ]
+        },
+        "ipv6/mixed/lookup_iter": {
+          "median_ns": 504.05025482177734,
+          "samples_ns": [
+            504.61547088623047,
+            505.14539337158203,
+            504.4415817260742,
+            502.62196350097656,
+            501.79640197753906,
+            502.0001754760742,
+            505.46741485595703,
+            504.05025482177734,
+            501.7229690551758
+          ],
+          "matches": 196608,
+          "prefixes": 1025,
+          "lengths": [
+            128,
+            64,
+            48,
+            32,
+            0
+          ]
+        },
+        "ipv6/miss/lookup": {
+          "median_ns": 389.9046630859375,
+          "samples_ns": [
+            385.42874908447266,
+            388.46778869628906,
+            396.7498092651367,
+            393.7679901123047,
+            389.84075927734375,
+            389.9046630859375,
+            390.15674591064453,
+            390.02100372314453,
+            388.9668731689453
+          ],
+          "matches": 0,
+          "prefixes": 1024,
+          "lengths": [
+            128,
+            64,
+            48,
+            32
+          ]
+        },
+        "ipv6/miss/lookup_iter": {
+          "median_ns": 358.3046646118164,
+          "samples_ns": [
+            355.9805603027344,
+            355.51102447509766,
+            358.3046646118164,
+            361.94261169433594,
+            357.7369079589844,
+            357.2403564453125,
+            360.23839569091797,
+            362.8276138305664,
+            358.4280014038086
+          ],
+          "matches": 0,
+          "prefixes": 1024,
+          "lengths": [
+            128,
+            64,
+            48,
+            32
+          ]
+        }
+      }
+    },
+    {
+      "case": "converge",
+      "label": "old-1",
+      "uptime_before": "16:46  up 47 days, 21:21, 3 users, load averages: 2.92 3.67 4.16",
+      "uptime_after": "16:46  up 47 days, 21:22, 3 users, load averages: 3.05 3.63 4.13",
+      "processes_before": [
+        " 3379  91.9       00:00 venv/bin/python",
+        "  590  41.2 47-21:20:21 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70969  25.2    18:08:02 /Applications/Superset.app/Contents/MacOS/Superset",
+        "70968   8.8    18:08:02 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "99939   6.8       21:05 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "70942   5.7    18:08:03 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "  554   4.1 47-21:20:21 /usr/libexec/opendirectoryd",
+        "95916   3.3 07-03:59:07 /Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+        "36870   2.8    01:39:16 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "  579   2.5 47-21:20:21 /usr/sbin/notifyd",
+        "  513   2.1 47-21:20:21 /usr/libexec/logd",
+        "36779   2.0    01:39:18 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+      ],
+      "processes_after": [
+        "  590  47.0 47-21:20:53 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70968  13.9    18:08:34 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942   8.7    18:08:35 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "21666   6.4    16:58:08 /Users/networmix/.local/bin/claude",
+        "99939   5.8       21:37 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        " 5838   2.7       00:00 (gh)",
+        "36779   2.5    01:39:50 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "36870   2.4    01:39:48 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "29008   1.9    17:38:58 /System/Library/Frameworks/WebKit.framework/Versions/A/XPCServices/com.apple.WebKit.WebContent.xpc/Contents/MacOS/com.apple.WebKit.WebContent",
+        "70969   1.9    18:08:34 /Applications/Superset.app/Contents/MacOS/Superset",
+        "28991   1.8    17:38:59 /Applications/Muse.app/Contents/MacOS/Muse",
+        "95942   1.8 07-03:59:38 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+      ],
+      "source": "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/__init__.py",
+      "data": {
+        "devices": 2000,
+        "retained_bytes": 50885524,
+        "bytes_per_device": 25442.762,
+        "top_allocations": [
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/addressing.py:178: size=25.4 MiB (+25.4 MiB), count=640017 (+640017), average=42 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/lpm.py:193: size=5438 KiB (+5438 KiB), count=8002 (+8002), average=696 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:93: size=2110 KiB (+2110 KiB), count=26006 (+26006), average=83 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:403: size=1875 KiB (+1875 KiB), count=12000 (+12000), average=160 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:104: size=1641 KiB (+1641 KiB), count=42000 (+42000), average=40 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:236: size=1314 KiB (+1314 KiB), count=12016 (+12016), average=112 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:375: size=1309 KiB (+1309 KiB), count=18567 (+18567), average=72 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/lpm.py:226: size=1125 KiB (+1125 KiB), count=12000 (+12000), average=96 B",
+          "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py:1812: size=844 KiB (+844 KiB), count=8002 (+8002), average=108 B",
+          "<string>:8: size=844 KiB (+844 KiB), count=4000 (+4000), average=216 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/routing.py:150: size=625 KiB (+625 KiB), count=8000 (+8000), average=80 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/lpm.py:80: size=562 KiB (+562 KiB), count=8000 (+8000), average=72 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/derive.py:441: size=469 KiB (+469 KiB), count=7996 (+7996), average=60 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/derive.py:561: size=375 KiB (+375 KiB), count=5998 (+5998), average=64 B"
+        ],
+        "ribs": {
+          "4": 1,
+          "6": 0
+        },
+        "fibs": {
+          "4": 1,
+          "6": 0
+        }
+      }
+    },
+    {
+      "case": "converge",
+      "label": "new",
+      "uptime_before": "16:46  up 47 days, 21:22, 3 users, load averages: 3.05 3.63 4.13",
+      "uptime_after": "16:46  up 47 days, 21:22, 3 users, load averages: 3.33 3.66 4.13",
+      "processes_before": [
+        "  590  47.0 47-21:20:53 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70968  14.6    18:08:34 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942   9.0    18:08:35 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.8       21:37 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "28991   4.8    17:38:59 /Applications/Muse.app/Contents/MacOS/Muse",
+        "21666   4.1    16:58:08 /Users/networmix/.local/bin/claude",
+        "36870   3.7    01:39:48 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "36779   3.3    01:39:50 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "70969   1.9    18:08:34 /Applications/Superset.app/Contents/MacOS/Superset",
+        "95942   1.8 07-03:59:38 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+        "  705   1.5 47-21:20:51 /System/Library/DriverExtensions/com.apple.DriverKit-AppleBCMWLAN.dext/com.apple.DriverKit-AppleBCMWLAN",
+        "68572   1.3       29:01 /Users/networmix/.local/bin/codex"
+      ],
+      "processes_after": [
+        "70968  34.1    18:08:51 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "  590  33.7 47-21:21:10 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70942   5.9    18:08:52 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.3       21:54 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "  593   4.6 47-21:21:10 /usr/sbin/coreaudiod",
+        "21666   4.3    16:58:25 /Users/networmix/.local/bin/claude",
+        "70969   2.4    18:08:51 /Applications/Superset.app/Contents/MacOS/Superset",
+        "36870   2.2    01:40:05 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "36779   1.9    01:40:07 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "68572   1.9       29:18 /Users/networmix/.local/bin/codex",
+        "70934   1.7    18:08:53 /Applications/Superset.app/Contents/MacOS/Superset",
+        "95942   1.7 07-03:59:55 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+      ],
+      "source": "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/__init__.py",
+      "data": {
+        "devices": 2000,
+        "retained_bytes": 19205249,
+        "bytes_per_device": 9602.6245,
+        "top_allocations": [
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/state.py:93: size=2110 KiB (+2110 KiB), count=26006 (+26006), average=83 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/state.py:403: size=1875 KiB (+1875 KiB), count=12000 (+12000), average=160 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/state.py:104: size=1641 KiB (+1641 KiB), count=42000 (+42000), average=40 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/state.py:236: size=1314 KiB (+1314 KiB), count=12016 (+12016), average=112 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/state.py:375: size=1309 KiB (+1309 KiB), count=18567 (+18567), average=72 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/lpm.py:233: size=1125 KiB (+1125 KiB), count=12000 (+12000), average=96 B",
+          "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py:1812: size=844 KiB (+844 KiB), count=8002 (+8002), average=108 B",
+          "<string>:8: size=844 KiB (+844 KiB), count=4000 (+4000), average=216 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/routing.py:150: size=625 KiB (+625 KiB), count=8000 (+8000), average=80 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/lpm.py:76: size=562 KiB (+562 KiB), count=8000 (+8000), average=72 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/derive.py:441: size=469 KiB (+469 KiB), count=7996 (+7996), average=60 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/derive.py:561: size=375 KiB (+375 KiB), count=5998 (+5998), average=64 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/routing.py:911: size=312 KiB (+312 KiB), count=4000 (+4000), average=80 B",
+          "/Users/networmix/.superset/worktrees/NetSim/s0/masks-retention/netsim/model/routing.py:335: size=312 KiB (+312 KiB), count=2000 (+2000), average=160 B"
+        ],
+        "ribs": {
+          "4": 1,
+          "6": 0
+        },
+        "fibs": {
+          "4": 1,
+          "6": 0
+        }
+      }
+    },
+    {
+      "case": "converge",
+      "label": "old-2",
+      "uptime_before": "16:46  up 47 days, 21:22, 3 users, load averages: 3.33 3.66 4.13",
+      "uptime_after": "16:47  up 47 days, 21:23, 3 users, load averages: 2.86 3.51 4.06",
+      "processes_before": [
+        "  590  33.7 47-21:21:10 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70968  25.1    18:08:51 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942   5.9    18:08:52 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.4       21:54 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "  593   4.6 47-21:21:10 /usr/sbin/coreaudiod",
+        " 1052   4.0 47-21:20:49 /System/Library/PrivateFrameworks/TCC.framework/Support/tccd",
+        "21666   2.7    16:58:25 /Users/networmix/.local/bin/claude",
+        "70969   2.5    18:08:51 /Applications/Superset.app/Contents/MacOS/Superset",
+        "36870   2.3    01:40:05 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        "36779   2.0    01:40:07 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "68572   2.0       29:18 /Users/networmix/.local/bin/codex",
+        "95942   1.8 07-03:59:55 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+      ],
+      "processes_after": [
+        "  590  47.2 47-21:21:42 /System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer",
+        "70968  10.5    18:09:23 /Applications/Superset.app/Contents/Frameworks/Superset Helper (Renderer).app/Contents/MacOS/Superset Helper (Renderer)",
+        "70942   5.8    18:09:24 /Applications/Superset.app/Contents/Frameworks/Superset Helper.app/Contents/MacOS/Superset Helper",
+        "99939   5.7       22:26 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)",
+        "36870   2.6    01:40:37 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)",
+        " 7481   2.4       00:03 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared",
+        "36779   2.4    01:40:39 /Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/154.0.8037.57/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)",
+        "70087   1.8    18:09:51 /Applications/iTerm.app/Contents/MacOS/iTerm2",
+        "95942   1.8 07-04:00:27 /Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.48/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper",
+        "70969   1.7    18:09:23 /Applications/Superset.app/Contents/MacOS/Superset",
+        "  842   1.4 47-21:21:25 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds_stores",
+        "68572   1.2       29:50 /Users/networmix/.local/bin/codex"
+      ],
+      "source": "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/__init__.py",
+      "data": {
+        "devices": 2000,
+        "retained_bytes": 50885524,
+        "bytes_per_device": 25442.762,
+        "top_allocations": [
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/addressing.py:178: size=25.4 MiB (+25.4 MiB), count=640017 (+640017), average=42 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/lpm.py:193: size=5438 KiB (+5438 KiB), count=8002 (+8002), average=696 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:93: size=2110 KiB (+2110 KiB), count=26006 (+26006), average=83 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:403: size=1875 KiB (+1875 KiB), count=12000 (+12000), average=160 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:104: size=1641 KiB (+1641 KiB), count=42000 (+42000), average=40 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:236: size=1314 KiB (+1314 KiB), count=12016 (+12016), average=112 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/state.py:375: size=1309 KiB (+1309 KiB), count=18567 (+18567), average=72 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/lpm.py:226: size=1125 KiB (+1125 KiB), count=12000 (+12000), average=96 B",
+          "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/dataclasses.py:1812: size=844 KiB (+844 KiB), count=8002 (+8002), average=108 B",
+          "<string>:8: size=844 KiB (+844 KiB), count=4000 (+4000), average=216 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/routing.py:150: size=625 KiB (+625 KiB), count=8000 (+8000), average=80 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/lpm.py:80: size=562 KiB (+562 KiB), count=8000 (+8000), average=72 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/derive.py:441: size=469 KiB (+469 KiB), count=7996 (+7996), average=60 B",
+          "/var/folders/8q/438f_q5s0ys8nlnvjqkf953m0000gn/T/netsim-s0-w2-s9w_p_vu/netsim/model/derive.py:561: size=375 KiB (+375 KiB), count=5998 (+5998), average=64 B"
+        ],
+        "ribs": {
+          "4": 1,
+          "6": 0
+        },
+        "fibs": {
+          "4": 1,
+          "6": 0
+        }
+      }
+    }
+  ]
+}

@@ -39,8 +39,8 @@ class Simulation:
         keep_roots: int | None = 256,
         keep_deltas: int = 64,
         extract_events: bool = True,
-        keep_events: int | None = None,
-        keep_records: int | None = None,
+        keep_events: int | None = 100_000,
+        keep_records: int | None = 10_000,
         keep_arrays: bool = True,
         keep_reports: bool = False,
     ) -> None:

@@ -577,8 +577,8 @@ class Study:
             'arrays': False,
             'reports': False,
             'timeline': False,
-            'events': None,
-            'records': None,
+            'events': 100_000,
+            'records': 10_000,
             **self.keep,
         }
         return Workload(
@@ -621,8 +621,8 @@ class Study:
             keep_deltas=self.keep.get('deltas', 0),
             keep_arrays=self.keep.get('arrays', False),
             keep_reports=self.keep.get('reports', False),
-            keep_events=self.keep.get('events'),
-            keep_records=self.keep.get('records'),
+            keep_events=self.keep.get('events', 100_000),
+            keep_records=self.keep.get('records', 10_000),
         )
         sim._study_observation = _StudyObservation(sim, start)  # type: ignore[attr-defined]
         return sim
