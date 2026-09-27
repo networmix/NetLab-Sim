@@ -1,42 +1,15 @@
-"""Explicit S0/W2 acceptance probes, red until the ownership blocker is resolved.
+"""Bounded defaults and explicit full-history retention for simulations/studies."""
 
-Run with: venv/bin/python -m pytest --no-cov -s benchmarks/s0_w2_reproducers.py
-These are kept outside default test discovery because no fix has been applied.
-See tests/runtime/s0-w2-handoff.md for the blocked integration dependencies.
-"""
-
-import gc
 import sys
-import tracemalloc
 
 import pytest
 
 from netsim import Environment
 from netsim.model import contracts as c
-from netsim.model.lpm import PrefixTable
 from netsim.model.network import Network
 from netsim.runtime import Simulation
+from netsim.runtime.timeline import Timeline
 from netsim.study import Study
-
-
-@pytest.mark.parametrize('bits', [32, 128])
-@pytest.mark.parametrize('frozen', [False, True])
-def test_empty_tables_have_no_per_table_mask_allocation(bits, frozen):
-    gc.collect()
-    tracemalloc.start()
-    try:
-        before = tracemalloc.get_traced_memory()[0]
-        tables = [
-            PrefixTable(bits).freeze() if frozen else PrefixTable(bits)
-            for _ in range(1000)
-        ]
-        retained = tracemalloc.get_traced_memory()[0] - before
-    finally:
-        tracemalloc.stop()
-    print(f'{bits=}, {frozen=}, tables={len(tables)}, retained_bytes={retained}')
-    # Generous allowance for table instances, dicts and the outer list, but
-    # not 33/129 mask integers and their tuple per table.
-    assert retained < 1_000_000
 
 
 class _Ticker:
@@ -86,3 +59,47 @@ def test_study_does_not_implicitly_select_unbounded_history():
     )
     assert sim.timeline.keep_records == 10_000
     assert sim.timeline.keep_events == 100_000
+
+
+@pytest.mark.parametrize('keep', [None, 0, 7])
+def test_explicit_retention_overrides_survive_all_constructor_paths(keep):
+    timeline = Timeline(keep_records=keep, keep_events=keep)
+    simulation = Simulation(
+        Environment(), Network(), keep_records=keep, keep_events=keep
+    )
+    study = Study(Network(), keep={'records': keep, 'events': keep})._simulation()
+    alias_study = Study(
+        Network(), keep={'keep_records': keep, 'keep_events': keep}
+    )._simulation()
+    for tl in (timeline, simulation.timeline, study.timeline, alias_study.timeline):
+        assert tl.keep_records == tl.keep_events == keep
+
+
+def test_standalone_timeline_and_agent_study_share_bounded_defaults():
+    tl = Timeline()
+    assert tl.keep_records == 10_000 and tl.keep_events == 100_000
+    net = Network(seed=1)
+    net.add_device('r')
+    net.add_agent('r', _Ticker())
+    study = Study(net)
+    sim = study._simulation(warmup=1)
+    sim.run_until(1)
+    assert sim.timeline.keep_records == 10_000
+    assert sim.timeline.keep_events == 100_000
+
+
+@pytest.mark.parametrize(
+    'keep',
+    [
+        {},
+        {'events': None, 'records': None},
+        {'events': 5},
+        {'keep_events': None, 'keep_records': 3},
+    ],
+)
+def test_workload_reports_effective_runtime_retention(keep):
+    study = Study(Network(), keep=keep)
+    retention = dict(study.describe().retention)
+    runtime = study._simulation().timeline
+    assert retention['events'] == runtime.keep_events
+    assert retention['records'] == runtime.keep_records

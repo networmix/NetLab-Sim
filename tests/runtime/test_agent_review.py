@@ -822,8 +822,8 @@ def test_classifier_accepts_audited_leaves_records_and_named_tuples():
     validate_admitted(value, value)
 
 
-def test_prefix_table_owns_exact_keys_and_masks_and_float_array_exact_bytes():
-    """RC4: keys, masks and array bytes never alias caller subclasses."""
+def test_prefix_table_owns_exact_keys_and_float_array_exact_bytes():
+    """RC4: keys and array bytes never alias caller subclasses."""
     from netsim.model.lpm import FrozenPrefixTable, PrefixTable
     from netsim.model.state import FloatArray, validate_immutable
 
@@ -838,10 +838,11 @@ def test_prefix_table_owns_exact_keys_and_masks_and_float_array_exact_bytes():
     (net, plen, _) = frozen.items()[0]
     assert type(net) is int and type(plen) is int
     validate_immutable(frozen)
-    masks = [0] * 33
-    owned = FrozenPrefixTable(32, {}, masks)  # type: ignore[arg-type]
-    masks[32] = 1
-    assert type(owned._masks) is tuple and owned._masks[32] == 0
+    rows = {key: 'ten'}
+    owned = FrozenPrefixTable(32, {8: rows})
+    rows[key] = 'changed'
+    assert owned.lookup(key) == (int(key), 8, 'ten')
+    validate_immutable(owned)
 
     class Blob(bytes):
         pass
@@ -1074,17 +1075,16 @@ def test_prefix_table_metadata_is_exact_even_for_empty_shards():
 
     length = Length(8)
     length.notes = [1]  # type: ignore[attr-defined]
-    masks = tuple(0 for _ in range(33))
-    table = FrozenPrefixTable(32, {length: {}}, masks)  # public constructor copies
+    table = FrozenPrefixTable(32, {length: {}})  # public constructor copies
     assert table.lengths() == () and len(table) == 0
     validate_immutable(table)
     # A table that somehow retains a subclass length is rejected by the walks.
-    raw = FrozenPrefixTable._owned(32, {length: {}}, masks)  # type: ignore[arg-type]
+    raw = FrozenPrefixTable._owned(32, {length: {}})  # type: ignore[arg-type]
     with pytest.raises(TypeError):
         validate_immutable(raw)
     with pytest.raises(TypeError):
         validate_admitted(raw, None)
-    filled = FrozenPrefixTable(32, {length: {Length(0): 'v'}}, masks)
+    filled = FrozenPrefixTable(32, {length: {Length(0): 'v'}})
     assert all(type(k) is int for k in filled.lengths())
     validate_immutable(filled)
 

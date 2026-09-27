@@ -129,11 +129,10 @@ def test_frozen_shards_are_not_writable():
 
 
 def test_frozen_table_copies_constructor_input():
-    from netsim.model.lpm import FrozenPrefixTable, PrefixTable
+    from netsim.model.lpm import FrozenPrefixTable
 
     tables = {32: {10: 'a'}}
-    masks = PrefixTable(32).freeze()._masks
-    frozen = FrozenPrefixTable(32, tables, masks)
+    frozen = FrozenPrefixTable(32, tables)
     tables[32][10] = 'hacked'
     tables[32][11] = 'extra'
     assert frozen.get(10, 32) == 'a' and frozen.get(11, 32) is None
@@ -143,10 +142,9 @@ def test_frozen_table_copies_constructor_input():
 def test_persistent_prefix_shards_keep_frozen_contract():
     from netsim.model.state import PMap
 
-    masks = PrefixTable(32).freeze()._masks
     rows = PMap({i: str(i) for i in range(1000)})
-    frozen = FrozenPrefixTable._owned(32, {32: rows}, masks)
-    copied = FrozenPrefixTable(32, {32: dict(rows.items())}, masks)
+    frozen = FrozenPrefixTable._owned(32, {32: rows})
+    copied = FrozenPrefixTable(32, {32: dict(rows.items())})
     assert frozen == copied and copied == frozen
     assert frozen.items() == copied.items()
     assert frozen.lookup(37) == (37, 32, '37')
@@ -156,9 +154,9 @@ def test_persistent_prefix_shards_keep_frozen_contract():
         view[32][37] = 'changed'
     with pytest.raises(TypeError):
         view[32] = {}
-    updated = FrozenPrefixTable._owned(32, {32: rows.set(37, 'changed')}, masks)
+    updated = FrozenPrefixTable._owned(32, {32: rows.set(37, 'changed')})
     assert frozen.get(37, 32) == copied.get(37, 32) == '37'
     assert updated != frozen and updated != copied and copied != updated
-    shorter = FrozenPrefixTable._owned(32, {32: rows.remove(37)}, masks)
+    shorter = FrozenPrefixTable._owned(32, {32: rows.remove(37)})
     assert shorter != frozen and shorter != copied and copied != shorter
-    assert FrozenPrefixTable._owned(32, {}, masks) != frozen
+    assert FrozenPrefixTable._owned(32, {}) != frozen

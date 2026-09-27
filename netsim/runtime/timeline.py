@@ -875,10 +875,11 @@ def _fib_events(
 class Timeline:
     """Append-only event log with bounded raw retention.
 
-    ``events`` holds every extracted event and ``records`` one entry per
-    commit, unless ``keep_events`` / ``keep_records`` budgets are set (then
-    the oldest are dropped and counted in ``dropped_events`` /
-    ``dropped_records``); ``deltas`` and ``roots`` are bounded deques
+    ``events`` holds extracted events and ``records`` one entry per commit.
+    Defaults retain 100,000 events and 10,000 records, with block-trim slack
+    of less than ``max(64, budget // 8)`` entries. The oldest are dropped
+    and counted in ``dropped_events`` / ``dropped_records``; explicit
+    ``None`` selects unbounded retention. ``deltas`` and ``roots`` are deques
     (defaults keep the last 64 deltas and the last root of the last 256
     timestamps).
     """
@@ -891,8 +892,8 @@ class Timeline:
         extract: bool = True,
         keep_reports: bool = False,
         keep_arrays: bool = True,
-        keep_events: int | None = None,
-        keep_records: int | None = None,
+        keep_events: int | None = 100_000,
+        keep_records: int | None = 10_000,
     ) -> None:
         self.events: list[Event] = []
         self.records: list[Record] = []
