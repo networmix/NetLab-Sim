@@ -1321,14 +1321,21 @@ def consumer_index(old: NetworkState, new: NetworkState) -> frozenset[str]:
     from netsim.model.state import diff_pmap
 
     delta = diff_pmap(old.devices, new.devices, by_identity=True)
-    consumers = set(old.srv6_consumers)
-    consumers.difference_update(delta.removed)
+    previous = old.srv6_consumers
+    removed = [name for name in delta.removed if name in previous]
+    added = []
     for name in delta.added + delta.changed:
         table = new.devices[name].srv6_policies
-        if table is not None and table.policies:
-            consumers.add(name)
-        else:
-            consumers.discard(name)
+        wanted = table is not None and bool(table.policies)
+        if wanted and name not in previous:
+            added.append(name)
+        elif not wanted and name in previous:
+            removed.append(name)
+    if not added and not removed:
+        return previous
+    consumers = set(previous)
+    consumers.difference_update(removed)
+    consumers.update(added)
     return canon(new.srv6_consumers, frozenset(consumers))
 
 

@@ -58,11 +58,42 @@ from netsim.model.state import (
     StateDelta,
     canon,
     check_name,
+    diff_pmap,
     validate_immutable,
 )
 
 DeltaHook = Callable[[float, Any, StateDelta], None]
 RouteSource = Callable[[NetworkState, float], NetworkState]
+
+
+def _locator_blocks(
+    old: NetworkState,
+    new: NetworkState,
+    blocks: PMap[tuple[str, str], tuple[int, int]],
+) -> PMap[tuple[str, str], tuple[int, int]]:
+    """Mirror locator blocks at update boundaries, visiting changed devices only.
+
+    This immutable validation index accompanies the committed root or staging
+    area. Builder operations cannot edit locators; pure updates can add, remove
+    or replace them (including whole devices/roots), so all such edits meet here.
+    """
+    changes = diff_pmap(old.devices, new.devices, by_identity=True)
+    result = blocks.builder()
+    for name in changes.removed + changes.added + changes.changed:
+        before, after = old.devices.get(name), new.devices.get(name)
+        a = before.srv6_sids if before is not None else None
+        b = after.srv6_sids if after is not None else None
+        if a is b or (a is not None and b is not None and a.locators is b.locators):
+            continue
+        if a is not None:
+            for locator in a.locators:
+                if b is None or locator not in b.locators:
+                    result.remove((name, locator))
+        if b is not None:
+            for locator, loc in b.locators.items():
+                if blocks.get((name, locator)) != loc.block:
+                    result.set((name, locator), loc.block)
+    return result.build()
 
 
 class _MapEdit:
@@ -154,8 +185,11 @@ class _Edits:
     top-level or per-device maps. Failed operations undo only their writes.
     """
 
-    def __init__(self, base: NetworkState) -> None:
+    def __init__(
+        self, base: NetworkState, locator_blocks: PMap[tuple[str, str], tuple[int, int]]
+    ) -> None:
         self.base = base
+        self.locator_blocks = locator_blocks
         self.undo: list[tuple[_MapEdit, Any, bool, Any]] = []
         self.devices = _MapEdit(base.devices, self)
         self.links = _MapEdit(base.links, self)
@@ -265,6 +299,7 @@ def published_failure(error: BaseException) -> bool:
 class Network:
     def __init__(self, *, seed: int = 0) -> None:
         self._state = NetworkState()
+        self._locator_blocks: PMap[tuple[str, str], tuple[int, int]] = PMap()
         self.seed = seed
         self.clock: Callable[[], float] = lambda: 0.0
         self.on_delta: list[DeltaHook] = []
@@ -319,7 +354,7 @@ class Network:
             raise RuntimeError('nested Network.batch()')
         old = self._state
         self._agent_undo = []
-        self._edits = _Edits(old)
+        self._edits = _Edits(old, self._locator_blocks)
         self._batch_ops = 0
         self._batch_handles = []
         try:
@@ -362,7 +397,7 @@ class Network:
             edits.apply(fn)
             self._batch_ops += 1
         else:
-            edits = _Edits(self._state)
+            edits = _Edits(self._state, self._locator_blocks)
             edits.apply(fn)
             self.update(lambda _: edits.snapshot(), origin)
 
@@ -395,6 +430,11 @@ class Network:
         """
         net = Network(seed=self.seed)
         net._state = self.state
+        net._locator_blocks = (
+            self._edits.locator_blocks
+            if self._edits is not None
+            else self._locator_blocks
+        )
         net.profiles = dict(self.profiles)
         net.sources = list(self.sources)
         net.agents = dict(self.agents)
@@ -426,7 +466,8 @@ class Network:
             # The callback may change inputs too. Invalidate its result before
             # adopting it as the baseline for subsequent staged operations.
             candidate = derive.bump_epochs(base, candidate)
-            self._edits = _Edits(candidate)
+            blocks = _locator_blocks(base, candidate, self._edits.locator_blocks)
+            self._edits = _Edits(candidate, blocks)
             self._batch_ops += 1
             return None
         old = self._state
@@ -440,7 +481,9 @@ class Network:
         delta = StateDelta(old, candidate)
         if delta.is_empty():
             return None
+        blocks = _locator_blocks(old, candidate, self._locator_blocks)
         self._state = candidate
+        self._locator_blocks = blocks
         self._dispatching = True
         errors: list[BaseException] = []
         try:
@@ -739,13 +782,12 @@ class Network:
         self, state: _Edits, device: str, name: str, node: Any, cfg: Any
     ) -> None:
         interfaces = state.interfaces(device)
-        for dname, dev in state.devices.items():
-            if dev.srv6_sids is not None:
-                for loc in dev.srv6_sids.locators.values():
-                    if any(srv6.contains(loc.block, addr) for addr, _ in cfg.ipv6):
-                        raise ValueError(
-                            f'locator block on {dname} covers interface address'
-                        )
+        if cfg.ipv6:
+            for (dname, _), block in state.locator_blocks.items():
+                if any(srv6.contains(block, addr) for addr, _ in cfg.ipv6):
+                    raise ValueError(
+                        f'locator block on {dname} covers interface address'
+                    )
         if isinstance(cfg, EthernetConfig):
             if cfg.speed <= 0 or cfg.metric <= 0:
                 raise ValueError('speed and metric must be positive')
