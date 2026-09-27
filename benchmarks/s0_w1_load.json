@@ -1,0 +1,273 @@
+[
+  {
+    "run": "old_a",
+    "command": [
+      "venv/bin/python",
+      "-m",
+      "benchmarks.s0_w1_scale",
+      "--baseline",
+      "0e5b299"
+    ],
+    "start_unix": 1790523631.572205,
+    "uptime_before": "16:40  up 47 days, 21:16, 3 users, load averages: 3.31 4.22 4.50",
+    "uptime_after": "16:41  up 47 days, 21:17, 3 users, load averages: 3.34 4.07 4.42",
+    "samples": [
+      {
+        "time_unix": 1790523636.578656,
+        "uptime": "16:40  up 47 days, 21:16, 3 users, load averages: 3.20 4.19 4.48",
+        "load_average": [
+          3.2021484375,
+          4.18603515625,
+          4.48193359375
+        ]
+      },
+      {
+        "time_unix": 1790523641.589535,
+        "uptime": "16:40  up 47 days, 21:16, 3 users, load averages: 3.11 4.15 4.47",
+        "load_average": [
+          3.10546875,
+          4.1494140625,
+          4.46728515625
+        ]
+      },
+      {
+        "time_unix": 1790523646.594621,
+        "uptime": "16:40  up 47 days, 21:16, 3 users, load averages: 3.10 4.13 4.46",
+        "load_average": [
+          3.0966796875,
+          4.1298828125,
+          4.45849609375
+        ]
+      },
+      {
+        "time_unix": 1790523651.599793,
+        "uptime": "16:40  up 47 days, 21:16, 3 users, load averages: 3.33 4.16 4.47",
+        "load_average": [
+          3.3291015625,
+          4.16064453125,
+          4.46728515625
+        ]
+      },
+      {
+        "time_unix": 1790523656.608448,
+        "uptime": "16:40  up 47 days, 21:16, 3 users, load averages: 3.38 4.16 4.46",
+        "load_average": [
+          3.3828125,
+          4.15771484375,
+          4.46435546875
+        ]
+      },
+      {
+        "time_unix": 1790523661.613857,
+        "uptime": "16:41  up 47 days, 21:16, 3 users, load averages: 3.51 4.17 4.47",
+        "load_average": [
+          3.51220703125,
+          4.17138671875,
+          4.46728515625
+        ]
+      },
+      {
+        "time_unix": 1790523666.622951,
+        "uptime": "16:41  up 47 days, 21:16, 3 users, load averages: 3.55 4.17 4.46",
+        "load_average": [
+          3.55078125,
+          4.16845703125,
+          4.46435546875
+        ]
+      },
+      {
+        "time_unix": 1790523671.632614,
+        "uptime": "16:41  up 47 days, 21:16, 3 users, load averages: 3.51 4.15 4.46",
+        "load_average": [
+          3.50634765625,
+          4.14892578125,
+          4.45556640625
+        ]
+      },
+      {
+        "time_unix": 1790523676.641767,
+        "uptime": "16:41  up 47 days, 21:16, 3 users, load averages: 3.63 4.16 4.46",
+        "load_average": [
+          3.62548828125,
+          4.16259765625,
+          4.45849609375
+        ]
+      },
+      {
+        "time_unix": 1790523681.647124,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.50 4.13 4.44",
+        "load_average": [
+          3.4951171875,
+          4.12646484375,
+          4.44384765625
+        ]
+      },
+      {
+        "time_unix": 1790523686.655354,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.38 4.09 4.43",
+        "load_average": [
+          3.375,
+          4.0908203125,
+          4.42919921875
+        ]
+      },
+      {
+        "time_unix": 1790523691.663632,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.34 4.07 4.42",
+        "load_average": [
+          3.3447265625,
+          4.072265625,
+          4.42041015625
+        ]
+      }
+    ],
+    "provisional": true
+  },
+  {
+    "run": "new",
+    "command": [
+      "venv/bin/python",
+      "-m",
+      "benchmarks.s0_w1_scale"
+    ],
+    "start_unix": 1790523691.693965,
+    "uptime_before": "16:41  up 47 days, 21:17, 3 users, load averages: 3.34 4.07 4.42",
+    "uptime_after": "16:41  up 47 days, 21:17, 3 users, load averages: 3.48 4.09 4.42",
+    "samples": [
+      {
+        "time_unix": 1790523696.700663,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.48 4.09 4.42",
+        "load_average": [
+          3.47705078125,
+          4.08740234375,
+          4.42333984375
+        ]
+      }
+    ],
+    "provisional": true
+  },
+  {
+    "run": "old_b",
+    "command": [
+      "venv/bin/python",
+      "-m",
+      "benchmarks.s0_w1_scale",
+      "--baseline",
+      "0e5b299"
+    ],
+    "start_unix": 1790523696.7133188,
+    "uptime_before": "16:41  up 47 days, 21:17, 3 users, load averages: 3.48 4.09 4.42",
+    "uptime_after": "16:42  up 47 days, 21:18, 3 users, load averages: 4.59 4.26 4.46",
+    "samples": [
+      {
+        "time_unix": 1790523701.7177331,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.60 4.10 4.43",
+        "load_average": [
+          3.5986328125,
+          4.1025390625,
+          4.42626953125
+        ]
+      },
+      {
+        "time_unix": 1790523706.7261062,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.79 4.13 4.44",
+        "load_average": [
+          3.79052734375,
+          4.1337890625,
+          4.43505859375
+        ]
+      },
+      {
+        "time_unix": 1790523711.7361898,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.65 4.10 4.42",
+        "load_average": [
+          3.64697265625,
+          4.09814453125,
+          4.42041015625
+        ]
+      },
+      {
+        "time_unix": 1790523716.7424152,
+        "uptime": "16:41  up 47 days, 21:17, 3 users, load averages: 3.59 4.08 4.41",
+        "load_average": [
+          3.5947265625,
+          4.07958984375,
+          4.41162109375
+        ]
+      },
+      {
+        "time_unix": 1790523721.7522612,
+        "uptime": "16:42  up 47 days, 21:17, 3 users, load averages: 3.47 4.04 4.40",
+        "load_average": [
+          3.466796875,
+          4.044921875,
+          4.3974609375
+        ]
+      },
+      {
+        "time_unix": 1790523726.758674,
+        "uptime": "16:42  up 47 days, 21:17, 3 users, load averages: 3.75 4.09 4.41",
+        "load_average": [
+          3.74951171875,
+          4.09375,
+          4.41259765625
+        ]
+      },
+      {
+        "time_unix": 1790523731.767672,
+        "uptime": "16:42  up 47 days, 21:17, 3 users, load averages: 4.01 4.14 4.43",
+        "load_average": [
+          4.009765625,
+          4.1416015625,
+          4.427734375
+        ]
+      },
+      {
+        "time_unix": 1790523736.7747068,
+        "uptime": "16:42  up 47 days, 21:17, 3 users, load averages: 4.01 4.14 4.42",
+        "load_average": [
+          4.0087890625,
+          4.13916015625,
+          4.4248046875
+        ]
+      },
+      {
+        "time_unix": 1790523741.780412,
+        "uptime": "16:42  up 47 days, 21:18, 3 users, load averages: 3.77 4.09 4.40",
+        "load_average": [
+          3.767578125,
+          4.0869140625,
+          4.404296875
+        ]
+      },
+      {
+        "time_unix": 1790523746.788021,
+        "uptime": "16:42  up 47 days, 21:18, 3 users, load averages: 4.19 4.17 4.43",
+        "load_average": [
+          4.1865234375,
+          4.16845703125,
+          4.43115234375
+        ]
+      },
+      {
+        "time_unix": 1790523751.797657,
+        "uptime": "16:42  up 47 days, 21:18, 3 users, load averages: 4.73 4.28 4.47",
+        "load_average": [
+          4.73193359375,
+          4.28173828125,
+          4.46923828125
+        ]
+      },
+      {
+        "time_unix": 1790523756.80452,
+        "uptime": "16:42  up 47 days, 21:18, 3 users, load averages: 4.59 4.26 4.46",
+        "load_average": [
+          4.5927734375,
+          4.26025390625,
+          4.46044921875
+        ]
+      }
+    ],
+    "provisional": true
+  }
+]
