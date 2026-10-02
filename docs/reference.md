@@ -61,17 +61,13 @@ The run methods accept these options:
 | Option | Methods | Meaning |
 |---|---|---|
 | `t0` | `iterations`, `enumerate`, `replay` | failure time |
-| `settle` | `iterations`, `enumerate`, `replay` | observation window (see below) |
 | `restore` | `iterations`, `enumerate`, `replay` | restore after the window |
 | `warmup` | all | simulated time run on a fresh runtime before `t0` (needed with agents) |
-| `horizon` | all; required by `process` | observation window after the failure |
+| `horizon` | all; required by `process`, default 1.0 otherwise | observation window after the failure, and after the recovery; nothing runs past it |
 | `event_budget` | all | maximum engine events per iteration; exceeding it reports `budget_exceeded` |
 | `stability`, `quiet` | all | predicate (`routing`, `programming`, `delivery`, `all`) that must hold for `quiet` seconds to report `converged` |
 
-Without agents and without `warmup`, `horizon`, `event_budget`, `stability`
-or `quiet`, `settle` is a minimum window after which derivations drain.
-Otherwise the observation window is a hard limit: `horizon`, or `settle` when
-`horizon` is absent. `iterations` also takes `parallelism`, which must be 1.
+`iterations` also takes `parallelism`, which must be 1.
 
 Each iteration's `data.sim` reports `status` (`converged`,
 `deadline_exceeded`, `budget_exceeded`), `converged_at`, transient and

@@ -68,10 +68,7 @@ def test_explicit_retention_overrides_survive_all_constructor_paths(keep):
         Environment(), Network(), keep_records=keep, keep_events=keep
     )
     study = Study(Network(), keep={'records': keep, 'events': keep})._simulation()
-    alias_study = Study(
-        Network(), keep={'keep_records': keep, 'keep_events': keep}
-    )._simulation()
-    for tl in (timeline, simulation.timeline, study.timeline, alias_study.timeline):
+    for tl in (timeline, simulation.timeline, study.timeline):
         assert tl.keep_records == tl.keep_events == keep
 
 
@@ -94,7 +91,6 @@ def test_standalone_timeline_and_agent_study_share_bounded_defaults():
         ({}, (100_000, 10_000)),
         ({'events': None, 'records': None}, (None, None)),
         ({'events': 5}, (5, 10_000)),
-        ({'keep_events': None, 'keep_records': 3}, (None, 3)),  # Prefix stripped.
         # Series and exported rows come from events: asking for them keeps all.
         ({'arrays': True}, (None, 10_000)),
         ({'timeline': True}, (None, 10_000)),

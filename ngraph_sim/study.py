@@ -416,7 +416,6 @@ class _StudyObservation:
             start,
         )
         self.phase = self.integrals
-        self.last_commit_time = sim.env.now
         self.max_utilization = 0.0
         self.drop_reasons: set[str] = set()
         self.reason_rates: dict[str, float] = {}
@@ -433,7 +432,6 @@ class _StudyObservation:
         self.begun = False
         sim.timeline.on_record.append(self.on_record)
         self._placement(start, sim.state.placement)
-        sim.network.on_delta.append(self.on_delta)
 
     def begin(self, sim: Simulation) -> None:
         """Take the baseline at the observation boundary, after pre-window work."""
@@ -500,9 +498,6 @@ class _StudyObservation:
             report.max_utilization() if report else 0.0,
         )
 
-    def on_delta(self, time: float, origin: Any, delta: StateDelta) -> None:
-        self.last_commit_time = time
-
     def start_phase(self, time: float) -> None:
         self.phase = _DeliveryIntegrals(self.integrals.offered, time)
         self.phase.sample(time, self.integrals.values.items())
@@ -527,12 +522,6 @@ class Study:
         self.network = network.fork()
         self.network.converge()
         self.keep = dict(keep or {})
-        for alias in ('keep_events', 'keep_records'):
-            if alias in self.keep:
-                key = alias.removeprefix('keep_')
-                if key in self.keep and self.keep[key] != self.keep[alias]:
-                    raise ValueError(f'conflicting keep options: {key}, {alias}')
-                self.keep[key] = self.keep.pop(alias)
         unknown = self.keep.keys() - {
             'roots',
             'deltas',
@@ -836,37 +825,25 @@ class Study:
             extras['timeline'] = sim.timeline.rows()
         return extras
 
-    @staticmethod
-    def _settled_time(sim: Simulation, start: float) -> float:
-        observation: _StudyObservation | None = getattr(sim, '_study_observation', None)
-        if observation is not None:
-            return max(start, observation.last_commit_time)
-        return max(
-            (r.time for r in sim.timeline.records if r.time >= start), default=start
-        )
-
     def iterations(
         self,
         draws: Iterable[FailureSet],
         *,
         t0: float = 1.0,
-        settle: float = 1.0,
+        horizon: float = 1.0,
         restore: bool = True,
         parallelism: int = 1,
         warmup: float = 0.0,
-        horizon: float | None = None,
         event_budget: int | None = None,
         stability: Stability | str | None = None,
         quiet: float = 0.0,
     ) -> StudyResult:
         """Observe failures independently, optionally followed by recovery.
 
-        With no new options and no agents, preserve the legacy minimum
-        ``settle`` window followed by run_derivations(). Otherwise ``horizon``
-        is a hard observation duration; if omitted, ``settle`` is its alias
-        (an upper bound, no draining beyond it). An explicit horizon wins.
-        Each failure/recovery phase gets that duration. The single event
-        budget includes warm-up, pre-failure, observation and recovery events.
+        The failure, and the recovery when ``restore`` is set, are each observed
+        for exactly ``horizon`` seconds; nothing runs past that. The single
+        event budget includes warm-up, pre-failure, observation and recovery
+        events.
 
         Warm-up runs [-warmup, 0], then the failure is at t0. Agents always
         get a fresh runtime; Simulation restarts initialized nodes with fresh
@@ -880,24 +857,14 @@ class Study:
 
         Stability is checked over the *final* quiet interval of each full
         observation window; liveness events do not restart it. None selects
-        'all'. Legacy settle_time remains compatible; converged_at is always
-        the beginning of an observed quiet interval, never the last commit.
+        'all'. converged_at is always the beginning of an observed quiet
+        interval, never the last commit.
         """
         if parallelism != 1:
             raise ValueError('only serial parallelism=1 is supported')
         _nonnegative(t0, 't0')
-        _nonnegative(settle, 'settle')
         kind = _window_options(warmup, event_budget, stability, quiet)
-        legacy = (
-            horizon is None
-            and not warmup
-            and event_budget is None
-            and stability is None
-            and not quiet
-            and not self.network.agents
-        )
-        duration = settle if horizon is None else horizon
-        deadline = _future(t0, duration, 'horizon')
+        deadline = _future(t0, horizon, 'horizon')
         _future(t0, quiet, 'quiet')
         unique: dict[str, FailureSet] = {}
         for draw in draws:
@@ -936,28 +903,16 @@ class Study:
             sim.network.on_delta.append(window.on_delta)
             if not runner.exhausted:
                 runner.until(deadline)
-            if legacy:
-                runner.events += sim.run_derivations()
             status, converged_at = window.result(sim.env.now, runner.exhausted)
             # The failure must actually have occurred before claiming convergence.
             if not tokens and status == 'converged':
                 status, converged_at = 'deadline_exceeded', None
-            failed_at = (
-                self._settled_time(sim, t0)
-                if legacy
-                else (
-                    converged_at if converged_at is not None else max(t0, sim.env.now)
-                )
-            )
             record = self._record(sim.network, draw)
             failure_drops = _drop_reasons(sim.network)
             observation: _StudyObservation = sim._study_observation  # type: ignore[attr-defined]
             transient_loss, transient_reasons = window.transient(
                 sim.env.now, status == 'converged'
             )
-            if legacy:
-                transient_loss = observation.phase.total_loss(failed_at)
-                transient_reasons = observation.loss_by_reason(failed_at)
             recovery_time = recovery_status = recovery_converged_at = None
             sim.network.on_delta.remove(window.on_delta)
             if restore and tokens and not runner.exhausted:
@@ -969,35 +924,19 @@ class Study:
                     recovery_start,
                     lambda registry=registry, token=tokens[0]: registry.release(token),
                 )
-                runner.until(_future(recovery_start, duration, 'horizon'))
-                if legacy:
-                    runner.events += sim.run_derivations()
+                runner.until(_future(recovery_start, horizon, 'horizon'))
                 recovery_status, recovery_converged_at = recovery.result(
                     sim.env.now, runner.exhausted
                 )
-                recovered_at = (
-                    self._settled_time(sim, recovery_start)
-                    if legacy
-                    else recovery_converged_at
-                )
                 recovery_time = (
-                    None if recovered_at is None else recovered_at - recovery_start
+                    None
+                    if recovery_converged_at is None
+                    else recovery_converged_at - recovery_start
                 )
                 recovery_loss, recovery_reasons = recovery.transient(
                     sim.env.now, recovery_status == 'converged'
                 )
-                transient_loss += (
-                    observation.phase.total_loss(recovered_at)
-                    if legacy and recovered_at is not None
-                    else recovery_loss
-                )
-                if legacy and recovered_at is not None:
-                    recovery_reasons = {
-                        reason: value - recovery.reason_base.get(reason, 0.0)
-                        for reason, value in observation.loss_by_reason(
-                            recovered_at
-                        ).items()
-                    }
+                transient_loss += recovery_loss
                 for reason, value in recovery_reasons.items():
                     transient_reasons[reason] = (
                         transient_reasons.get(reason, 0.0) + value
@@ -1011,10 +950,7 @@ class Study:
                 status=status,
                 converged_at=converged_at,
                 convergence_time=None if converged_at is None else converged_at - t0,
-                settle_time=failed_at - t0
-                if legacy
-                else (None if converged_at is None else converged_at - t0),
-                recovery_settle_time=recovery_time,
+                recovery_convergence_time=recovery_time,
                 recovery_status=recovery_status,
                 recovery_converged_at=recovery_converged_at,
                 bits_lost_transient=transient_loss,
@@ -1055,7 +991,7 @@ class Study:
         k: int = 1,
         *,
         warmup: float = 0.0,
-        horizon: float | None = None,
+        horizon: float = 1.0,
         event_budget: int | None = None,
         stability: Stability | str | None = None,
         quiet: float = 0.0,
@@ -1152,7 +1088,7 @@ class Study:
         select: Iterable[str] | str | None = None,
         *,
         warmup: float = 0.0,
-        horizon: float | None = None,
+        horizon: float = 1.0,
         event_budget: int | None = None,
         stability: Stability | str | None = None,
         quiet: float = 0.0,

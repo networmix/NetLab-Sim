@@ -920,13 +920,7 @@ else:
         rate: float = 1.0
         duration: Any = 1.0
         keep: dict[str, Any] | None = None
-        keep_roots: int | None = 0
-        keep_deltas: int = 0
-        keep_arrays: bool = False
-        keep_reports: bool = False
-        keep_timeline: bool = False
         t0: float = 1.0
-        settle: float = 1.0
         restore: bool = True
         parallelism: int = 1
         results_json: str | dict[str, Any] | None = None
@@ -941,21 +935,13 @@ else:
             from ngraph_sim.runtime.failures import Process
             from ngraph_sim.study import Study
 
-            keep = {
-                'roots': self.keep_roots,
-                'deltas': self.keep_deltas,
-                'arrays': self.keep_arrays,
-                'reports': self.keep_reports,
-                'timeline': self.keep_timeline,
-                **(self.keep or {}),
-            }
             study = Study.from_scenario(
                 scenario,
                 demand_set=self.demand_set,
                 addressing=self.addressing,
                 srv6=self.srv6,
                 capacity_unit=self.capacity_unit,
-                keep=keep,
+                keep=self.keep,
             )
             windows = {
                 'warmup': self.warmup,
@@ -965,12 +951,12 @@ else:
             }
             options = {
                 **windows,
-                'horizon': self.horizon,
                 't0': self.t0,
-                'settle': self.settle,
                 'restore': self.restore,
                 'parallelism': self.parallelism,
             }
+            if self.horizon is not None:  # iterations and replay default to 1.0
+                options['horizon'] = self.horizon
             if self.mode == 'iterations':
                 draws = Draws.from_policy(
                     scenario.network,

@@ -39,7 +39,7 @@ Integration decisions:
   consumes its captured prefix, C1 calls consumed(device, agent, generation,
   captured_inbox); rejected receipts must not acknowledge entries.
 - Listener cleanup uses ('listeners', device) entities; integer connection
-  ids start at 1 (legacy maintenance entity 0 still handles all listeners).
+  ids start at 1.
   set_down_retention(N), default 64, retains the last N DOWN records fully
   consumed by both owners; removal/reset retires an owner's obligation.
   Unconsumed DOWN events are never compacted. Excess records are removed in
@@ -776,7 +776,7 @@ class TransportRuntime:
         ids = (
             sorted(connections)
             if '*' in entities
-            else sorted(e for e in entities if isinstance(e, int) and e != 0)
+            else sorted(e for e in entities if isinstance(e, int))
         )
         for cid in ids:
             old = connections.get(cid)
@@ -786,7 +786,7 @@ class TransportRuntime:
                     connections = connections.set(cid, new)
         self._index(transport)
         listeners = transport.listeners
-        keys = set(listeners) if '*' in entities or 0 in entities else set()
+        keys = set(listeners) if '*' in entities else set()
         for entity in entities:
             if isinstance(entity, tuple) and entity[0] == 'listeners':
                 keys.update(self._listener_devices.get(entity[1], ()))

@@ -8,6 +8,7 @@ from ngraph_sim.model import derive
 from ngraph_sim.model.network import Network
 from ngraph_sim.runtime import Simulation, pipeline
 from ngraph_sim.runtime.agents import AgentBatchError
+from tests.runtime.inbox import deliver_now, stamped
 from tests.runtime.test_agents import Plugin, fixture
 
 
@@ -43,8 +44,8 @@ def test_unrelated_run_never_visits_parked_rejections(monkeypatch, count):
     monkeypatch.setattr(pipeline, 'heappop', counted)
     # A fresh arrival for a parked owner must stay queued without making its
     # rejected prefix runnable. A different owner may still run normally.
-    assert sim.agents.deliver('r0000', 'bad', c.TimerFired(0, 'later'))
-    assert sim.agents.deliver('good', 'ok', c.TimerFired(0, 'unrelated'))
+    assert deliver_now(sim, 'r0000', 'bad', c.TimerFired(0, 'later'))
+    assert deliver_now(sim, 'good', 'ok', c.TimerFired(0, 'unrelated'))
     sim.settle()
     assert net.state.devices['good'].agents['ok'].runs == 2
     assert [entity for entity in visited if entity[1] == 'bad'] == []
@@ -66,7 +67,7 @@ def test_retry_does_not_resurrect_parked_generation(action):
         return c.AgentOutput()
 
     sim = fixture(Plugin(callback=callback))
-    assert sim.agents.deliver('r', 'test', c.TimerFired(0, 'old'))
+    assert deliver_now(sim, 'r', 'test', c.TimerFired(0, 'old'))
     with pytest.raises(AgentBatchError):
         sim.settle()
     bad[0] = False
@@ -102,14 +103,15 @@ def test_retry_keeps_initialized_state_rng_and_later_arrivals(delay):
     sim = fixture(Plugin(config=c.AgentConfig(run_delay=delay), callback=callback))
     sim.settle()
     admitted = sim.state.devices['r'].agents['test']
-    first, later = c.TimerFired(0, 'first'), c.TimerFired(0, 'later')
+    first = stamped(sim, 'r', 'test', c.TimerFired(0, 'first'))
+    later = stamped(sim, 'r', 'test', c.TimerFired(0, 'later'))
     bad[0] = True
-    assert sim.agents.deliver('r', 'test', first)
+    assert deliver_now(sim, 'r', 'test', first)
     with pytest.raises(AgentBatchError):
         sim.run_until(1)
     rejected = sim.state.devices['r'].agents['test']
     assert rejected.state is admitted.state and rejected.rng is admitted.rng
-    assert sim.agents.deliver('r', 'test', later)
+    assert deliver_now(sim, 'r', 'test', later)
     sim.run_until(5)
     assert len(seen) == 2
     bad[0] = False
@@ -130,8 +132,9 @@ def test_unpublished_batch_parks_until_retry(monkeypatch):
         return c.AgentOutput(state=1)
 
     sim = fixture(Plugin(callback=callback))
-    first, later = c.TimerFired(0, 'first'), c.TimerFired(0, 'later')
-    assert sim.agents.deliver('r', 'test', first)
+    first = stamped(sim, 'r', 'test', c.TimerFired(0, 'first'))
+    later = stamped(sim, 'r', 'test', c.TimerFired(0, 'later'))
+    assert deliver_now(sim, 'r', 'test', first)
     update = sim.network.update
     fail = [True]
 
@@ -145,7 +148,7 @@ def test_unpublished_batch_parks_until_retry(monkeypatch):
     monkeypatch.setattr(sim.network, 'update', reject_commit)
     with pytest.raises(RuntimeError, match='commit failed'):
         sim.settle()
-    assert sim.agents.deliver('r', 'test', later)
+    assert deliver_now(sim, 'r', 'test', later)
     sim.network.add_agent('r', Plugin(c.ClientId('other')))
     sim.settle()
     assert len(seen) == 1

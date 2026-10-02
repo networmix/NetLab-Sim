@@ -5,6 +5,7 @@ import pytest
 from ngraph_sim.model import contracts as c
 from ngraph_sim.model.addressing import MacAddress
 from ngraph_sim.model.network import Network
+from tests.runtime.inbox import deliver_now
 from tests.runtime.test_transport import bind, deliveries, register
 
 
@@ -199,7 +200,8 @@ def inject(sim, name, lsas):
     from tests.agents.fixtures import state
 
     connection = next(iter(state(sim, name).sessions.values()))
-    assert sim.agents.deliver(
+    assert deliver_now(
+        sim,
         name,
         'ref',
         c.Delivery(sim.env.now, LsUpdate(tuple(lsas)), connection=connection),

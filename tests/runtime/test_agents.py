@@ -10,6 +10,7 @@ from ngraph_sim.model import routing
 from ngraph_sim.model.network import Network
 from ngraph_sim.model.routing import Nexthop, Route
 from ngraph_sim.runtime.simulation import Simulation
+from tests.runtime.inbox import deliver_now, stamped
 
 
 @dataclass(frozen=True)
@@ -90,9 +91,9 @@ def test_partial_failure_retry_and_captured_prefix(monkeypatch):
         Plugin(c.ClientId('a'), callback=callback),
     )
     monkeypatch.setattr(sim.transport, 'send_message', lambda *args: sent.append(args))
-    first = c.Delivery(0, 'first', connection=1)
-    later = c.Delivery(0, 'later', connection=1)
-    sim.agents.deliver('r', 'b', first)
+    first = stamped(sim, 'r', 'b', c.Delivery(0, 'first', connection=1))
+    later = stamped(sim, 'r', 'b', c.Delivery(0, 'later', connection=1))
+    deliver_now(sim, 'r', 'b', first)
     with pytest.raises(AgentBatchError) as failure:
         sim.settle()
     assert failure.value.rejections[0].agent == 'b'
@@ -107,7 +108,7 @@ def test_partial_failure_retry_and_captured_prefix(monkeypatch):
     assert len(sim.timeline.select(kind=AgentRunEvent)) == 2
     assert calls[0][0] == 'a' and calls[1][0] == 'b'
     assert not calls[1][3]  # both prepared against the same input
-    sim.agents.deliver('r', 'b', later)
+    deliver_now(sim, 'r', 'b', later)
     # Drain successful FIB work; no implicit retry on a fresh arrival.
     sim.settle()
     assert len([call for call in calls if call[0] == 'b']) == 1
@@ -140,7 +141,7 @@ def test_observer_failure_consumes_receipt_and_outbox(monkeypatch):
             raise ValueError('observer')
 
     sim.network.on_delta.insert(0, observer)
-    sim.agents.deliver('r', 'test', c.Delivery(0, 1, connection=1))
+    deliver_now(sim, 'r', 'test', c.Delivery(0, 1, connection=1))
     with pytest.raises(ValueError, match='observer'):
         sim.settle()
     assert len(calls) == len(sent) == 1
@@ -290,7 +291,7 @@ def test_timers_reset_removal_and_stale_generation(monkeypatch):
     sim.network.remove_agent('r', 'test')
     assert sim.agents.budget()['agents'] == 0
     assert sim.agents.budget()['armed_timers'] == 0
-    assert not sim.agents.deliver('r', 'test', c.TimerFired(3, 'gone'))
+    assert not deliver_now(sim, 'r', 'test', c.TimerFired(3, 'gone'))
     sim.run_until(10)
     assert sim.agents.budget()['scheduled_timer_events'] == 0
 
@@ -319,9 +320,9 @@ def test_inbox_limit_and_float_deadlines():
     sim = fixture(Plugin(config=c.AgentConfig(run_delay=1, inbox_limit=1)))
     sim.settle()
     for index in range(4):
-        assert sim.agents.deliver('r', 'test', c.TimerFired(0, f'timer-{index}'))
+        assert deliver_now(sim, 'r', 'test', c.TimerFired(0, f'timer-{index}'))
     with pytest.raises(AgentInboxOverflow):
-        sim.agents.deliver('r', 'test', c.TimerFired(0, 'overflow'))
+        deliver_now(sim, 'r', 'test', c.TimerFired(0, 'overflow'))
     sim.run_until(1)
     assert not sim.agents.budget()['inbox_entries']
     sim = fixture(
@@ -534,13 +535,13 @@ def test_timer_rearm_cancel_and_compaction():
     # Re-arm repeatedly while the original events remain in the future.
     for index in range(100):
         outputs[:] = [c.TimerOp('t', 20 + index)]
-        sim.agents.deliver('r', 'test', c.Delivery(0, index, connection=1))
+        deliver_now(sim, 'r', 'test', c.Delivery(0, index, connection=1))
         sim.settle()
     budget = sim.agents.budget()
     assert budget['armed_timers'] == 1
     assert budget['scheduled_timer_events'] <= 64
     outputs[:] = [c.TimerOp('t')]
-    sim.agents.deliver('r', 'test', c.Delivery(0, 'cancel', connection=1))
+    deliver_now(sim, 'r', 'test', c.Delivery(0, 'cancel', connection=1))
     sim.settle()
     assert sim.agents.budget()['armed_timers'] == 0
     sim.run_until(200)
@@ -578,7 +579,7 @@ def test_positive_run_delay_must_advance_clock():
     sim.settle()
     sim.run_until(1e20)
     with pytest.raises(ValueError, match='advance'):
-        sim.agents.deliver('r', 'test', c.TimerFired(sim.env.now, 'now'))
+        deliver_now(sim, 'r', 'test', c.TimerFired(sim.env.now, 'now'))
     assert sim.agents.budget()['inbox_entries'] == 0
 
 
@@ -780,8 +781,8 @@ def test_retry_at_later_time_captures_same_prefix_with_fresh_due_work():
         return c.AgentOutput()
 
     sim = fixture(Plugin(c.ClientId('a'), callback=callback))
-    first = c.TimerFired(0, 'first')
-    sim.agents.deliver('r', 'a', first)
+    first = stamped(sim, 'r', 'a', c.TimerFired(0, 'first'))
+    deliver_now(sim, 'r', 'a', first)
     with pytest.raises(AgentBatchError):
         sim.settle()
     sim.run_until(5)
@@ -828,7 +829,7 @@ def test_all_inbox_prefixes_are_captured_before_any_callback():
     def callback(ctx):
         seen.append((ctx.agent, ctx.inbox))
         if ctx.agent == 'a':
-            sim.agents.deliver('r', 'b', c.TimerFired(0, 'during-run'))
+            deliver_now(sim, 'r', 'b', c.TimerFired(0, 'during-run'))
         return c.AgentOutput()
 
     sim = fixture(
@@ -836,7 +837,8 @@ def test_all_inbox_prefixes_are_captured_before_any_callback():
         Plugin(c.ClientId('b'), callback=callback),
     )
     sim.settle()
-    assert seen == [('a', ()), ('b', ()), ('b', (c.TimerFired(0, 'during-run'),))]
+    late = stamped(sim, 'r', 'b', c.TimerFired(0, 'during-run'))
+    assert seen == [('a', ()), ('b', ()), ('b', (late,))]
 
 
 def test_immediate_partial_retry_uses_successor_round():
@@ -875,3 +877,12 @@ def test_readding_to_empty_rib_preserves_version_lineage():
     version = state.devices['r'].ribs[4].version
     state = sim.agents._apply(state, 'r', client, add)
     assert state.devices['r'].ribs[4].version == version + 1
+
+
+def test_delivery_requires_the_destination_generation():
+    sim = fixture(Plugin())
+    sim.settle()
+    with pytest.raises(ValueError, match='destination generation'):
+        sim.agents.deliver('r', 'test', c.TimerFired(0, 'untagged'))
+    generation = sim.agents.generation('r', 'test')
+    assert sim.agents.deliver('r', 'test', c.TimerFired(0, 'tagged', generation))

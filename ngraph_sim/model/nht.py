@@ -233,32 +233,6 @@ def registration_key(dev: DeviceState, key: NhtKey) -> NhtKey:
     return key
 
 
-def registered_key(dev: DeviceState, key: NhtKey) -> NhtKey:
-    """Find a retained registration without rebinding to the current interface.
-
-    For compatibility, result/unregister accept the original unbound request
-    when exactly one incarnation matches. With multiple matching generations,
-    callers must use the canonical key returned by register (or in ctx.nht).
-    Explicit keys use an O(1) lookup and work after interface removal.
-    """
-    table = dev.nht
-    if (
-        table is None
-        or key in table.registrations
-        or key.interface is None
-        or key.interface_generation is not None
-    ):
-        return key
-    matches = [
-        registered
-        for registered in table.registrations
-        if replace(registered, interface_generation=None) == key
-    ]
-    if len(matches) > 1:
-        raise ValueError('ambiguous NHT scope; use a generation-bound key')
-    return matches[0] if matches else key
-
-
 def register(state: NetworkState, device: str, key: NhtKey) -> NetworkState:
     """Store a generation-bound key; preserve the state-returning mutation API.
 
@@ -285,8 +259,9 @@ def register(state: NetworkState, device: str, key: NhtKey) -> NetworkState:
 
 
 def unregister(state: NetworkState, device: str, key: NhtKey) -> NetworkState:
+    """Remove the registration stored under ``key``, the canonical key that
+    ``register`` returned (it carries the interface generation)."""
     dev = state.devices[device]
-    key = registered_key(dev, key)
     table = dev.nht
     if table is None or key not in table.registrations:
         return state

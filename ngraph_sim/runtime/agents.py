@@ -26,9 +26,9 @@ are implemented by their own slice; the method names below are fixed):
   notification (SessionEvent, Rejection or TimerFired) never returns False:
   exhausting its allowance raises ``AgentInboxOverflow`` through the caller
   to the simulation driver. Callers must propagate it, never count-and-ignore.
-  Scheduled deliveries must stamp ``entry.generation`` with the destination
-  generation. ``None`` remains compatible with immediate current-generation
-  callers. A stale generation is rejected before touching the inbox.
+  Every delivery stamps ``entry.generation`` with the destination
+  generation; an entry without one raises ``ValueError``. A stale generation
+  is rejected before touching the inbox.
 - ``AgentRuntime.generation(device, agent)`` is the live generation or
   ``None``.
 - ``TransportRuntime.send_datagram / send_message / session_op`` are called
@@ -411,9 +411,11 @@ class AgentRuntime:
 
     def deliver(self, device: str, agent: str, entry: c.InboxEntry) -> bool:
         generation = self.generation(device, agent)
-        if generation is None or (
-            entry.generation is not None and entry.generation != generation
-        ):
+        if generation is None:
+            return False
+        if entry.generation is None:
+            raise ValueError('an inbox entry must carry its destination generation')
+        if entry.generation != generation:
             return False
         validate_immutable(entry, 'inbox')
         key = (device, agent, generation)

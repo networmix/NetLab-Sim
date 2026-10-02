@@ -153,26 +153,25 @@ def test_omitted_registration_generation_is_bound_until_explicit_replacement():
     assert bound == replace(request, interface_generation=dev['e'].generation)
     assert tuple(dev.node.nht.registrations) == (bound,)
     assert client.result(bound).eligible
-    assert client.result(request) is client.result(bound)
+    assert client.result(request) is None  # Only the canonical key is stored.
     assert nht.register(net.state, dev.name, request) is net.state
     recreate_scope(net, dev)
     stale = client.result(bound)
     assert not stale.eligible and stale.reason == 'SCOPE_STALE'
-    assert client.result(request) is stale
     assert client.installed(bound).adjacencies == ()
     assert client.register(bound) is bound
     assert nht.register(net.state, dev.name, bound) is net.state
     # An unbound one-shot query deliberately asks about the current interface.
     assert client.resolve(request).eligible
     assert client.resolve(bound).reason == 'SCOPE_STALE'
-    client.unregister(request)
+    client.unregister(bound)
     assert client.result(bound) is None
     replacement = client.register(request)
     assert replacement.interface_generation == dev['e'].generation
     assert replacement != bound and client.result(replacement).eligible
 
 
-def test_pure_register_binds_generation_and_unbound_unregister_after_removal():
+def test_pure_register_binds_generation_and_unregister_uses_the_bound_key():
     net, dev, request = scoped_pair()
     root = nht.register(net.state, dev.name, request)
     (bound,) = root.devices[dev.name].nht.registrations
@@ -184,12 +183,13 @@ def test_pure_register_binds_generation_and_unbound_unregister_after_removal():
     root = replace(root, devices=root.devices.set(dev.name, without))
     root = nht.refresh(root, dev.name)
     assert root.devices[dev.name].nht.registrations[bound].reason == 'SCOPE_STALE'
-    removed = nht.unregister(root, dev.name, request)
+    assert nht.unregister(root, dev.name, request) is root
+    removed = nht.unregister(root, dev.name, bound)
     assert not removed.devices[dev.name].nht.registrations
-    assert nht.unregister(removed, dev.name, request) is removed
+    assert nht.unregister(removed, dev.name, bound) is removed
 
 
-def test_ambiguous_unbound_key_requires_explicit_generation():
+def test_unbound_key_never_matches_a_registration():
     net, dev, request = scoped_pair()
     client = dev.nht_client()
     old = client.register(request)
@@ -197,11 +197,12 @@ def test_ambiguous_unbound_key_requires_explicit_generation():
     new = client.register(request)
     assert old != new and client.result(old).reason == 'SCOPE_STALE'
     assert client.result(new).eligible
-    for operation in (client.result, client.unregister):
-        with pytest.raises(ValueError, match='generation-bound key'):
-            operation(request)
+    assert client.result(request) is None
+    root = net.state
+    client.unregister(request)
+    assert net.state is root
     client.unregister(old)
-    assert client.result(request) is client.result(new)
+    assert tuple(dev.node.nht.registrations) == (new,)
 
 
 def test_empty_local_context_and_absent_registration():
@@ -212,4 +213,3 @@ def test_empty_local_context_and_absent_registration():
     assert ctx.peer_mac('missing') is None
     assert not nht.resolve(ctx, ResolutionPolicy(), key, input_epoch=0).eligible
     assert nht.installed(ctx, key).status == 'PENDING'
-    assert nht.registered_key(dev, key) is key

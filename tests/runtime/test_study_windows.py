@@ -103,21 +103,20 @@ def test_quiet_begins_on_output_change_and_includes_deadline_events():
     assert short['converged_at'] is None
 
 
-def test_settle_alias_becomes_upper_bound_and_explicit_horizon_wins():
+def test_horizon_is_a_hard_bound_with_or_without_window_options():
     net, _ = diamond(fib_delay=0.5)
     draws = [FailureSet(excluded_links=('R1:eth1--R2:eth1',))]
     study = Study(net)
-    bounded = metrics(
-        study.iterations(draws, settle=0.125, stability='all', restore=False)
-    )
-    assert bounded['status'] == 'deadline_exceeded'
-    assert bounded['end'] == 1.125
-    legacy = metrics(study.iterations(draws, settle=0.125, restore=False))
-    assert legacy['settle_time'] == 0.5
-    assert legacy['end'] == 1.5
-    explicit = metrics(study.iterations(draws, settle=0.125, horizon=1, restore=False))
-    assert explicit['end'] == 2
-    assert explicit['status'] == 'converged'
+    for options in ({}, {'stability': 'all'}):
+        short = metrics(
+            study.iterations(draws, horizon=0.125, restore=False, **options)
+        )
+        assert short['status'] == 'deadline_exceeded'
+        assert short['end'] == 1.125
+    covering = metrics(study.iterations(draws, horizon=1, restore=False))
+    assert covering['end'] == 2
+    assert covering['status'] == 'converged'
+    assert covering['convergence_time'] == 0.5
 
 
 @pytest.mark.parametrize('budget', [0, 1, 17])
@@ -246,7 +245,7 @@ def test_fresh_agent_runtime_uses_configuration_and_warms_every_iteration(monkey
 def test_all_streamed_metrics_equal_with_tiny_retention():
     events = Schedule([((('device', 'a'),), 1 + i * 2, 1) for i in range(80)])
     full = Study(two_rate_network()).process(events, 162, quiet=1)
-    study = Study(two_rate_network(), keep={'keep_events': 1, 'keep_records': 1})
+    study = Study(two_rate_network(), keep={'events': 1, 'records': 1})
     _, sims = with_timer(study, period=1)
     # Compare counts without a liveness timer first; timers emit no timeline rows.
     bounded = study.process(events, 162, quiet=1)

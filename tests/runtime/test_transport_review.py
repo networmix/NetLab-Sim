@@ -7,6 +7,7 @@ import pytest
 from ngraph_sim.model import contracts as c
 from ngraph_sim.model.interfaces import OperState
 from ngraph_sim.model.state import PMap, StateDelta
+from tests.runtime.inbox import deliver_now
 from tests.runtime.test_sessions import message, open_pair
 from tests.runtime.test_transport import pair, send
 from tests.runtime.test_transport_integration import (
@@ -88,7 +89,7 @@ def test_real_one_slot_inboxes_keep_session_events_and_all_overflows():
     )
     sim = session(config=config, actions=(('burst', send_output(0, 1, 2)),))
     for device in ('R1', 'R2'):
-        assert sim.agents.deliver(device, 'wire', c.TimerFired(0, 'occupied'))
+        assert deliver_now(sim, device, 'wire', c.TimerFired(0, 'occupied'))
     sim.run_until(1.25)
     for device in ('R1', 'R2'):
         assert [e.state for e in observed(sim, device, c.SessionEvent)] == [

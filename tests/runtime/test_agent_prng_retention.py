@@ -5,6 +5,7 @@ import sys
 import pytest
 
 from ngraph_sim.model import contracts as c
+from tests.runtime.inbox import deliver_now
 from tests.runtime.test_agents import Plugin, fixture
 
 
@@ -41,7 +42,7 @@ def test_idle_publications_retain_constant_rng_objects_and_bytes(runs, initial_d
     sim.settle()
     nodes = [sim.state.devices['r'].agents['test']]
     for _ in range(runs):
-        sim.agents.deliver('r', 'test', c.TimerFired(sim.env.now, 'idle'))
+        deliver_now(sim, 'r', 'test', c.TimerFired(sim.env.now, 'idle'))
         sim.settle()
         nodes.append(sim.state.devices['r'].agents['test'])
     values = [node.rng for node in nodes]

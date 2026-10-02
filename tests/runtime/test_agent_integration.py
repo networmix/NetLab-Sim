@@ -19,6 +19,7 @@ from ngraph_sim.runtime.agents import AgentBatchError, AgentRuntime
 from ngraph_sim.runtime.simulation import Simulation
 from ngraph_sim.runtime.transport import TransportRuntime
 from tests.model.test_network import A, build_diamond
+from tests.runtime.inbox import deliver_now
 
 
 @dataclass(frozen=True, slots=True)
@@ -440,8 +441,11 @@ def test_agent_lifecycle_mid_session_cleans_old_incarnation(device, operation):
         for listener in sim.state.transport.listeners.values()
     )
     assert sim.transport.budget()['queued_messages'] == 0
-    assert not sim.agents.deliver(
-        device, 'integration', c.TimerFired(sim.env.now, 'stale', previous.generation)
+    assert not deliver_now(
+        sim,
+        device,
+        'integration',
+        c.TimerFired(sim.env.now, 'stale', previous.generation),
     )
     # Old message deliveries, queue probes and no-progress timers all reach
     # their deadlines; none may revive the connection or deliver old data.

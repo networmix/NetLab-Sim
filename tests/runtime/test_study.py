@@ -42,15 +42,16 @@ def test_iterations_equal_direct_convergence_and_preserve_baseline():
     assert len(result.flow_results) == 9
 
 
-def test_exact_transient_loss_fib_delay_and_short_settle():
+def test_exact_transient_loss_with_fib_delay():
     net, _ = diamond(fib_delay=0.05)
     result = Study(net).iterations(
-        [FailureSet(excluded_links=('R1:eth1--R2:eth1',))], settle=0.01
+        [FailureSet(excluded_links=('R1:eth1--R2:eth1',))], horizon=0.25
     )
     row = result.flow_results[0]
     extras = row['data']['sim']
     assert row['summary']['total_placed'] == 100e6
-    assert extras['settle_time'] == pytest.approx(0.05)
+    assert extras['status'] == 'converged'
+    assert extras['convergence_time'] == pytest.approx(0.05)
     assert extras['bits_lost_transient'] == pytest.approx(50e6 * 0.05)
     assert extras['per_demand']['d']['downtime'] == pytest.approx(0.05)
     assert extras['loss_integral'] == pytest.approx(50e6 * 0.05)
@@ -98,7 +99,7 @@ def test_enumerate_replay_retention_and_empty_cases(tmp_path):
     result = study.enumerate('devices', restore=False)
     assert len(result.flow_results) == 4
     assert all(
-        row['data']['sim']['recovery_settle_time'] is None
+        row['data']['sim']['recovery_convergence_time'] is None
         for row in result.flow_results
     )
     assert result.flow_results[0]['data']['sim']['utilization_series']
@@ -122,7 +123,7 @@ def test_enumerate_replay_retention_and_empty_cases(tmp_path):
 
 
 @pytest.mark.parametrize(
-    'options', [{'parallelism': 2}, {'t0': -1}, {'settle': float('nan')}]
+    'options', [{'parallelism': 2}, {'t0': -1}, {'horizon': float('nan')}]
 )
 def test_invalid_iteration_options(options):
     net, _ = diamond()
@@ -228,9 +229,7 @@ def test_metrics_visit_delivery_tuples_linearly(size):
     assert sum(sample.count for sample in samples) <= 3 * size * len(samples)
 
 
-@pytest.mark.parametrize(
-    'keys', [('events', 'records'), ('keep_events', 'keep_records')]
-)
+@pytest.mark.parametrize('keys', [('events', 'records')])
 def test_study_history_budgets_preserve_full_run_metrics(keys):
     net = two_rate_network()
     events = Schedule([((('device', 'a'),), 1 + i * 2, 1) for i in range(40)])
@@ -247,14 +246,14 @@ def test_study_history_budgets_preserve_full_run_metrics(keys):
     assert result.sim['dropped_records'] > 0
 
 
-def test_bounded_records_preserve_settle_time():
+def test_bounded_records_preserve_convergence_time():
     net, _ = diamond(fib_delay=0.05)
     draws = [FailureSet(excluded_nodes=('R1', 'R2', 'R3', 'R4'))]
     full = Study(net).iterations(draws)
     bounded = Study(net, keep={'events': 0, 'records': 0}).iterations(draws)
     assert (
-        bounded.flow_results[0]['data']['sim']['settle_time']
-        == full.flow_results[0]['data']['sim']['settle_time']
+        bounded.flow_results[0]['data']['sim']['convergence_time']
+        == full.flow_results[0]['data']['sim']['convergence_time']
     )
     assert (
         bounded.flow_results[0]['data']['sim']['bits_lost_transient']
@@ -321,14 +320,15 @@ def test_integrals_timestamp_coalescing_missing_demand_and_window_edges():
     assert integral.metrics(5) == metrics  # Reporting does not advance/mutate it.
 
 
-def test_conflicting_retention_aliases_are_rejected():
-    with pytest.raises(ValueError, match='conflicting'):
-        Study(two_rate_network(), keep={'events': 1, 'keep_events': 2})
+@pytest.mark.parametrize('key', ['keep_events', 'keep_records'])
+def test_retention_keys_have_no_aliases(key):
+    with pytest.raises(ValueError, match='unknown keep options'):
+        Study(two_rate_network(), keep={key: 1})
 
 
 def test_iterations_end_at_the_observation_window_despite_recurring_timers():
     """A periodic timer (a protocol hello) never empties the heap; the
-    iteration must stop at t0 + settle, not drain the queue."""
+    iteration must stop at t0 + horizon, not drain the queue."""
     from ngraph_sim.model.network import Network
     from ngraph_sim.runtime.failures import FailureSet
     from ngraph_sim.study import Study
@@ -351,6 +351,6 @@ def test_iterations_end_at_the_observation_window_despite_recurring_timers():
         return sim
 
     study._simulation = with_timer
-    result = study.iterations([FailureSet()], t0=1, settle=1, restore=False)
+    result = study.iterations([FailureSet()], t0=1, horizon=1, restore=False)
     assert result is not None
     assert ticks and max(ticks) <= 2.0

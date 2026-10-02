@@ -18,6 +18,7 @@ from ngraph_sim.runtime.pipeline import ConvergenceError
 from ngraph_sim.runtime.simulation import Simulation
 from tests.model.test_network import A, build_diamond
 from tests.model.test_policies import diamond, policy
+from tests.runtime.inbox import deliver_now, stamped
 from tests.runtime.test_agents import Plugin, fixture, row
 
 
@@ -46,8 +47,8 @@ def test_commit_time_sr_validation_rejects_only_its_journal(malformed):
         net.add_agent('R1', Plugin(c.ClientId(name), callback=callback))
     routers['R1'].configure(srdb_source=('agent', 'b'))
     sim = Simulation(Environment(), net)
-    first = c.Delivery(0, 'captured', connection=1)
-    sim.agents.deliver('R1', 'b', first)
+    first = stamped(sim, 'R1', 'b', c.Delivery(0, 'captured', connection=1))
+    deliver_now(sim, 'R1', 'b', first)
     with pytest.raises(agents.AgentBatchError):
         sim.settle()
     a, b = (sim.state.devices['R1'].agents[name] for name in ('a', 'b'))
@@ -56,8 +57,8 @@ def test_commit_time_sr_validation_rejects_only_its_journal(malformed):
     assert b.state is b.rng is None
     assert sim.state.devices['R1'].ribs[4].rows_of(a.client)
     assert not sim.state.devices['R1'].ribs[4].rows_of(b.client)
-    later = c.Delivery(0, 'later', connection=1)
-    sim.agents.deliver('R1', 'b', later)
+    later = stamped(sim, 'R1', 'b', c.Delivery(0, 'later', connection=1))
+    deliver_now(sim, 'R1', 'b', later)
     sim.settle()  # successful FIB work can generate a fresh CAUSE_ROUTES for a
     a_calls = [call[0] for call in calls].count('a')
     bad = False
@@ -87,7 +88,7 @@ def test_finalization_failure_consumes_every_receipt_and_finishes_peers(
 
     sim = fixture(*(Plugin(c.ClientId(name), callback=callback) for name in ('a', 'b')))
     for name in ('a', 'b'):
-        sim.agents.deliver('r', name, c.Delivery(0, 'captured', connection=1))
+        deliver_now(sim, 'r', name, c.Delivery(0, 'captured', connection=1))
 
     def stat(name, time, value):
         # All accepted prefixes have been consumed before ANY finalization.
@@ -134,10 +135,13 @@ def test_only_published_captured_prefixes_are_acknowledged(monkeypatch):
         return c.AgentOutput(state=ctx.inbox)
 
     sim = fixture(*(Plugin(c.ClientId(name), callback=callback) for name in ('a', 'b')))
-    first = c.SessionEvent(0, 1, c.DOWN, c.CLOSED)
-    later = c.TimerFired(0, 'later')
+    first = {
+        name: stamped(sim, 'r', name, c.SessionEvent(0, 1, c.DOWN, c.CLOSED))
+        for name in ('a', 'b')
+    }
+    later = stamped(sim, 'r', 'b', c.TimerFired(0, 'later'))
     for name in ('a', 'b'):
-        sim.agents.deliver('r', name, first)
+        deliver_now(sim, 'r', name, first[name])
     real_consumed = sim.transport.consumed
 
     def consumed(device, agent, generation, entries):
@@ -147,13 +151,17 @@ def test_only_published_captured_prefixes_are_acknowledged(monkeypatch):
     monkeypatch.setattr(sim.transport, 'consumed', consumed)
     with pytest.raises(agents.AgentBatchError):
         sim.settle()
-    assert acknowledgements == [('a', (first,))]
-    sim.agents.deliver('r', 'b', later)
+    assert acknowledgements == [('a', (first['a'],))]
+    deliver_now(sim, 'r', 'b', later)
     bad = False
     sim.retry()
     sim.settle()
-    assert acknowledgements == [('a', (first,)), ('b', (first,)), ('b', (later,))]
-    assert acknowledgements[1][1][0] is first
+    assert acknowledgements == [
+        ('a', (first['a'],)),
+        ('b', (first['b'],)),
+        ('b', (later,)),
+    ]
+    assert acknowledgements[1][1][0] is first['b']
     assert acknowledgements[2][1][0] is later
 
 
@@ -168,15 +176,15 @@ def test_only_published_captured_prefixes_are_acknowledged(monkeypatch):
 def test_control_allowance_is_separate_and_exhaustion_is_explicit(entry):
     sim = fixture(Plugin(config=c.AgentConfig(run_delay=1, inbox_limit=1)))
     sim.settle()
-    assert sim.agents.deliver('r', 'test', c.Delivery(0, 'data', connection=1))
-    assert not sim.agents.deliver('r', 'test', c.Delivery(0, 'more data', connection=1))
+    assert deliver_now(sim, 'r', 'test', c.Delivery(0, 'data', connection=1))
+    assert not deliver_now(sim, 'r', 'test', c.Delivery(0, 'more data', connection=1))
     for _ in range(4):
-        assert sim.agents.deliver('r', 'test', entry)
+        assert deliver_now(sim, 'r', 'test', entry)
     with pytest.raises(RuntimeError, match='control inbox'):
-        sim.agents.deliver('r', 'test', entry)
+        deliver_now(sim, 'r', 'test', entry)
     assert sim.agents.budget()['inbox_entries'] == 5
     sim.run_until(1)
-    assert sim.agents.deliver('r', 'test', entry)
+    assert deliver_now(sim, 'r', 'test', entry)
 
 
 def test_transport_control_overflow_propagates_out_of_run_until():
@@ -326,11 +334,11 @@ def test_admission_walks_only_new_subtrees_and_identity_return_is_free():
     sim.settle()
     assert len(reads) == 1001  # validated once, transitively
     reads.clear()
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
     sim.settle()
     assert reads == []  # identity return: nothing walked
     first = sim.state.devices['r'].agents['test'].state
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
     sim.settle()
     # Only the new leaf is validated (its predecessor's field is read once to
     # pair it); the 1000 reused ``items`` are trusted by identity.
@@ -547,7 +555,7 @@ def test_context_uses_only_the_owners_connection_index(monkeypatch, unrelated):
     monkeypatch.setattr(
         sim.transport, 'budget', lambda: pytest.fail('global budget scan')
     )
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
     sim.settle()
     assert tuple(contexts[-1].connections) == (1,) and seen == [1]
     view = contexts[-1].connections[1]
@@ -651,7 +659,7 @@ def test_causes_arriving_while_parked_get_a_run_after_retry():
     sim = fixture(Plugin(paths=(('config', 'enabled'),), callback=callback))
     sim.settle()
     bad['value'] = True
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'first'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'first'))
     with pytest.raises(agents.AgentBatchError):
         sim.settle()
     sim.network.device('r').configure(enabled=False)
@@ -701,7 +709,7 @@ def test_nht_cost_change_while_parked_is_delivered_after_retry():
     sim.settle()
     before = dev.fib(4)
     bad['value'] = True
-    sim.agents.deliver('R1', 'test', c.TimerFired(0, 'first'))
+    deliver_now(sim, 'R1', 'test', c.TimerFired(0, 'first'))
     with pytest.raises(agents.AgentBatchError):
         sim.settle()
     dev.rib_client(c.IGP).add_routes((replace(row, metric=20),))

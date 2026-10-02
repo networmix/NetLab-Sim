@@ -618,10 +618,9 @@ class NhtClient:
         )
 
     def result(self, key: NhtKey) -> NhtResult | None:
+        """The stored result for the canonical key that ``register`` returned."""
         self._check(key)
-        dev = self.device.node
-        key = nht.registered_key(dev, key)
-        table = dev.nht
+        table = self.device.node.nht
         return table.registrations.get(key) if table is not None else None
 
     def resolve(

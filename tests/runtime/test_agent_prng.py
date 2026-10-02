@@ -8,6 +8,7 @@ from ngraph_sim.model.prng import Prng
 from ngraph_sim.model.state import validate_admitted, validate_immutable
 from ngraph_sim.runtime import Simulation
 from ngraph_sim.runtime.agents import AgentBatchError
+from tests.runtime.inbox import deliver_now
 from tests.runtime.test_agents import Plugin, fixture
 
 
@@ -34,7 +35,7 @@ def test_named_streams_stay_independent_through_publication():
         sim.network.debug_validate = True
         sim.settle()
         for _ in range(8):
-            sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+            deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
             sim.settle()
         validate_immutable(node(sim).rng)
         validate_admitted(node(sim).rng, None)
@@ -71,7 +72,7 @@ def test_rejected_named_draws_replay_and_preserve_pre_run_identity(
         return update(fn, origin)
 
     monkeypatch.setattr(sim.network, 'update', guarded)
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
     with pytest.raises(RuntimeError if failure == 'outer_commit' else AgentBatchError):
         sim.settle()
     assert node(sim).rng is admitted
@@ -110,7 +111,7 @@ def test_reset_and_fresh_simulation_clear_all_streams():
 
 
 def _tick(sim):
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
     sim.settle()
 
 
@@ -192,7 +193,7 @@ def test_rejected_run_then_seed_edit_continues_the_family_until_reset():
     seed = sim.state.devices['r'].config.seed
     first = node(sim)
     fail = True
-    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    deliver_now(sim, 'r', 'test', c.TimerFired(0, 'tick'))
     with pytest.raises(AgentBatchError):
         sim.settle()
     assert node(sim).rng is first.rng
