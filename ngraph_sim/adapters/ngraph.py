@@ -179,15 +179,14 @@ def _populate_network(
         node = network.nodes[name]
         check_name(name, allow_slash=True)
         dev = net.add_device(name, enabled=not node.disabled, allow_slash=True)
-        attrs = _attrs(node)
-        settings = attrs.get('sim', {})
+        settings = _settings(node)
         dev.configure(
             **{k: settings[k] for k in ('fib_delay', 'fast_failover') if k in settings}
         )
         if 'mtbf' in settings and 'mttr' in settings:
             failure_parameters[('device', name)] = dict(settings)
-        v4 = attrs.get('loopback_ipv4') or f'{next(p.loopbacks)}/32'
-        v6 = attrs.get('loopback_ipv6') or (
+        v4 = settings.get('loopback_ipv4') or f'{next(p.loopbacks)}/32'
+        v6 = settings.get('loopback_ipv6') or (
             str(next(p.loopbacks_v6).network_address) + '/128' if ipv6 else None
         )
         dev.add_loopback('lo0', ipv4=[v4], ipv6=[v6] if v6 else ())
@@ -195,15 +194,13 @@ def _populate_network(
     lag_groups: dict[tuple[str, str, str], list[Any]] = {}
     for lid in sorted(network.links):
         link = network.links[lid]
-        attrs = _attrs(link)
-        lag = attrs.get('lag')
+        lag = _settings(link).get('lag')
         if lag is not None:
             lag_groups.setdefault((link.source, link.target, str(lag)), []).append(link)
             continue
         _add_link(net, link, counters, p, addressing, capacity_unit, ipv6)
     for (src, dst, lag), links in sorted(lag_groups.items()):
-        attrs = _attrs(links[0])
-        min_links = int(attrs.get('min_links', 1))
+        min_links = int(_settings(links[0]).get('min_links', 1))
         members_a = [_next_name(counters, src) for _ in links]
         members_b = [_next_name(counters, dst) for _ in links]
         v4 = _pair(p.links) if addressing == 'p2p' else None
@@ -243,7 +240,7 @@ def _populate_network(
     for lid, link in sorted(network.links.items()):
         for group in sorted(getattr(link, 'risk_groups', ())):
             groups.setdefault(group, []).append(('link', lid))
-        settings = _attrs(link).get('sim', {})
+        settings = _settings(link)
         if 'mtbf' in settings and 'mttr' in settings:
             failure_parameters[('link', lid)] = dict(settings)
         imported = net.link(net.ngraph_link_ids[lid])
@@ -262,7 +259,7 @@ def _populate_network(
             raise ValueError(f'cyclic risk group: {group.name}')
         visiting = visiting | {group.name}
         groups.setdefault(group.name, [])
-        settings = _attrs(group).get('sim', {})
+        settings = _settings(group)
         if 'mtbf' in settings and 'mttr' in settings:
             failure_parameters[('risk_group', group.name)] = dict(settings)
         for child in sorted(group.children, key=lambda g: g.name):
@@ -276,11 +273,9 @@ def _populate_network(
         net.add_source(oracle_igp)
 
 
-def _attrs(entity: Any) -> dict[str, Any]:
-    """Legacy top-level attrs plus the namespaced NetGraph-Sim settings."""
-    attrs = dict(getattr(entity, 'attrs', {}) or {})
-    attrs.update(attrs.get('sim', {}))
-    return attrs
+def _settings(entity: Any) -> dict[str, Any]:
+    """The NetGraph-Sim settings of a NetGraph entity: its ``attrs.sim`` mapping."""
+    return dict((getattr(entity, 'attrs', None) or {}).get('sim') or {})
 
 
 def _next_name(counters: dict[str, int], device: str) -> str:
@@ -314,9 +309,9 @@ def _add_link(
     capacity_unit: float,
     ipv6: bool,
 ) -> None:
-    attrs = _attrs(link)
-    a_name = attrs.get('source_interface') or _next_name(counters, link.source)
-    b_name = attrs.get('target_interface') or _next_name(counters, link.target)
+    settings = _settings(link)
+    a_name = settings.get('source_interface') or _next_name(counters, link.source)
+    b_name = settings.get('target_interface') or _next_name(counters, link.target)
     v4 = _pair(p.links) if addressing == 'p2p' else None
     v6 = _pair6(p.links_v6) if (addressing == 'p2p' and ipv6) else None
     speed = float(link.capacity) * capacity_unit
@@ -331,7 +326,7 @@ def _add_link(
         metric=int(link.cost),
         unnumbered=addressing == 'unnumbered',
     )
-    reverse_cost = attrs.get('reverse_cost')
+    reverse_cost = settings.get('reverse_cost')
     if reverse_cost is not None:
         net.device(link.target)[b_name].configure(metric=int(reverse_cost))
     if ipv6 and addressing == 'unnumbered':
@@ -358,16 +353,13 @@ def demands_from(
     demand_sets: dict[str, list[Any]],
     *,
     capacity_unit: float = 1e9,
-    strict: bool = True,
 ) -> list[str]:
     """Expand NetGraph ``TrafficDemand`` entries into NetGraph-Sim demands.
 
     Destinations are loopback addresses.
     """
     with _MetadataGuard(net), net.batch():
-        return _populate_demands(
-            network, net, demand_sets, capacity_unit=capacity_unit, strict=strict
-        )
+        return _populate_demands(network, net, demand_sets, capacity_unit=capacity_unit)
 
 
 SUPPORTED_FLOW_POLICIES = frozenset(
@@ -393,7 +385,7 @@ def _check_supported(td: Any, where: str, *, srv6: bool = False) -> None:
         value = getattr(policy, 'value', policy)
         if (isinstance(key, str) and key.startswith('TE_')) or value in (3, 4, 5):
             raise ValueError(
-                f'{where}: flow_policy {key!r} is not supported in strict mode: '
+                f'{where}: flow_policy {key!r} is not supported: '
                 'TE admission semantics and payload/wire capacity mapping are '
                 'not implemented, including for static_paths'
             )
@@ -409,7 +401,6 @@ def _populate_demands(
     demand_sets: dict[str, list[Any]],
     *,
     capacity_unit: float = 1e9,
-    strict: bool = True,
 ) -> list[str]:
     """Expand demands. Semantics kept from NetGraph: ``pairwise`` splits the
     volume over the pairs; ``combine`` sends an even share from every source
@@ -417,8 +408,8 @@ def _populate_demands(
     as with NetGraph's pseudo sink), targets that are also sources are
     excluded. Known approximation: NetGraph re-splits a combined volume over
     the sources that can reach a target in each iteration, NetGraph-Sim keeps each
-    source's share fixed (a cut-off source drops its share). With ``strict``
-    unsupported options raise. With srv6=True, one explicit pairwise path
+    source's share fixed (a cut-off source drops its share). Unsupported
+    options raise. With srv6=True, one explicit pairwise path
     becomes a DROP-fallback SR policy. TE admission semantics, group modes
     and capacity-aware multi-path pins remain unsupported. Bundle-member pins
     need an explicit attrs.sim.allow_bundle_pins=True approximation opt-in."""
@@ -426,12 +417,11 @@ def _populate_demands(
     used = _used_ipv4(net)
     for set_name in sorted(demand_sets):
         for i, td in enumerate(demand_sets[set_name]):
-            if strict:
-                _check_supported(
-                    td,
-                    f'{set_name}[{i}]',
-                    srv6=bool(getattr(net, 'ngraph_sim_srv6', False)),
-                )
+            _check_supported(
+                td,
+                f'{set_name}[{i}]',
+                srv6=bool(getattr(net, 'ngraph_sim_srv6', False)),
+            )
             sources = _match(network, td.source)
             targets = _match(network, td.target)
             if getattr(td, 'static_paths', ()) and getattr(
@@ -563,7 +553,7 @@ def _path_interfaces(
                     choices,
                     key=lambda link: (
                         float(
-                            _attrs(link).get('reverse_cost', link.cost)
+                            _settings(link).get('reverse_cost', link.cost)
                             if link.target == a
                             else link.cost
                         ),
@@ -627,7 +617,7 @@ def _pinned_demand(
     source, target = sources[0], targets[0]
     if network.nodes[source].disabled or network.nodes[target].disabled:
         raise ValueError('static_paths: source and target must be enabled')
-    allow_bundle_pins = _attrs(td).get('allow_bundle_pins', False)
+    allow_bundle_pins = _settings(td).get('allow_bundle_pins', False)
     if type(allow_bundle_pins) is not bool:
         raise ValueError('static_paths: attrs.sim.allow_bundle_pins must be a boolean')
     segments = (
@@ -754,7 +744,6 @@ def from_scenario(
     failure_policy: str | None = None,
     demand_set: str | None = None,
     iterations: int = 0,
-    strict: bool = True,
     srv6: bool = False,
     **kw: Any,
 ) -> tuple[Network, list[str], FailureSchedule | None]:
@@ -779,7 +768,7 @@ def from_scenario(
         if demand_set is not None:
             sets = {demand_set: sets[demand_set]}
         ids = _populate_demands(
-            scenario.network, net, sets, capacity_unit=capacity_unit, strict=strict
+            scenario.network, net, sets, capacity_unit=capacity_unit
         )
     schedule = None
     if iterations:
@@ -819,7 +808,7 @@ def to_network(
             node_cls(
                 name,
                 disabled=not dev.config.enabled,
-                attrs={'loopback_ipv4': _loopback_v4(net, name)},
+                attrs={'sim': {'loopback_ipv4': _loopback_v4(net, name)}},
             )
         )
     from ngraph_sim.model import derive

@@ -284,10 +284,6 @@ class TestRetention:
         assert len(tl.records) > 1 and all(r.event_count == 0 for r in tl.records)
         assert tl.stage_names(10) == ['carrier', 'lag', 'l3', 'fib', 'placement']
 
-    def test_recorder_alias(self):
-        net, R, sim = flap()
-        assert sim.recorder is sim.timeline
-
 
 class TestDeltaNoise:
     def test_changed_paths_hide_bookkeeping(self):

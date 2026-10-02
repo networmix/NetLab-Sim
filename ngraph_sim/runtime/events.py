@@ -115,9 +115,7 @@ class Stats:
     """Constant retention per key, with optional bounded diagnostic samples.
 
     ``aggregates`` always covers every increment. ``samples=N`` retains only
-    the last N (time, value) pairs per key in ``samples``. The legacy read API
-    ``counters`` returns a single (last_time, cumulative_sum) pair per key,
-    preserving existing sum-based consumers independently of sampling.
+    the last N (time, value) pairs per key in ``samples``.
     """
 
     def __init__(self, *, samples: int = 0) -> None:
@@ -126,13 +124,6 @@ class Stats:
         self._sample_limit = samples
         self.aggregates: dict[str, StatAggregate] = {}
         self.samples: dict[str, deque[tuple[float, float]]] = {}
-
-    @property
-    def counters(self) -> dict[str, list[tuple[float, float]]]:
-        return {
-            key: [(value.last_time, value.sum)]
-            for key, value in self.aggregates.items()
-        }
 
     def add(self, name: str, time: float, value: float = 1.0) -> None:
         old = self.aggregates.get(name)

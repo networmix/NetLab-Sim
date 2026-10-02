@@ -76,10 +76,22 @@ def diamond_stub():
     for n in ('R1', 'R2', 'R3', 'R4'):
         g.add_node(Node(n))
     g.add_link(
-        Link('R1', 'R2', capacity=100, cost=1, attrs={'lag': 'Po1', 'min_links': 2})
+        Link(
+            'R1',
+            'R2',
+            capacity=100,
+            cost=1,
+            attrs={'sim': {'lag': 'Po1', 'min_links': 2}},
+        )
     )
     g.add_link(
-        Link('R1', 'R2', capacity=100, cost=1, attrs={'lag': 'Po1', 'min_links': 2})
+        Link(
+            'R1',
+            'R2',
+            capacity=100,
+            cost=1,
+            attrs={'sim': {'lag': 'Po1', 'min_links': 2}},
+        )
     )
     g.add_link(Link('R1', 'R3', capacity=100, cost=1))
     g.add_link(Link('R2', 'R4', capacity=100, cost=1))
@@ -484,7 +496,7 @@ class TestCombineAllocation:
         assert net.state is root
         assert net.ngraph_sim_demand_priorities == before
 
-    def test_strict_rejects_untranslated_options(self):
+    def test_untranslated_options_are_rejected(self):
         graph = diamond_stub()
         net = adapter.from_network(graph)
 
@@ -495,10 +507,6 @@ class TestCombineAllocation:
         td.flow_policy = type('P', (), {'name': 'TE_WCMP_UNLIM', 'value': 3})()
         with pytest.raises(ValueError, match='flow_policy'):
             adapter.demands_from(graph, net, {'x': [td]}, capacity_unit=1.0)
-        ids = adapter.demands_from(
-            graph, net, {'x': [td]}, capacity_unit=1.0, strict=False
-        )
-        assert len(ids) == 1
         td2 = Rich('^R1$', '^R4$', 1.0, mode='pairwise')
         td2.static_paths = (('R1', 'R4'),)
         with pytest.raises(ValueError, match='static_paths'):
@@ -507,6 +515,8 @@ class TestCombineAllocation:
         td3.group_mode = 'per_group'
         with pytest.raises(ValueError, match='group_mode'):
             adapter.demands_from(graph, net, {'z': [td3]}, capacity_unit=1.0)
+        with pytest.raises(TypeError, match='strict'):
+            adapter.demands_from(graph, net, {'x': [td]}, strict=False)  # type: ignore[call-arg]
 
 
 def test_metadata_survives_a_post_commit_observer_error():
@@ -541,3 +551,23 @@ def test_fork_detaches_nested_adapter_metadata():
     fork = net.fork()
     fork.ngraph_sim_failure_parameters[('device', 'R1')]['mtbf'] = 2
     assert net.ngraph_sim_failure_parameters[('device', 'R1')]['mtbf'] == 10
+
+
+def test_settings_are_read_only_from_the_sim_namespace():
+    graph = diamond_stub()
+    graph.nodes['R1'].attrs = {'loopback_ipv4': '10.9.9.9/32'}  # not a setting
+    graph.nodes['R2'].attrs = {'sim': {'loopback_ipv4': '10.8.8.8/32'}}
+    net = adapter.from_network(graph)
+    assert adapter._loopback_v4(net, 'R1') != '10.9.9.9'
+    assert adapter._loopback_v4(net, 'R2') == '10.8.8.8'
+
+
+def test_exported_loopbacks_import_back_unchanged():
+    graph = diamond_stub()
+    graph.nodes['R3'].attrs = {'sim': {'loopback_ipv4': '10.7.7.7/32'}}
+    net = adapter.from_network(graph)
+    out = adapter.to_network(net, node_cls=Node, link_cls=Link, network_cls=StubNetwork)
+    again = adapter.from_network(out)
+    assert {
+        name: adapter._loopback_v4(again, name) for name in ('R1', 'R2', 'R3', 'R4')
+    } == {name: adapter._loopback_v4(net, name) for name in ('R1', 'R2', 'R3', 'R4')}

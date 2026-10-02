@@ -100,7 +100,9 @@ def test_partial_failure_retry_and_captured_prefix(monkeypatch):
     assert a.runs == 1 and b.runs == 0 and b.rng is None and b.state is None
     assert b.receipt.status == 'REJECTED'
     assert len(sent) == 1 and sent[0][-1].payload == 'a'
-    assert sim.stats.counters == {'a': [(0, 1)]}
+    assert {
+        k: (v.count, v.sum, v.last_time) for k, v in sim.stats.aggregates.items()
+    } == {'a': (1, 1, 0)}
     assert len([r for r in sim.timeline.records if r.origin.name == 'agent']) == 1
     assert len(sim.timeline.select(kind=AgentRunEvent)) == 2
     assert calls[0][0] == 'a' and calls[1][0] == 'b'

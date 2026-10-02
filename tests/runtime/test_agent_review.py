@@ -390,7 +390,6 @@ def test_stats_default_retention_is_bounded_and_aggregates_are_exact():
         keep_records=0,
     )
     sim.run_until(1000)
-    assert len(sim.stats.counters['ticks']) <= 1
     aggregate = sim.stats.aggregates['ticks']
     assert (
         aggregate.count,
@@ -401,7 +400,7 @@ def test_stats_default_retention_is_bounded_and_aggregates_are_exact():
         aggregate.last_time,
     ) == (1001, 500500, 0, 1000, 1000, 1000)
     assert not sim.stats.samples
-    assert sum(value for _, value in sim.stats.counters['ticks']) == aggregate.sum
+    assert set(sim.stats.aggregates) == {'ticks'}
 
 
 def test_stats_opt_in_samples_are_bounded_independently_of_aggregates():
@@ -412,7 +411,6 @@ def test_stats_opt_in_samples_are_bounded_independently_of_aggregates():
     assert stats.samples['key'].maxlen == 3
     assert stats.aggregates['key'].count == 10
     assert stats.aggregates['key'].sum == -5
-    assert sum(value for _, value in stats.counters['key']) == -5
 
 
 @pytest.mark.parametrize('samples', [-1, True, 1.5, None])

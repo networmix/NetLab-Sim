@@ -78,7 +78,8 @@ def twins(**kwargs):
 
 
 def counter(sim, name):
-    return sum(value for _, value in sim.stats.counters.get(name, ()))
+    aggregate = sim.stats.aggregates.get(name)
+    return aggregate.sum if aggregate is not None else 0
 
 
 def state(sim, name='r0'):

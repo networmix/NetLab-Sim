@@ -85,8 +85,8 @@ policies. `to_ngraph()` returns a NetGraph `results.json` step whose
 ## NetGraph adapter
 
 `from_scenario(scenario, *, addressing='unnumbered', capacity_unit=1e9,
-failure_policy=None, demand_set=None, iterations=0, strict=True, srv6=False,
-ipv6=False, igp=True, pools=None)` returns `(network, demand_ids, schedule)`.
+failure_policy=None, demand_set=None, iterations=0, srv6=False, ipv6=False,
+igp=True, pools=None)` returns `(network, demand_ids, schedule)`.
 It maps nodes to devices with loopbacks, links to Ethernets (parallel links
 tagged `lag` to a PortChannel), costs to metrics and the demand set to
 demands. `pairwise` demands split the volume over the pairs; `combine`
@@ -97,18 +97,20 @@ NetGraph-Sim priorities (higher first). The failure policy becomes a
 and uDT46, every L3 link end a uA, and a pairwise demand with one explicit
 `StaticPath` becomes an SR policy.
 
-Strict mode, the default, accepts only the `SHORTEST_PATHS_ECMP` and
+The adapter accepts only the `SHORTEST_PATHS_ECMP` and
 `SHORTEST_PATHS_ECMP_LOSSY` flow policies, the `combine` and `pairwise`
 modes, the `flatten` group mode, and static paths only with `srv6=True`.
 
-Per-entity settings are read from `attrs`:
+Per-entity settings are read only from the `attrs.sim` mapping:
 
-| Entity | In `attrs.sim` only | In `attrs` or `attrs.sim` |
-|---|---|---|
-| node | `fib_delay`, `fast_failover`, `mtbf`, `mttr`, `ttf`, `ttr` | `loopback_ipv4`, `loopback_ipv6` |
-| link | `carrier_delay_down`, `carrier_delay_up`, `mtbf`, `mttr`, `ttf`, `ttr` | `source_interface`, `target_interface`, `lag`, `min_links`, `reverse_cost` |
-| risk group | `mtbf`, `mttr`, `ttf`, `ttr` | |
-| demand | | `allow_bundle_pins` |
+| Entity | Keys in `attrs.sim` |
+|---|---|
+| node | `fib_delay`, `fast_failover`, `loopback_ipv4`, `loopback_ipv6`, `mtbf`, `mttr`, `ttf`, `ttr` |
+| link | `carrier_delay_down`, `carrier_delay_up`, `source_interface`, `target_interface`, `lag`, `min_links`, `reverse_cost`, `mtbf`, `mttr`, `ttf`, `ttr` |
+| risk group | `mtbf`, `mttr`, `ttf`, `ttr` |
+| demand | `allow_bundle_pins` |
+
+`to_network` writes each node's loopback back under `attrs.sim`.
 
 Entities that set both `mtbf` and `mttr` form `Study.failure_parameters`,
 the renewal process of the `SimStudy` process mode.

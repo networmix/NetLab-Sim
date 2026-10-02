@@ -289,7 +289,7 @@ def pinned_chain(*, policy=None, bundle=False, real=False):
                 'B',
                 capacity=100,
                 cost=1,
-                attrs={'lag': 'Po1', 'min_links': 1} if bundle else {},
+                attrs={'sim': {'lag': 'Po1', 'min_links': 1}} if bundle else {},
             )
         )
     graph.add_link(link_cls('B', 'D', capacity=100, cost=1))
@@ -329,21 +329,15 @@ def test_real_congested_te_pin_is_rejected(policy):
     assert core_pinned(sc.network, td).summary.total_placed == pytest.approx(100)
     with pytest.raises(ValueError, match='admission semantics'):
         from_scenario(sc, srv6=True, capacity_unit=1e6)
-    # The legacy strict=False escape hatch deliberately retains native
-    # UNCONSTRAINED placement; it does not promise NetGraph admission semantics.
-    net, _, _ = from_scenario(sc, srv6=True, capacity_unit=1e6, strict=False)
-    net.converge()
-    assert net.placement.delivered_total / 1e6 == pytest.approx(200)
 
 
 @pytest.mark.parametrize('form', ['nodes', 'links'])
-@pytest.mark.parametrize('strict', [True, False])
-def test_bundle_member_pins_require_explicit_opt_in(form, strict):
+def test_bundle_member_pins_require_explicit_opt_in(form):
     sc, td = pinned_chain(bundle=True)
     if form == 'links':
         td.static_paths = (NS(nodes=(), links=('A|B|0', 'B|D|0')),)
     with pytest.raises(ValueError, match='allow_bundle_pins'):
-        from_scenario(sc, srv6=True, strict=strict)
+        from_scenario(sc, srv6=True)
 
 
 @pytest.mark.parametrize('form', ['nodes', 'links'])
@@ -397,7 +391,7 @@ def test_bundle_opt_in_is_per_demand_and_rejected_import_is_atomic():
     )
     before = net.state
     with pytest.raises(ValueError, match='allow_bundle_pins'):
-        demands_from(sc.network, net, {'rejected': [td]}, strict=False)
+        demands_from(sc.network, net, {'rejected': [td]})
     assert net.state is before
     assert net.ngraph_sim_demand_destinations == {}
     td.attrs = {'sim': {'allow_bundle_pins': True}}
@@ -410,7 +404,7 @@ def test_bundle_opt_in_is_per_demand_and_rejected_import_is_atomic():
     assert net.state is before
 
 
-def test_bundle_opt_in_does_not_enable_te_admission_in_strict_mode():
+def test_bundle_opt_in_does_not_enable_te_admission():
     sc, td = pinned_chain(bundle=True, policy='TE_WCMP_UNLIM')
     td.attrs = {'sim': {'allow_bundle_pins': True}}
     with pytest.raises(ValueError, match='admission semantics'):

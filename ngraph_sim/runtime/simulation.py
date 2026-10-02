@@ -105,11 +105,6 @@ class Simulation:
         self.timeline.baseline(env.now, network.state)
         self.agents.bind()
 
-    @property
-    def recorder(self) -> Timeline:
-        """Alias of ``timeline``."""
-        return self.timeline
-
     def _on_delta(self, time: float, origin: Any, delta: Any) -> None:
         self.pipeline.on_delta(time, origin, delta)
         self.timeline.on_delta(time, origin, delta)
