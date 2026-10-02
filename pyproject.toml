@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "netsim"
 version = "0.1.0"
-description = "A discrete-event simulation engine."
+description = "Discrete-event simulation for IP networks."
 readme = "README.md"
 authors = [{ name = "Andrey Golovanov" }]
 license = "MIT"
@@ -30,6 +30,11 @@ classifiers = [
 ]
 
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/networmix/NetSim"
+Documentation = "https://github.com/networmix/NetSim/blob/main/docs/reference.md"
+Issues = "https://github.com/networmix/NetSim/issues"
 
 [project.scripts]
 netsim = "netsim.cli:main"

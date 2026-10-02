@@ -19,8 +19,10 @@ Two layers:
 ## Install
 
 ```bash
-pip install netsim
+pip install git+https://github.com/networmix/NetSim
 ```
+
+The name `netsim` on PyPI belongs to an unrelated project.
 
 ## Engine
 
@@ -50,7 +52,7 @@ env.run()
 | `Environment` | Clock and event scheduler |
 | `Event`, `Timeout` | Something that may happen; a timeout triggers after a delay |
 | `Process` | Generator-based coroutine; is itself an event, so processes can wait for each other |
-| `AllOf`, `AnyOf` | Composite events (`a & b`, `a \| b`) |
+| `AllOf`, `AnyOf` | Wait for all or any of several events; `a & b` and `a \| b` are shorthands |
 | `Store`, `FilterStore`, `PriorityStore` | Queues (FIFO, filtered get, priority order) |
 | `Resource`, `PriorityResource`, `PreemptiveResource` | Capacity slots, with priorities and preemption |
 | `Container` | Bulk quantities |
@@ -79,29 +81,29 @@ net.add_demand('d1', 'R1', '10.0.0.2', rate=4e9)
 sim = Simulation(netsim.Environment(), net)   # converges at t=0
 sim.at(10, net.links['R1:eth1--R2:eth1'].fail)
 sim.run_until(20)
-print(sim.timeline.snapshot_at(10).placement.dropped_by_reason)   # {'NO_ROUTE': 4e9}
+print(sim.timeline.snapshot_at(10).placement.dropped_by_reason)   # PMap({'NO_ROUTE': 4000000000.0})
 ```
 
 All simulated state is one immutable tree. Every change commits a new root,
 and derivations (carrier debounce, LAG membership, L3 neighbors, routes, FIB
 resolution, placement) run in dependency order either without a clock
-(`net.converge()`, `net.place()`) or on the simulation clock, where device
-settings such as `fib_delay` and `carrier_delay_down` decide how long a dead
-leg keeps carrying traffic.
+(`net.converge()`, `net.place()`) or on the simulation clock. There, a
+device's `fib_delay` and an interface's `carrier_delay_down` decide how long
+traffic is still sent to a dead leg and dropped.
 
 - Bulk edits go in `with net.batch():` and commit once.
 - `sim.timeline` records every commit as typed events: `summary(t)`,
-  `select(kind=..., device=...)`, `interface_series()`,
+  `select(kind=EventClass, device=...)`, `interface_series(device, interface)`,
   `utilization_series(edge)`, `rows()`, `to_csv(path)`. By default it keeps the
   latest 10,000 records and 100,000 events.
-- `net.add_source(netsim.model.igp.oracle_igp)` installs shortest-path ECMP
-  routes without a protocol.
+- `net.add_source(oracle_igp)`, from `netsim.model.igp`, installs
+  shortest-path ECMP routes without a protocol.
 
 ## Segment routing
 
 Locators and local SIDs (End, End.X, End.DT46 and their NEXT-C-SID forms
-uN, uA, uDT46; PSP and USD flavors), SR policies with weighted candidate
-paths, BSID and per-flow steering, RFC 9800 compression, and H.Encaps or
+uN, uA, uDT46; PSP and USD flavors), SR policies whose candidate paths hold
+weighted segment lists, BSID and per-flow steering, RFC 9800 compression, and H.Encaps or
 H.Encaps.Red at the headend. Placement follows the encapsulated packet hop
 by hop, so wire load includes the outer headers.
 
@@ -129,8 +131,8 @@ net.converge()
 print(r1.node.srv6_policies.states[policy.key].status)   # UP
 ```
 
-Policy state reports validity, the selected path, programming status and
-observed delivery separately. See `netsim/model/srv6.py` for the records and
+Policy state reports validity, the selected path and programming status;
+`srv6.policy_status(state)` adds the delivery observed in placement. See `netsim/model/srv6.py` for the records and
 `docs/reference.md` for the SONiC CONFIG_DB interchange format.
 
 ## Protocol agents
@@ -167,14 +169,26 @@ print([str(to_network(*row.prefix, 4)) for row in r1.rib(4).rows_of(ClientId('re
 ## Failure studies
 
 ```python
-from netsim.runtime import Draws, Process, Schedule
+from netsim.runtime import Draws, Process
 from netsim.study import Study
 
+net = Network()
+r1, r2, r3 = (net.add_device(f'R{i}') for i in (1, 2, 3))
+for i, r in enumerate((r1, r2, r3), 1):
+    r.add_loopback('lo0', ipv4=[f'10.0.0.{i}/32'])
+net.add_p2p(r1, 'eth1', r2, 'eth1', unnumbered=True)
+net.add_p2p(r2, 'eth2', r3, 'eth1', unnumbered=True)
+net.add_p2p(r1, 'eth2', r3, 'eth2', unnumbered=True)
+net.add_source(oracle_igp)
+net.add_demand('d1', 'R1', '10.0.0.3', rate=4e9)
+
 study = Study(net)
-result = study.enumerate('links')                 # every single link, k=2 for pairs
-result = study.process(Process({('link', lid): {'mtbf': 100, 'mttr': 2}}, seed=42),
-                       horizon=10_000)            # renewal process
-result = study.iterations(draws, warmup=2, horizon=3, stability='all', quiet=0.5)
+result = study.enumerate('links')                 # every single link; k=2 for pairs
+link = next(iter(net.links))
+result = study.process(Process({('link', link): {'mtbf': 100, 'mttr': 2}}, seed=42),
+                       horizon=1_000)             # renewal process
+result = study.iterations(Draws.enumerate(net, 'links'), horizon=3,
+                          stability='all', quiet=0.5)
 rows = result.rows()                              # per flow and failure pattern
 ```
 
@@ -193,8 +207,8 @@ netsim run scenario.yaml --results results.json
 
 - `netsim.adapters.ngraph`: NetGraph scenarios and networks in, per-link
   utilization and NetGraph-shaped results out.
-- `netsim.adapters.core`: NetGraph-Core as an SPF accelerator and an
-  independent cross-check for plain-IP placement.
+- `netsim.adapters.core`: links as NetGraph-Core graph arrays
+  (`edge_arrays`, `build_graph`), used to cross-check plain-IP placement.
 - `netsim.adapters.sonic`: SONiC CONFIG_DB load and dump for a bounded schema.
 
 Details of these formats and the study options are in

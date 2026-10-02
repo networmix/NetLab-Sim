@@ -3,8 +3,8 @@
 Envelope: {"version": 1, "devices": {hostname: {table: {key: fields}}}}.
 The static locator/My-SID vocabulary follows SONiC's srv6_static_config_hld;
 SRV6_POLICY candidate_paths and explicit per-SID lengths are NetSim extensions.
-Only the default table and pipe decapsulation are modeled. See README for the
-complete subset. Unknown fields are errors, never silently discarded.
+Only the default table and pipe decapsulation are modeled. See
+``docs/reference.md`` for the complete subset. Unknown fields are errors, never silently discarded.
 """
 
 from __future__ import annotations

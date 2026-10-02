@@ -4,13 +4,15 @@ Formats and options that are too detailed for the README.
 
 ## Batches
 
-`with net.batch():` stages device, interface, link, route and demand edits
-and commits them once; hooks and the runtime see one delta with origin
-`('batch', n_ops)`. An exception inside the block restores the tree and the
-allocators; handles of provisional entities become stale. Reads inside the
-block (`state`, a device's `node`, `fork()`) see the staged edits.
-`converge()` and `place()` are not allowed inside a batch. Client profiles,
-route sources and the capacity model are outside the transaction.
+`with net.batch():` stages device, interface, link, route, demand and SRv6
+(locator, SID and policy) edits and agent registrations, then commits them
+once; hooks and the runtime see one delta with origin `('batch', n_ops)`. An
+exception inside the block restores the tree and the allocators and undoes
+the agent registrations; handles of entities created in the block become
+stale. Reads inside the block (`state`, a device's `node`, `fork()`) see the
+staged edits. `converge()` and `place()` are not allowed inside a batch.
+Client profiles, route sources and the capacity model are outside the
+transaction.
 
 ## Timeline
 
@@ -40,20 +42,36 @@ are built from retained events.
 
 Entities are `('device', name)`, `('link', id)` or `('risk_group', name)`.
 All sources on one simulation share leases: an entity fails on its first
-lease and recovers on its last release. Renewal distributions are
-`exponential`, `lognormal`, `weibull` and `constant`, parameterized by
-`mtbf` and `mttr` (means), `sigma` for lognormal and `shape` for Weibull.
+lease and recovers on its last release.
 
-`Study.iterations`, `enumerate`, `process` and `replay` accept:
+A renewal `Process` takes `mtbf` and `mttr` per entity, the mean times in
+seconds. `ttf` and `ttr` choose the distributions, either by name
+(`exponential`, the default, `lognormal`, `weibull` or `constant`) or as a
+mapping such as `{'kind': 'lognormal', 'sigma': 0.5}`. `sigma` is the
+lognormal spread in log space and `shape` the Weibull shape; both belong in
+that mapping. The means stay `mtbf` and `mttr`.
 
-| Option | Meaning |
-|---|---|
-| `t0`, `settle`, `restore` | failure time, minimum observation window, restore after the window |
-| `warmup` | simulated time run on a fresh runtime before `t0` (needed with agents) |
-| `horizon` | observation window after the failure (`settle` is its alias) |
-| `event_budget` | maximum engine events per iteration; exceeding reports `budget_exceeded` |
-| `stability`, `quiet` | predicate (`routing`, `programming`, `delivery`, `all`) that must hold for `quiet` seconds to report `converged` |
-| `keep` | retention: `roots`, `deltas`, `events`, `records`, `arrays`, `reports`, `timeline` |
+`Study(network, keep=...)` sets retention, as described under Timeline: `keep`
+takes `roots`, `deltas`, `events`, `records`, `arrays`, `reports` and
+`timeline`. `Study.from_scenario(scenario, keep=..., **options)` builds the
+network with the NetGraph adapter below.
+
+The run methods accept these options:
+
+| Option | Methods | Meaning |
+|---|---|---|
+| `t0` | `iterations`, `enumerate`, `replay` | failure time |
+| `settle` | `iterations`, `enumerate`, `replay` | observation window (see below) |
+| `restore` | `iterations`, `enumerate`, `replay` | restore after the window |
+| `warmup` | all | simulated time run on a fresh runtime before `t0` (needed with agents) |
+| `horizon` | all; required by `process` | observation window after the failure |
+| `event_budget` | all | maximum engine events per iteration; exceeding it reports `budget_exceeded` |
+| `stability`, `quiet` | all | predicate (`routing`, `programming`, `delivery`, `all`) that must hold for `quiet` seconds to report `converged` |
+
+Without agents and without `warmup`, `horizon`, `event_budget`, `stability`
+or `quiet`, `settle` is a minimum window after which derivations drain.
+Otherwise the observation window is a hard limit: `horizon`, or `settle` when
+`horizon` is absent. `iterations` also takes `parallelism`, which must be 1.
 
 Each iteration's `data.netsim` reports `status` (`converged`,
 `deadline_exceeded`, `budget_exceeded`), `converged_at`, transient and
@@ -61,24 +79,39 @@ full-window loss in bits, per-demand downtime, drop reasons, engine events
 and rounds; with agents, the baseline is prepared on a warmed runtime and
 carries `baseline_complete`. `StudyResult.rows()` has one row per flow and
 failure pattern (with `occurrence_count`), plus `policy_*` columns for SR
-policies; `to_ngraph()` follows NetGraph's `FlowIterationResult` shape.
+policies. `to_ngraph()` returns a NetGraph `results.json` step whose
+`baseline` and `flow_results` follow `FlowIterationResult`.
 
 ## NetGraph adapter
 
-`from_scenario(scenario, capacity_unit=1e9, addressing='unnumbered',
-srv6=False, strict=True)` maps nodes to devices with loopbacks, links to
-Ethernets (parallel links tagged `lag` to a PortChannel), costs to metrics,
-`demands` to demand sets and `failures` to draws. `pairwise` demands split
-the volume over the pairs; `combine` demands become one anycast prefix.
-NetGraph priorities (lower first) map to NetSim priorities (higher first).
-With `srv6=True` every device gets an F3216 locator, uN and uDT46, every
-L3 link end a uA, and a pairwise demand with one explicit `StaticPath`
-becomes an SR policy. Strict mode rejects WCMP and TE flow policies.
+`from_scenario(scenario, *, addressing='unnumbered', capacity_unit=1e9,
+failure_policy=None, demand_set=None, iterations=0, strict=True, srv6=False,
+ipv6=False, igp=True, pools=None)` returns `(network, demand_ids, schedule)`.
+It maps nodes to devices with loopbacks, links to Ethernets (parallel links
+tagged `lag` to a PortChannel), costs to metrics and the demand set to
+demands. `pairwise` demands split the volume over the pairs; `combine`
+demands become one anycast prefix. NetGraph priorities (lower first) map to
+NetSim priorities (higher first). The failure policy becomes a
+`FailureSchedule` only when `iterations > 0`; for studies, use
+`Draws.from_policy`. With `srv6=True` every device gets an F3216 locator, uN
+and uDT46, every L3 link end a uA, and a pairwise demand with one explicit
+`StaticPath` becomes an SR policy.
 
-Timing overrides live in `attrs.netsim` on nodes, links and risk groups:
-`mtbf`, `mttr`, `ttf`, `ttr`, `fib_delay`, `fast_failover`,
-`carrier_delay_down`, `carrier_delay_up`, `source_interface`,
-`target_interface`, `loopback_ipv4`, `loopback_ipv6`.
+Strict mode, the default, accepts only the `SHORTEST_PATHS_ECMP` and
+`SHORTEST_PATHS_ECMP_LOSSY` flow policies, the `combine` and `pairwise`
+modes, the `flatten` group mode, and static paths only with `srv6=True`.
+
+Per-entity settings are read from `attrs`:
+
+| Entity | In `attrs.netsim` only | In `attrs` or `attrs.netsim` |
+|---|---|---|
+| node | `fib_delay`, `fast_failover`, `mtbf`, `mttr`, `ttf`, `ttr` | `loopback_ipv4`, `loopback_ipv6` |
+| link | `carrier_delay_down`, `carrier_delay_up`, `mtbf`, `mttr`, `ttf`, `ttr` | `source_interface`, `target_interface`, `lag`, `min_links`, `reverse_cost` |
+| risk group | `mtbf`, `mttr`, `ttf`, `ttr` | |
+| demand | | `allow_bundle_pins` |
+
+Entities that set both `mtbf` and `mttr` form `Study.failure_parameters`,
+the renewal process of the `NetSimStudy` process mode.
 
 Importing `netsim.adapters.ngraph` registers the `NetSimStudy` workflow step:
 
@@ -101,8 +134,10 @@ NetGraph and writes the complete results.
 
 ## SONiC adapter
 
-`sonic.load(mapping_or_json_or_path)`, `sonic.dump(network, path=None)` and
-`sonic.appl_db(network)` use the envelope
+`sonic.load(source)` takes a mapping, JSON text or a `pathlib.Path`; a plain
+string is parsed as JSON text. `sonic.dump(network, destination=None)` returns
+the mapping and also writes it to `destination` when one is given.
+`sonic.appl_db(network)` returns the APPL_DB view. All three use the envelope
 `{"version": 1, "devices": {"R1": {"TABLE": {"key": {"field": "value"}}}}}`.
 Devices are unconnected on load; add links with
 `net.add_link((device, interface), (device, interface))`.
@@ -111,14 +146,28 @@ Devices are unconnected on load; add links with
 |---|---|
 | `PORT` | `speed` (Mbit/s, default 10000), `mtu` (1500), `admin_status` |
 | `INTERFACE`, `LOOPBACK_INTERFACE` | keys `interface` and `interface\|address/prefix` |
-| `STATIC_ROUTE` | `nexthop` and/or `ifname` vectors, or `blackhole: "true"`; `distance` |
-| `SRV6_MY_LOCATORS` | `prefix`; `block_len`, `node_len`, `func_len`, `arg_len` (32/16/16/0) |
-| `SRV6_MY_SIDS` | key `locator\|prefix`; `action` (`End`, `End.X`, `End.DT46`, `uN`, `uA`, `uDT46`), `flavors`, `interface`, `adj` |
+| `STATIC_ROUTE` | `nexthop` and/or `ifname` as comma-separated strings, or `blackhole: "true"`; `distance` (1 to 255, default 1) |
+| `SRV6_MY_LOCATORS` | `prefix`; `block_len`, `node_len`, `func_len`, `arg_len` (default 32/16/16/0, a classic locator; micro-SIDs need `arg_len: 64`); `vrf` (default only) |
+| `SRV6_MY_SIDS` | key `locator\|prefix`; `action` (`End`, `End.X`, `End.DT46`, `uN`, `uA`, `uDT46`), `flavors` (`psp`, `usd`, `usid`), `interface`, `adj`, `decap_dscp_mode` (`pipe` only), `decap_vrf` (default only), and the four `*_len` fields |
 | `SRV6_SID_LIST` | `path`: literal IPv6 addresses or objects with `sid`, lengths and `flavors` |
-| `SRV6_POLICY` | `color`, `endpoint`, `candidate_paths` (`segment_lists` references with `weight`, `preference`, `name`), `bsid`, `fallback` |
+| `SRV6_POLICY` | `color`, `endpoint`, `candidate_paths`, `bsid`, `fallback` (`IGP`, the default, or `DROP`) |
+
+A candidate path has `preference` (default 100), `name`, `segment_lists`,
+`protocol_origin`, `originator` and `discriminator`. Each `segment_lists`
+entry is `{"name": ..., "weight": ...}`, naming an `SRV6_SID_LIST` entry; the
+weight defaults to 1.
 
 Unknown tables or fields, unsupported behaviours and non-default VRFs raise
-`SchemaError` with the entry path. Load followed by dump preserves the input
-except key order. Configurations using bundles, unnumbered interfaces or
-symbolic segments cannot be dumped. APPL_DB output lists forwarding-order
-wire SIDs per SID list.
+`SchemaError` with the entry path. Load followed by dump returns the input
+except for key order. APPL_DB output lists the forwarding-order wire SIDs of
+each SID list.
+
+`dump` raises `SchemaError` for configuration that version 1 cannot express:
+bundles, unnumbered interfaces, symbolic segments, an interface metric other
+than 1, descriptions, explicit `forwarding_v4` or `forwarding_v6`, carrier
+delays, an MTU outside 1280 to 65535, speeds that are not whole Mbit/s,
+disabled devices, `srv6_source`, a non-default `srv6_hop_limit`, SIDs or
+policies not owned by static configuration, and steering rules. Derived
+routes, such as the oracle IGP's, demands and agents are not configuration
+and are not exported. The device settings `fib_delay` and `fast_failover`
+are dropped without an error.
