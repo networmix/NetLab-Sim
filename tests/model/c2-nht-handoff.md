@@ -1,4 +1,4 @@
-# Gate C slice C2 — local query, NHT and learned SR validation
+# Gate C slice C2: local query, NHT and learned SR validation
 
 Base: `9032ea8` (C0, design revision 16). Worktree branch: `gatec/c2-nht`.
 The supplied worktree started at `02c9fbb` and was fast-forwarded to the

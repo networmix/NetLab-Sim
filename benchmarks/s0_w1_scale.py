@@ -4,12 +4,12 @@
     PYTHONHASHSEED=0 venv/bin/python -m benchmarks.s0_w1_scale
     PYTHONHASHSEED=0 venv/bin/python -m benchmarks.s0_w1_scale --baseline 0e5b299
 
-Baseline mode reads the exact network module and consumer_index function from
-Git into this process before building anything; it does not change the checkout.
-This isolates the two W1 changes; other modules must match the baseline revision.
-Build matches build_phases.py's topology. Tracing is off unless --tracemalloc is
-given. Consumer timings isolate the helper with synthetic index-only headends,
-as in the review probe; they are not complete SRv6 topology/commit timings.
+Baseline mode loads network.py and consumer_index from the given revision
+without touching the checkout. The comparison isolates these two changes only
+where every other module matches that revision, as on s0/locator-consumer.
+The build is N devices, one IPv4 loopback each, N-1 unnumbered links, in one
+batch. Tracing is off unless --tracemalloc is given. Consumer timings call the
+helper on a synthetic index of headend names, not a full SRv6 commit.
 """
 
 from __future__ import annotations

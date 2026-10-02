@@ -92,7 +92,8 @@ leg keeps carrying traffic.
 - Bulk edits go in `with net.batch():` and commit once.
 - `sim.timeline` records every commit as typed events: `summary(t)`,
   `select(kind=..., device=...)`, `interface_series()`,
-  `utilization_series(edge)`, `rows()`, `to_csv(path)`.
+  `utilization_series(edge)`, `rows()`, `to_csv(path)`. By default it keeps the
+  latest 10,000 records and 100,000 events.
 - `net.add_source(netsim.model.igp.oracle_igp)` installs shortest-path ECMP
   routes without a protocol.
 
@@ -139,7 +140,7 @@ neighbors, RIB, installed forwarding, timers and delivered messages. It
 returns route, policy, SID and next-hop-tracking operations plus datagrams,
 session operations and timers; the runtime applies them in one delta per
 round and isolates a rejected output from its peers. Datagrams travel over
-link channels that honour physical failure, sessions are ordered reliable
+link channels that honour physical failure; sessions are ordered reliable
 streams with timeouts.
 
 `netsim.agents.reference` is a small link-state protocol built on that

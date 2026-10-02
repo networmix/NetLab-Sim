@@ -9,7 +9,7 @@ from tests.runtime.test_agents import Plugin, fixture
 
 
 def retained_size(values):
-    """Count each reachable RNG value once, including the MT integer leaves."""
+    """Count each reachable object once, down to the integer leaves."""
     seen = set()
     stack = list(values)
     size = 0
@@ -45,7 +45,7 @@ def test_idle_publications_retain_constant_rng_objects_and_bytes(runs, initial_d
         sim.settle()
         nodes.append(sim.state.devices['r'].agents['test'])
     values = [node.rng for node in nodes]
-    # Keep every publication alive: bounded timeline eviction cannot mask G18.
+    # Keep every publication alive so that timeline eviction cannot hide copies.
     assert len({id(value) for value in values}) == 1
     # (key, counters) with at most one drawn stream: two tuples, a pair and three
     # ints, about 300 bytes; object headers differ between interpreter builds.

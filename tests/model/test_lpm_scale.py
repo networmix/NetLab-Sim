@@ -1,4 +1,4 @@
-"""S0 regression: empty prefix tables retain no mask arrays."""
+"""S0: empty prefix tables allocate no per-table mask arrays."""
 
 import gc
 import tracemalloc
@@ -36,8 +36,7 @@ def test_shift_arithmetic_preserves_integer_address_and_key_boundaries(bits):
     table.insert(0, bits, None)
     table.insert((1 << bits) - 1, bits, 'last')
     for addr in (0, 1, (1 << bits) - 1, 1 << bits, -1, -(1 << bits)):
-        # The previous bitwise masks selected the low address-width bits,
-        # including for Python integers outside the IP address range.
+        # Integers outside the address range match on their low address bits.
         canonical = addr % (1 << bits)
         assert table.lookup(addr) == table.lookup(canonical)
         assert list(table.lookup_iter(addr)) == list(table.lookup_iter(canonical))

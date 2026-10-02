@@ -17,22 +17,24 @@ route sources and the capacity model are outside the transaction.
 Every commit is one record (`seq`, `time`, `round`, `origin`) with typed
 events: link state, interface oper transitions (RFC 2863 names and reasons),
 carrier debounce, bundle membership, RIB rows, FIB entries, SIDs, policies,
-demands, placement summaries, agent runs. `Simulation(keep_roots=,
-keep_deltas=, keep_events=, keep_records=)` bound what is retained; series
-come from the arrays the placement events carry. `Simulation` and `Timeline`
-default to 10,000 records and 100,000 events. Oldest entries are evicted in
-blocks, allowing fewer than `max(64, budget // 8)` extra entries per budget;
-`dropped_records` and `dropped_events` count the evictions. Pass
-`keep_records=None, keep_events=None` explicitly to retain full history.
-`Study` uses the same defaults for absent `keep` keys, including agent warmup
-and baseline runs; `keep={'records': None, 'events': None}` opts into full
-history. `keep={'arrays': True}` or `keep={'timeline': True}` selects full
-event history unless `events` is given explicitly, because the utilization
-series and exported rows they request come from retained events. Queries and
-exported timelines cover retained history only.
-Streaming `on_record` observers receive every record and event before eviction,
-so Study's streamed metrics cover the whole observation window. Roots and deltas
-retain their existing defaults (256 timestamps and 64 commits in Simulation).
+demands, placement summaries, agent runs. Series come from the arrays the
+placement events carry.
+
+`Simulation(keep_roots=, keep_deltas=, keep_events=, keep_records=)` bound
+what is retained. The defaults keep the last root of each of the last 256
+timestamps, 64 deltas, 10,000 records and 100,000 events. `None` for roots,
+records or events keeps all of them. Records and events are evicted oldest
+first, in blocks, so a list can exceed its budget by fewer than
+`max(64, budget // 8)` entries. `dropped_records` and `dropped_events` count
+the evictions. Queries and
+`to_csv` see only retained entries, while `on_record` observers receive every
+record and event before eviction.
+
+`Study` uses the same record and event budgets for absent `keep` keys,
+including agent warmup and baseline runs. Its metrics come from observers and
+cover the whole window. `keep={'arrays': True}` or `keep={'timeline': True}`
+keeps every event unless `events` is set, because the series and rows they add
+are built from retained events.
 
 ## Failure studies
 

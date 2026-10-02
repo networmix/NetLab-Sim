@@ -45,7 +45,7 @@ def test_default_idle_run_has_bounded_event_and_record_history():
             f'dropped_records={tl.dropped_records}, '
             f'dropped_events={tl.dropped_events}, {shallow_bytes=}'
         )
-    # Proposed budgets, including the existing amortized trim slack.
+    # Default budgets plus the amortized trim slack.
     assert len(tl.records) <= 10_000 + max(64, 10_000 // 8)
     assert len(tl.events) <= 100_000 + max(64, 100_000 // 8)
     assert tl.dropped_records > 0 and tl.dropped_events > 0

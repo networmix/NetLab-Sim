@@ -360,7 +360,7 @@ class Process(Event):
                     event._defused = True
                     event = gen.throw(_copy_exception(event._value))
             except StopIteration as e:
-                # Generator returned — trigger this Process event.
+                # Generator returned: trigger this Process event.
                 event = None  # type: ignore[assignment]
                 self._triggered = True
                 self._ok = True
@@ -369,7 +369,7 @@ class Process(Event):
                 self.env.schedule(self)
                 break
             except BaseException as e:
-                # Generator raised — fail this Process event.
+                # Generator raised: fail this Process event.
                 event = None  # type: ignore[assignment]
                 self._triggered = True
                 self._ok = False
@@ -383,10 +383,10 @@ class Process(Event):
             # The generator yielded an event to wait on.
             try:
                 if event.callbacks is not None:
-                    # Event not yet processed — register for callback.
+                    # Event not yet processed: register for callback.
                     event.callbacks.append(self._resume)
                     break
-                # Event already processed — loop back and send its value.
+                # Event already processed: loop back and send its value.
             except AttributeError:
                 if hasattr(event, 'callbacks'):
                     raise

@@ -381,7 +381,7 @@ class TestMM1Queue:
 
         measured_W = sum(sojourn_times) / len(sojourn_times)
 
-        # With ~40K samples, SE ≈ 0.025. 5% tolerance is ~100 SE — will not flake.
+        # With ~40K samples, SE ≈ 0.025, so a 5% tolerance is ~100 SE and will not flake.
         assert abs(measured_W - theoretical_W) / theoretical_W < 0.05, (
             f'measured W={measured_W:.2f}, theoretical W={theoretical_W:.2f}'
         )

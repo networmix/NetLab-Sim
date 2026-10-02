@@ -71,11 +71,11 @@ def _locator_blocks(
     new: NetworkState,
     blocks: PMap[tuple[str, str], tuple[int, int]],
 ) -> PMap[tuple[str, str], tuple[int, int]]:
-    """Mirror locator blocks at update boundaries, visiting changed devices only.
+    """Carry the ``(device, locator) -> block`` index across one root change.
 
-    This immutable validation index accompanies the committed root or staging
-    area. Builder operations cannot edit locators; pure updates can add, remove
-    or replace them (including whole devices/roots), so all such edits meet here.
+    Interface validation reads this index instead of scanning every device.
+    Builder operations cannot edit locators, so every locator change passes
+    through ``update`` and this function, which visits changed devices only.
     """
     changes = diff_pmap(old.devices, new.devices, by_identity=True)
     result = blocks.builder()

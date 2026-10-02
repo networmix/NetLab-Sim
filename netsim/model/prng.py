@@ -1,20 +1,19 @@
-"""Version 1 compact, deterministic simulation PRNG (not cryptographic).
+"""Deterministic simulation PRNG, version 1 (not cryptographic).
 
-Each stream uses SplitMix64: Vigna's public-domain reference implementation,
-https://prng.di.unimi.it/splitmix64.c (Steele, Lea and Flood, 2014,
-https://doi.org/10.1145/2714064.2660195). Word n is the reference generator
-seeded with the stream id, after n increments. All arithmetic wraps at 64 bits.
+Every stream is SplitMix64 (Steele, Lea and Flood, 2014,
+https://doi.org/10.1145/2714064.2660195; reference code at
+https://prng.di.unimi.it/splitmix64.c): word n is the reference generator
+seeded with the stream id after n increments, in 64-bit arithmetic.
 
-The v1 state is ``(key, counters)``: the family's 64-bit base key and a sorted
-tuple of (64-bit stream id, 64-bit draw counter) pairs for drawn streams. Only
-drawn streams occupy ``counters``. The key is fixed when the family is created
-(``for_agent`` hashes the seeds once), so a restored family continues its
-sequence whatever the seeds say now. Version 1 fixes the hash encoding,
-SplitMix64 constants and every distribution below; it intentionally does not
-reproduce random.Random's Mersenne Twister sequence. No stdlib random
-algorithms, Python hashes, global caches or mutable globals participate in
-generation. Callers persisting state outside NetSim must record Prng.VERSION
-alongside it and supply that version when restoring.
+State is ``(key, counters)``: the family's 64-bit base key and a sorted tuple
+of (stream id, draw count) pairs, one per stream that has drawn. The key is
+set once when the family is created, so a restored family continues its
+sequence even if the seeds it came from have changed.
+
+Version 1 fixes the hash encoding, the constants and every distribution below.
+It does not reproduce ``random.Random`` sequences, and generation uses no
+stdlib random code, ``hash()`` or mutable globals. Code that persists state
+outside NetSim must record ``Prng.VERSION`` with it and pass it back on restore.
 """
 
 from __future__ import annotations
@@ -82,11 +81,9 @@ def _check_counters(counters: object) -> PrngCounters:
 
 
 class _Bank:
-    """Invocation-local cursors shared by named handles; never enter the tree.
+    """Invocation-local counters shared by a family's handles; never committed.
 
-    ``state`` is the committed ``(key, counters)`` object, kept by identity
-    until a draw dirties it; the restored object itself is returned while
-    nothing was drawn.
+    ``state`` stays the restored object until a draw marks the bank dirty.
     """
 
     __slots__ = ('state', 'counters', 'dirty')
@@ -113,28 +110,20 @@ class _Bank:
 
 
 class Prng:
-    """A v1 SplitMix64 family with independent, persistent named streams.
+    """A family of independent named streams under one base key.
 
-    ``Prng(key, counters=(), version=1)`` creates a family under a 64-bit base
-    key. ``for_agent`` derives that key from the four agent seed fields for a
-    fresh family; ``restore(state)`` resumes a committed ``(key, counters)``
-    under its own key, so the seeds it was derived from no longer matter.
-    ``stream(name)`` returns a handle sharing this invocation's counters;
-    repeated calls for the same path return the same private stream object.
-    Nested names are length-delimited paths, so stream('a/b') differs from
-    stream('a').stream('b'). Merely obtaining a handle consumes nothing.
+    ``Prng(key, counters=())`` creates a family, ``for_agent`` derives the key
+    from an agent's seeds, and ``restore(state)`` resumes a committed state
+    under its own key. ``stream(name)`` returns a handle that shares the
+    family's counters. Within one invocation the same name returns the same
+    handle, and getting a handle draws nothing. Names nest as length-delimited
+    paths, so ``stream('a/b')`` differs from ``stream('a').stream('b')``.
 
-    ``getstate`` returns ``(key, counters)`` for all drawn streams and
-    preserves the restored object when no word was drawn. Restore with the
-    same version in the next run; handles and lists passed to ``shuffle`` must
-    stay invocation-local. Supported draw methods are random, uniform,
-    randrange, randint, choice, sample, shuffle and getrandbits. They follow
-    random.Random's argument/range semantics, without its sequence
-    compatibility or sample(counts=...) API. Other random.Random methods are
-    unsupported and raise AttributeError. There are no distribution caches.
-    reset_agent starts a fresh family under the new generation's key;
-    rejection preserves every pre-run counter. Each word advances only its
-    stream; a k-bit draw uses ceil(k/64) words.
+    ``getstate`` returns the restored object itself until something is drawn.
+    Handles, and lists passed to ``shuffle``, belong to one invocation. The
+    draw methods below follow ``random.Random``'s argument and range rules.
+    ``sample`` takes no ``counts``, and other ``random.Random`` methods are not
+    provided. A k-bit draw advances only its own stream, by ceil(k/64) words.
     """
 
     VERSION = 1
@@ -156,7 +145,7 @@ class Prng:
 
     @classmethod
     def restore(cls, state: PrngState, *, version: int = 1) -> Prng:
-        """Resume a committed family; ``getstate`` returns ``state`` itself until a draw."""
+        """Resume a committed family under the key stored in ``state``."""
         _check_version(version)
         if type(state) is not tuple or len(state) != 2:
             raise ValueError('invalid v1 PRNG state')
@@ -175,12 +164,12 @@ class Prng:
         agent_name: str,
         generation: int,
     ) -> Prng:
-        """Hash sign/magnitude integers and length-prefixed UTF-8, big-endian.
+        """A fresh family keyed by an 8-byte BLAKE2b digest of the four fields.
 
-        BLAKE2b uses an 8-byte digest and the v1 personalization shown below.
-        There is no normalization of names and no delimiter ambiguity. The
-        runtime calls this once per agent generation, at its first
-        publication; afterwards it restores the committed state.
+        Integers are a sign byte and a length-prefixed big-endian magnitude;
+        the name is length-prefixed UTF-8 without normalization. No two field
+        tuples share an encoding. The runtime keys a generation here until its
+        first publication and restores the committed state after that.
         """
         encoded = (
             _integer(network_seed)
@@ -195,7 +184,7 @@ class Prng:
         return cls(key)
 
     def stream(self, name: str) -> Prng:
-        """Derive a name/path under the base key, independent of every cursor."""
+        """The handle for ``name`` nested under this one; creating it draws nothing."""
         if not isinstance(name, str):
             raise TypeError('stream name must be a string')
         if self._children is None:
@@ -248,7 +237,7 @@ class Prng:
         return (self._word() >> 11) * (1.0 / 9007199254740992.0)
 
     def uniform(self, a: float, b: float) -> float:
-        """Return a + (b-a)*random(), including reversed bounds and rounding."""
+        """Return ``a + (b - a) * random()``; ``b < a`` is allowed, as in ``random``."""
         return a + (b - a) * self.random()
 
     def _randbelow(self, n: int) -> int:

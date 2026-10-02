@@ -1,4 +1,4 @@
-# C2F — runtime seam tests and scoped SR invalidation
+# C2F: runtime seam tests and scoped SR invalidation
 
 Base: `main` at `2ab9d7d`, merged by fast-forward into `gatec/c2-nht`.
 The integration commit was read before work. Its NHT refresh, profile propagation

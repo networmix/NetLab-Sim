@@ -1,9 +1,10 @@
-"""G18: 500 agents x 5 ticks, timing without tracemalloc, retention separately.
+"""Idle agent runs: 500 agents x 5 ticks, timed without tracemalloc.
 
-Run sequential fresh processes: --runtime-ref BASE, current, --runtime-ref BASE.
-Only the original agents module is loaded from BASE; no checkout is changed.
-All other runtime/model files must match BASE except PRNG contract docstrings.
-Unbounded history is explicit so retention-default changes cannot hide G18.
+Retention is measured in a separate run. Run fresh processes in sequence:
+--runtime-ref BASE, current, --runtime-ref BASE. Only agents.py is loaded from
+BASE and the checkout is untouched, so the comparison holds only where all
+other runtime and model files match BASE, as on s0/prng. History is explicitly
+unbounded, so timeline eviction cannot hide retained PRNG state.
 """
 
 import argparse

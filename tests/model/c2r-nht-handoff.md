@@ -1,4 +1,4 @@
-# C2R — detached queries and generation-bound NHT scopes
+# C2R: detached queries and generation-bound NHT scopes
 
 Merged `main` into `gatec/c2-nht` before changes. Main had advanced from the
 requested `89677eb` to `32563fb` (C5 merge); the merge was a fast-forward.

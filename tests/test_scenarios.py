@@ -495,8 +495,8 @@ class TestFilterStoreScenario:
         env.process(worker(env, 'W2', 'washer'))
         env.run()
 
-        # W1 wants 'nut' — gets it at t=1 (second item supplied)
-        # W2 wants 'washer' — gets it at t=3 (fourth item supplied)
+        # W1 wants 'nut' and gets it at t=1 (second item supplied)
+        # W2 wants 'washer' and gets it at t=3 (fourth item supplied)
         assert ('W1', 'nut', 1) in log
         assert ('W2', 'washer', 3) in log
 
@@ -1070,11 +1070,11 @@ class TestDynamicTopology:
             result = yield p | t
 
             if p in result:
-                # Finished before deadline — do followup
+                # Finished before the deadline: do the follow-up
                 log.append(('on_time', result[p], env.now))
                 yield env.process(followup(env))
             else:
-                # Missed deadline — fallback
+                # Missed the deadline: fall back
                 log.append(('late', env.now))
                 yield env.process(fallback(env))
 

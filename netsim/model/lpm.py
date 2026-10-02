@@ -3,9 +3,9 @@
 A dict per prefix length plus a descending tuple of populated lengths.
 ``lookup`` truncates the address for each populated length and probes, so the
 cost is O(k) dict probes with k = number of distinct lengths present
-(typically 3 to 6), and insert/remove are O(1). Shift arithmetic avoids
-per-table mask storage and shared hot-path mask objects (free-threading
-rule from ``AGENTS.md``).
+(typically 3 to 6), and insert/remove are O(1). Truncation uses shifts,
+so tables store no masks and share no objects on the lookup path
+(free-threading rule in ``AGENTS.md``).
 
 ``PrefixTable`` is the mutable builder; ``freeze()`` returns a
 ``FrozenPrefixTable`` with the same lookups and no mutators, which is what
@@ -160,8 +160,9 @@ class FrozenPrefixTable(Generic[V]):
         exclude: Callable[[int, int], bool] | None = None,
         min_len: int = 0,
     ) -> tuple[int, int, V] | None:
-        # Probe directly: constructing and closing an iterator for one result
-        # would outweigh the arithmetic work for short tables.
+        # Probe directly: creating and closing an iterator for one result costs
+        # more than the arithmetic on short tables. Keep this loop in step with
+        # lookup_iter; tests/model/test_lpm.py checks that they agree.
         bits = self._bits
         if addr >> bits:
             addr %= 1 << bits

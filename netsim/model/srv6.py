@@ -2,9 +2,10 @@
 
 Frozen records, constants and pure SR-DB operations live here. Device handles
 commit validated allocation and ownership changes; L3 derives adjacency state.
-Compression, encapsulation and forwarding use these shared records. Standards: RFC 8402 (SR architecture), RFC 8754 (SRH), RFC 8986
-(network programming), RFC 9256 (SR Policy), RFC 9602 (5f00::/16),
-RFC 9800 (NEXT-C-SID). The authoritative Gate B behaviour set is the one
+Compression, encapsulation and forwarding use these shared records.
+Standards: RFC 8402 (SR architecture), RFC 8754 (SRH), RFC 8986 (network
+programming), RFC 9256 (SR Policy), RFC 9602 (5f00::/16), RFC 9800
+(NEXT-C-SID). The authoritative Gate B behaviour set is the one
 in the design (revision 15): H.Encaps and H.Encaps.Red at the headend;
 End and End.X with the PSP and USD flavors; End.DT46; NEXT-C-SID for
 those three (uN, uA, uDT46). Anything else is rejected at configuration.

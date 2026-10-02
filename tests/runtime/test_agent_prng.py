@@ -1,4 +1,4 @@
-"""Runtime boundaries for compact base and module-stream counters."""
+"""Agent PRNG state across publication, rejection, seed edits, reset and restart."""
 
 import pytest
 

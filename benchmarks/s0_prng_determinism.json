@@ -1,29 +1,29 @@
 {
-  "script": "\nimport json\nfrom netsim.model.prng import Prng\nstate = None\noutput = []\nfor run in range(100):\n    r = Prng.for_agent(17, -9, 'module:\u03b2', 2, state)\n    items = list(range(8))\n    r.stream('shuffle').shuffle(items)\n    output.append([r.random(), r.randrange(-10, 12, 3), r.choice('abc'),\n                   r.sample(range(30), 4), r.getrandbits(101),\n                   r.stream('jitter').uniform(1, 5), r.randint(-4, 8), items])\n    state = r.getstate()\nprint(json.dumps([output, state], sort_keys=True))\n",
+  "script": "\nimport json\nfrom netsim.model.prng import Prng\nstate = None\noutput = []\nfor run in range(100):\n    r = Prng.for_agent(17, -9, 'module:β', 2) if state is None else Prng.restore(state)\n    items = list(range(8))\n    r.stream('shuffle').shuffle(items)\n    output.append([r.random(), r.randrange(-10, 12, 3), r.choice('abc'),\n                   r.sample(range(30), 4), r.getrandbits(101),\n                   r.stream('jitter').uniform(1, 5), r.randint(-4, 8), items])\n    state = r.getstate()\nprint(json.dumps([output, state], sort_keys=True))\n",
   "results": [
     {
       "python": "venv/bin/python",
       "hashseed": "1",
-      "sha256": "a925f90ebb3bb52f9e609b06f3213f3361d7e8c07500eec3c0811450b609c4dc",
-      "bytes": 13013
+      "sha256": "e2970cfff88ce21760a462bac72961fd469bb7dee20010db35fe3e380d6c747e",
+      "bytes": 13036
     },
     {
       "python": "venv/bin/python",
       "hashseed": "987654321",
-      "sha256": "a925f90ebb3bb52f9e609b06f3213f3361d7e8c07500eec3c0811450b609c4dc",
-      "bytes": 13013
+      "sha256": "e2970cfff88ce21760a462bac72961fd469bb7dee20010db35fe3e380d6c747e",
+      "bytes": 13036
     },
     {
       "python": "venv-ft/bin/python",
       "hashseed": "1",
-      "sha256": "a925f90ebb3bb52f9e609b06f3213f3361d7e8c07500eec3c0811450b609c4dc",
-      "bytes": 13013
+      "sha256": "e2970cfff88ce21760a462bac72961fd469bb7dee20010db35fe3e380d6c747e",
+      "bytes": 13036
     },
     {
       "python": "venv-ft/bin/python",
       "hashseed": "987654321",
-      "sha256": "a925f90ebb3bb52f9e609b06f3213f3361d7e8c07500eec3c0811450b609c4dc",
-      "bytes": 13013
+      "sha256": "e2970cfff88ce21760a462bac72961fd469bb7dee20010db35fe3e380d6c747e",
+      "bytes": 13036
     }
   ]
 }

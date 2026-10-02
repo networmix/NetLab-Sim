@@ -1,4 +1,4 @@
-"""NetSim — a discrete-event simulation engine with a network layer.
+"""NetSim: a discrete-event simulation engine with a network layer.
 
 The engine (``Environment``, ``Event``, ``Process``, resources) lives here;
 the network model is ``netsim.model`` and its clock binding ``netsim.runtime``.

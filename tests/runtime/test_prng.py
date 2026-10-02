@@ -287,7 +287,7 @@ def test_invalid_counters_are_rejected(counters):
         (1 << 64, ()),
         (True, ()),
         (1.0, ()),
-        (3, (1, 2, 3), None),  # The old Mersenne Twister shape.
+        (3, (1, 2, 3), None),  # random.Random.getstate() shape.
     ],
 )
 def test_invalid_or_mt_state_is_rejected(state):
