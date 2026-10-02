@@ -1,12 +1,11 @@
-"""Client identities, profiles and the protocol-agent contract (Gate C).
+"""Client identities, profiles and the protocol-agent contract.
 
 Every producer of routes is a client (FBOSS ``ClientID`` / ``FibClient``,
 zebra route ``type`` + ``instance``): the user's statics, the oracle IGP,
 protocol agents, controllers. Identity is ``(name, instance)``; the
 profile carries the default distance and RFC 9256 §2.6 protocol origin.
 
-The second half of this module is the **agent contract** of the design's
-"Protocol agents and integration" section (revision 16): the records an
+The second half of this module is the **agent contract**: the records an
 agent reads (``AgentContext`` and its projections, inbox entries), the
 records it returns (``AgentOutput`` and its operation records) and the
 records the tree keeps about it (``AgentNode``, ``RunReceipt``, NHT and

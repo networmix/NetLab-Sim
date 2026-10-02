@@ -1,11 +1,11 @@
-"""Transport: link channels and sessions (Gate C slice C3).
+"""Transport: link channels and sessions.
 
 ``LinkChannel(device, interface)`` datagrams and ``Session`` connections
-(a reliable-message abstraction, not TCP) as specified in the design's
-"Transport" subsection: physical transfer and receive availability checked
-at send and delivery, ordered release per channel incarnation, distinct
-connection ids, abort versus drain-then-close, no-progress timeouts and
-bounded admission with explicit rejections. The TRANSPORT kind derives
+(a reliable-message abstraction, not TCP), with these rules: physical
+transfer and receive availability checked at send and delivery, ordered
+release per channel incarnation, distinct connection ids, abort versus
+drain-then-close, no-progress timeouts and bounded admission with explicit
+rejections. The TRANSPORT kind derives
 path reachability in ``NetworkState.transport``.
 
 The runtime interface used by publication (``netsim.runtime.agents``):

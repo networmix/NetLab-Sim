@@ -88,8 +88,8 @@ def _known_structure(
     if structure is None or structure.lbl == 0 or structure.lnfl == 0:
         return None
     # RFC 9800 §6.1: a shiftable flavored SID must fill all 128 bits.
-    # Revision 15's terminal uDT46 representation (F3216_TERMINAL) is B|F
-    # with LNL=AL=0: a known S12 tail, never a shiftable series member.
+    # The terminal uDT46 structure (F3216_TERMINAL) is B|F with LNL=AL=0:
+    # a known S12 tail, never a shiftable series member.
     # AL=0 alone does not identify a terminal: incomplete node/composite
     # flavored metadata is unknown, including during the tail-fit check.
     terminal_tail = structure.lnl == 0 and structure.al == 0

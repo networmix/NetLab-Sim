@@ -738,10 +738,9 @@ def validate_admitted(new: Any, old: Any, path: str = 'root') -> None:
 
     Admission of agent state and advertised views uses this instead of a
     whole-tree walk: a value returned by identity costs nothing, a record
-    that reuses most of its previous fields costs only its changed subtrees
-    (the incremental trusted-builder rule of the design), and a mutable
-    value anywhere in a *new* subtree is still rejected with the same
-    fail-closed classification as ``validate_immutable``. Pairing follows
+    that reuses most of its previous fields costs only its changed subtrees,
+    and a mutable value anywhere in a *new* subtree is still rejected with
+    the same fail-closed classification as ``validate_immutable``. Pairing follows
     structure: dataclass fields by name (same type only), ``PMap`` entries
     by key, tuples by index when lengths match; anything unpaired is walked
     in full. ``old`` must itself have been admitted through this function or

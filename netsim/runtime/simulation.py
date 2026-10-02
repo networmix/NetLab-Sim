@@ -107,7 +107,7 @@ class Simulation:
 
     @property
     def recorder(self) -> Timeline:
-        """Alias of ``timeline`` (the name used by the design document)."""
+        """Alias of ``timeline``."""
         return self.timeline
 
     def _on_delta(self, time: float, origin: Any, delta: Any) -> None:
