@@ -89,17 +89,21 @@ def test_standalone_timeline_and_agent_study_share_bounded_defaults():
 
 
 @pytest.mark.parametrize(
-    'keep',
+    'keep,expected',
     [
-        {},
-        {'events': None, 'records': None},
-        {'events': 5},
-        {'keep_events': None, 'keep_records': 3},
+        ({}, (100_000, 10_000)),
+        ({'events': None, 'records': None}, (None, None)),
+        ({'events': 5}, (5, 10_000)),
+        ({'keep_events': None, 'keep_records': 3}, (None, 3)),  # Prefix stripped.
+        # Series and exported rows come from events: asking for them keeps all.
+        ({'arrays': True}, (None, 10_000)),
+        ({'timeline': True}, (None, 10_000)),
+        ({'arrays': True, 'timeline': True, 'events': 7}, (7, 10_000)),
     ],
 )
-def test_workload_reports_effective_runtime_retention(keep):
+def test_workload_reports_effective_runtime_retention(keep, expected):
     study = Study(Network(), keep=keep)
     retention = dict(study.describe().retention)
     runtime = study._simulation().timeline
-    assert retention['events'] == runtime.keep_events
-    assert retention['records'] == runtime.keep_records
+    assert (retention['events'], retention['records']) == expected
+    assert (runtime.keep_events, runtime.keep_records) == expected

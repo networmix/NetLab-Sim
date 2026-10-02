@@ -190,11 +190,14 @@ class AgentNode:
     """A device's agent as the tree sees it (``DeviceState.agents[name]``).
 
     ``state`` and ``srdb_view`` are opaque and identity-compared; ``rng``
-    is the committed ``Prng`` v1 state: a sorted tuple of (64-bit stream id,
-    64-bit counter) pairs for drawn streams, or ``None`` before any draw
-    (including before the first run). Idle publications reuse its identity;
-    rejected runs preserve the pre-run object. ``initialized`` becomes true once
-    ``on_init`` has been published; ``generation`` changes on reset.
+    is the committed ``Prng`` v1 state ``(key, counters)``: the family key
+    hashed from the seeds at this generation's first publication, and a
+    sorted tuple of (64-bit stream id, 64-bit counter) pairs for drawn
+    streams; ``None`` before the first publication. Idle publications reuse
+    its identity; rejected runs preserve the pre-run object; seed edits after
+    the first publication change nothing until a reset. ``initialized``
+    becomes true once ``on_init`` has been published; ``generation`` changes
+    on reset.
     """
 
     name: str
@@ -950,15 +953,18 @@ class AgentContext(Protocol):
         """Versioned ``netsim.model.prng.Prng`` with independent named streams.
 
         The base key hashes (network seed, device seed, agent name, generation)
-        with BLAKE2b and canonical bytes. ``stream(name)`` isolates module draws
-        across runs, returning the same private handle for repeated names in
-        an invocation. Supports random, uniform, randrange, randint, choice,
-        sample, shuffle (invocation-local lists), getrandbits and getstate.
-        Other random.Random methods raise AttributeError; no distribution
-        caches are kept. reset_agent starts fresh counters for a new generation.
-        Only successful publication commits drawn counters; idle/rejected runs
-        preserve the committed object's identity. Values differ from the old
-        Mersenne Twister sequence; the v1 algorithm is interpreter-independent.
+        with BLAKE2b and canonical bytes once, at the generation's first
+        publication, and is stored with the committed state; editing a device
+        or network seed afterwards changes nothing until ``reset_agent`` or
+        ``restart_all`` starts a new generation. ``stream(name)`` isolates
+        module draws across runs, returning the same private handle for
+        repeated names in an invocation. Supports random, uniform, randrange,
+        randint, choice, sample, shuffle (invocation-local lists), getrandbits
+        and getstate. Other random.Random methods raise AttributeError; no
+        distribution caches are kept. Only successful publication commits
+        drawn counters; idle/rejected runs preserve the committed object's
+        identity. Values differ from the old Mersenne Twister sequence; the v1
+        algorithm is interpreter-independent.
         """
         ...
 

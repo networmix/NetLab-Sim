@@ -26,7 +26,10 @@ blocks, allowing fewer than `max(64, budget // 8)` extra entries per budget;
 `keep_records=None, keep_events=None` explicitly to retain full history.
 `Study` uses the same defaults for absent `keep` keys, including agent warmup
 and baseline runs; `keep={'records': None, 'events': None}` opts into full
-history. Queries and exported timelines cover retained history only.
+history. `keep={'arrays': True}` or `keep={'timeline': True}` selects full
+event history unless `events` is given explicitly, because the utilization
+series and exported rows they request come from retained events. Queries and
+exported timelines cover retained history only.
 Streaming `on_record` observers receive every record and event before eviction,
 so Study's streamed metrics cover the whole observation window. Roots and deltas
 retain their existing defaults (256 timestamps and 64 commits in Simulation).

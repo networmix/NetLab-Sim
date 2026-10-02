@@ -160,3 +160,34 @@ def test_persistent_prefix_shards_keep_frozen_contract():
     shorter = FrozenPrefixTable._owned(32, {32: rows.remove(37)})
     assert shorter != frozen and shorter != copied and copied != shorter
     assert FrozenPrefixTable._owned(32, {}) != frozen
+
+
+@pytest.mark.parametrize('bits', [32, 128])
+def test_lookup_equals_the_first_iterated_match(bits):
+    """``lookup`` probes directly for speed; it must never diverge from the iterator."""
+    rng = random.Random(bits)
+    table = PrefixTable(bits)
+    for _ in range(300):
+        plen = rng.randint(0, bits)
+        net = (rng.getrandbits(bits) >> (bits - plen)) << (bits - plen) if plen else 0
+        table.insert(net, plen, (net, plen))
+    frozen = table.freeze()
+    excluded = {(net, plen) for net, plen, _ in table.items() if rng.random() < 0.3}
+
+    def exclude(net, plen):
+        return (net, plen) in excluded
+
+    for _ in range(2000):
+        addr = (
+            rng.getrandbits(bits)
+            if rng.random() < 0.5
+            else rng.choice(table.items())[0]
+        )
+        min_len = rng.choice((0, 8, 24, bits // 2))
+        for candidate in (table, frozen):
+            direct = candidate.lookup(addr, exclude=exclude, min_len=min_len)
+            iterated = next(
+                iter(candidate.lookup_iter(addr, exclude=exclude, min_len=min_len)),
+                None,
+            )
+            assert direct == iterated

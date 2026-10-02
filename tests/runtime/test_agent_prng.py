@@ -107,3 +107,135 @@ def test_reset_and_fresh_simulation_clear_all_streams():
     assert len({generation for generation, _ in observed}) == 3
     assert len({values for _, values in observed}) == 3
     assert node(sim).rng is not None  # The existing runtime's snapshot stays intact.
+
+
+def _tick(sim):
+    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    sim.settle()
+
+
+def test_seed_edit_before_first_publication_is_honored():
+    values = []
+
+    def callback(ctx):
+        values.append(ctx.rng.random())
+        return c.AgentOutput(state=ctx.agent_state)
+
+    sim = fixture(Plugin(callback=callback))
+    sim.network['r'].configure(seed=7)
+    assert node(sim).rng is None
+    sim.settle()
+    expected = Prng.for_agent(0, 7, 'test', node(sim).generation)
+    assert values == [expected.random()]
+    assert node(sim).rng == expected.getstate()
+
+
+def test_seed_edits_after_first_publication_neither_reseed_nor_grow_state():
+    def scenario(edit):
+        values = []
+
+        def callback(ctx):
+            values.append(ctx.rng.stream('jitter').random())
+            return c.AgentOutput(state=ctx.agent_state)
+
+        sim = fixture(Plugin(callback=callback))
+        sim.settle()
+        committed = node(sim).rng
+        base = sim.state.devices['r'].config.seed
+        keys = set()
+        for run in range(64):
+            if edit:  # Cycling through eight seeds includes changing back.
+                sim.network['r'].configure(seed=base + 1 + run % 8)
+                sim.network.seed = run
+            _tick(sim)
+            keys.add(node(sim).rng[0])
+        assert keys == {committed[0]}
+        assert len(node(sim).rng[1]) == 1
+        return values
+
+    assert scenario(True) == scenario(False)
+
+
+def test_seed_edit_after_idle_first_publication_keeps_the_committed_key():
+    draws = []
+    draw = False
+
+    def callback(ctx):
+        if draw:
+            draws.append(ctx.rng.random())
+        return c.AgentOutput(state=ctx.agent_state)
+
+    sim = fixture(Plugin(callback=callback))
+    sim.settle()  # The first publication commits the key before any draw.
+    seed = sim.state.devices['r'].config.seed
+    family = Prng.for_agent(0, seed, 'test', node(sim).generation)
+    assert node(sim).rng == (family.getstate()[0], ())
+    sim.network['r'].configure(seed=seed + 5)
+    draw = True
+    _tick(sim)
+    assert draws == [family.random()]
+    assert node(sim).rng == family.getstate()
+
+
+def test_rejected_run_then_seed_edit_continues_the_family_until_reset():
+    values = []
+    fail = False
+
+    def callback(ctx):
+        values.append((ctx.generation, ctx.rng.random()))
+        if fail:
+            raise ValueError('reject')
+        return c.AgentOutput(state=ctx.agent_state)
+
+    sim = fixture(Plugin(callback=callback))
+    sim.settle()
+    seed = sim.state.devices['r'].config.seed
+    first = node(sim)
+    fail = True
+    sim.agents.deliver('r', 'test', c.TimerFired(0, 'tick'))
+    with pytest.raises(AgentBatchError):
+        sim.settle()
+    assert node(sim).rng is first.rng
+    sim.network['r'].configure(seed=seed + 1)
+    fail = False
+    sim.retry()
+    sim.settle()
+    family = Prng.for_agent(0, seed, 'test', first.generation)
+    one, two = family.random(), family.random()
+    assert [value for _, value in values] == [one, two, two]
+    sim.reset_agent('r', 'test')
+    assert node(sim).rng is None
+    sim.settle()
+    generation = node(sim).generation
+    assert generation != first.generation
+    fresh = Prng.for_agent(0, seed + 1, 'test', generation)
+    assert values[-1] == (generation, fresh.random())
+    assert node(sim).rng == fresh.getstate()
+
+
+def test_restart_adopts_the_current_network_seed_for_the_new_generation():
+    values = []
+
+    def callback(ctx):
+        values.append((ctx.generation, ctx.rng.random()))
+        return c.AgentOutput(state=ctx.agent_state)
+
+    sim = fixture(Plugin(callback=callback))
+    sim.settle()
+    seed = sim.state.devices['r'].config.seed
+    sim.network.seed = 42  # Ignored by the committed generation...
+    _tick(sim)
+    generation = node(sim).generation
+    family = Prng.for_agent(0, seed, 'test', generation)
+    assert [v for g, v in values if g == generation] == [
+        family.random(),
+        family.random(),
+    ]
+    fresh = Simulation(Environment(), sim.network.fork())  # ...adopted on restart.
+    fresh.settle()
+    restarted = node(fresh).generation
+    assert restarted != generation
+    assert values[-1] == (
+        restarted,
+        Prng.for_agent(42, seed, 'test', restarted).random(),
+    )

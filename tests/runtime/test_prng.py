@@ -35,14 +35,19 @@ def test_v1_seed_encoding_and_public_known_answers():
         8398029112726890720,
         5784434096098153939,
     ]
-    assert rng.getstate() == ((9511305789293171608, 4),)
+    key = 9845853327430893526
+    assert rng.getstate() == (key, ((9511305789293171608, 4),))
     assert [rng.stream('m:β').getrandbits(64) for _ in range(4)] == [
         6401095837003498183,
         4586300332935740154,
         14362780155090693659,
         3624566571900516395,
     ]
-    assert rng.getstate() == ((9149529816362344692, 4), (9511305789293171608, 4))
+    assert rng.getstate() == (
+        key,
+        ((9149529816362344692, 4), (9511305789293171608, 4)),
+    )
+    assert Prng.for_agent(1, -2, 'a:β', 3).getstate() == (key, ())
 
 
 def test_each_seed_field_and_name_path_is_distinct():
@@ -61,7 +66,7 @@ def test_stream_independence_across_runs_including_previously_idle_run():
         state = None
         values = []
         for run in range(8):
-            rng = Prng(123, state)
+            rng = Prng(123) if state is None else Prng.restore(state)
             if extra:
                 for _ in range(run + 1):
                     rng.stream('noisy').random()
@@ -81,11 +86,13 @@ def test_repeated_handles_continue_and_state_is_canonical():
     for name in ('', 'b', 'b', 'a'):
         second.stream(name).random()
     state = first.getstate()
-    assert state == second.getstate() == tuple(sorted(state))
-    assert len(state) == 3  # No unused base stream entry.
+    assert state == second.getstate()
+    key, counters = state
+    assert key == 91 and counters == tuple(sorted(counters))
+    assert len(counters) == 3  # No unused base stream entry.
     validate_immutable(state)
     validate_admitted(state, None)
-    restored = Prng(91, state)
+    restored = Prng.restore(state)
     assert restored.getstate() is state
     assert restored.stream('b').random() == first.stream('b').random()
     assert restored.getstate() == first.getstate()
@@ -98,9 +105,10 @@ def test_named_handles_are_identical_only_within_the_invocation():
     assert rng.stream('module') is first
     assert rng.stream('module').stream('child') is first.stream('child')
     assert rng.stream('different') is not first
-    assert rng.getstate() is None  # Caching a handle must not create a cursor.
+    fresh = rng.getstate()
+    assert fresh == (51, ()) and rng.getstate() is fresh  # No cursor from a handle.
     first.random()
-    restored = Prng(51, rng.getstate())
+    restored = Prng.restore(rng.getstate())
     assert restored.stream('module') is not first
     assert restored.stream('module').random() == first.random()
 
@@ -131,20 +139,21 @@ def test_other_random_methods_raise_attribute_error():
 
 def test_idle_and_zero_size_operations_reuse_state_identity():
     rng = Prng(1)
+    fresh = rng.getstate()
     rng.stream('unused')
     assert rng.getrandbits(0) == 0
     assert rng.sample([], 0) == []
     assert rng.shuffle([]) is None
     rng.shuffle([1])
-    assert rng.getstate() is None
+    assert fresh == (1, ()) and rng.getstate() is fresh
     rng.random()
     state = rng.getstate()
-    assert rng.getstate() is state
-    resumed = Prng(1, state)
+    assert state is not fresh and rng.getstate() is state
+    resumed = Prng.restore(state)
     resumed.stream('still unused').getrandbits(0)
     assert resumed.getstate() is state
     # Retaining the old invocation's mutable handle cannot mutate a snapshot.
-    before = tuple(state)
+    before = (state[0], tuple(state[1]))
     rng.random()
     assert state == before and rng.getstate() is not state
 
@@ -152,10 +161,10 @@ def test_idle_and_zero_size_operations_reuse_state_identity():
 def test_counter_wrap_is_64_bit_and_retains_drawn_stream():
     rng = Prng(3)
     rng.random()
-    ((stream, _),) = rng.getstate()
+    (_, ((stream, _),)) = rng.getstate()
     wrapped = Prng(3, ((stream, (1 << 64) - 1),))
     assert wrapped.getrandbits(64) == _splitmix64(stream, 0)
-    assert wrapped.getstate() == ((stream, 0),)
+    assert wrapped.getstate() == (3, ((stream, 0),))
 
 
 def test_float_and_bit_mapping():
@@ -236,15 +245,16 @@ def test_uniformity_smoke():
 )
 def test_invalid_calls_do_not_draw(method, args, error):
     rng = Prng(7)
+    state = rng.getstate()
     with pytest.raises(error):
         getattr(rng, method)(*args)
-    assert rng.getstate() is None
+    assert rng.getstate() is state
 
 
 @pytest.mark.parametrize(
-    'state',
+    'counters',
     [
-        (),
+        None,
         [],
         ((1,),),
         ((1, -1),),
@@ -255,12 +265,34 @@ def test_invalid_calls_do_not_draw(method, args, error):
         ((False, 1),),
         ((2, 1), (1, 1)),
         ((1, 1), (1, 2)),
-        (3, (1, 2), None),
+        [(1, 2)],
+    ],
+)
+def test_invalid_counters_are_rejected(counters):
+    with pytest.raises(ValueError):
+        Prng(0, counters)
+    with pytest.raises(ValueError):
+        Prng.restore((0, counters))
+
+
+@pytest.mark.parametrize(
+    'state',
+    [
+        None,
+        (),
+        (0,),
+        [0, ()],
+        (0, (), None),
+        (-1, ()),
+        (1 << 64, ()),
+        (True, ()),
+        (1.0, ()),
+        (3, (1, 2, 3), None),  # The old Mersenne Twister shape.
     ],
 )
 def test_invalid_or_mt_state_is_rejected(state):
     with pytest.raises(ValueError):
-        Prng(0, state)
+        Prng.restore(state)
 
 
 def test_invalid_key_or_version():
@@ -271,6 +303,33 @@ def test_invalid_key_or_version():
         Prng(1.0)
     with pytest.raises(ValueError, match='version'):
         Prng(0, version=2)
+    with pytest.raises(ValueError, match='version'):
+        Prng.restore((0, ()), version=2)
+
+
+def test_restore_resumes_by_key_alone():
+    original = Prng.for_agent(1, 2, 'agent', 3)
+    original.random()
+    original.stream('jitter').getrandbits(96)
+    state = original.getstate()
+    resumed = Prng.restore(state)
+    reference = Prng.for_agent(1, 2, 'agent', 3)
+    reference.random()
+    reference.stream('jitter').getrandbits(96)
+    assert resumed.random() == reference.random()
+    assert resumed.stream('jitter').random() == reference.stream('jitter').random()
+    assert resumed.getstate() == reference.getstate()
+    assert state[0] == Prng.for_agent(1, 2, 'agent', 3).getstate()[0]
+    assert state[0] != Prng.for_agent(1, 3, 'agent', 3).getstate()[0]
+
+
+def test_randbelow_rejects_non_positive_bounds_without_drawing():
+    rng = Prng(7)
+    state = rng.getstate()
+    for bound in (0, -3):
+        with pytest.raises(ValueError):
+            rng._randbelow(bound)
+    assert rng.getstate() is state
 
 
 def test_independent_instances_are_thread_local():
@@ -290,7 +349,7 @@ from netsim.model.prng import Prng
 state = None
 values = []
 for run in range(3):
-    r = Prng.for_agent(17, -9, 'module:β', 2, state)
+    r = Prng.for_agent(17, -9, 'module:β', 2) if state is None else Prng.restore(state)
     values.append([r.random(), r.randrange(-10, 12, 3), r.choice('abc'),
                    r.sample(range(30), 4), r.getrandbits(101),
                    r.stream('jitter').uniform(1, 5)])

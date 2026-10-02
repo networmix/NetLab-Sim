@@ -568,8 +568,14 @@ class AgentRuntime:
                     counters.get('messages', 0),
                     counters.get('bytes', 0),
                 )
-        rng = Prng.for_agent(
-            self.sim.network.seed, dev.config.seed, name, node.generation, node.rng
+        # A generation's PRNG family is keyed from the seeds once, at its first
+        # publication; later seed edits take effect at reset_agent/restart_all.
+        rng = (
+            Prng.restore(node.rng)
+            if node.rng is not None
+            else Prng.for_agent(
+                self.sim.network.seed, dev.config.seed, name, node.generation
+            )
         )
         return Context(
             now,
@@ -785,7 +791,9 @@ class AgentRuntime:
                     node,
                     state=output.state,
                     srdb_view=output.srdb_view,
-                    rng=ctx.rng.getstate(),  # Reuses node.rng when no draws occurred.
+                    # The first publication commits (key, counters); later idle
+                    # runs reuse node.rng itself.
+                    rng=ctx.rng.getstate(),
                     receipt=receipt,
                     runs=node.runs + 1,
                     initialized=True,

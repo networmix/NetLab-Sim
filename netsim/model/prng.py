@@ -5,13 +5,16 @@ https://prng.di.unimi.it/splitmix64.c (Steele, Lea and Flood, 2014,
 https://doi.org/10.1145/2714064.2660195). Word n is the reference generator
 seeded with the stream id, after n increments. All arithmetic wraps at 64 bits.
 
-The v1 state is a sorted tuple of (64-bit stream id, 64-bit draw counter)
-pairs, or None before any draw. Only drawn streams occupy state. Version 1
-fixes the hash encoding, SplitMix64 constants and every distribution below;
-it intentionally does not reproduce random.Random's Mersenne Twister sequence.
-No stdlib random algorithms, Python hashes, global caches or mutable globals
-participate in generation. Callers persisting state outside NetSim must record
-Prng.VERSION alongside it and supply that version when restoring.
+The v1 state is ``(key, counters)``: the family's 64-bit base key and a sorted
+tuple of (64-bit stream id, 64-bit draw counter) pairs for drawn streams. Only
+drawn streams occupy ``counters``. The key is fixed when the family is created
+(``for_agent`` hashes the seeds once), so a restored family continues its
+sequence whatever the seeds say now. Version 1 fixes the hash encoding,
+SplitMix64 constants and every distribution below; it intentionally does not
+reproduce random.Random's Mersenne Twister sequence. No stdlib random
+algorithms, Python hashes, global caches or mutable globals participate in
+generation. Callers persisting state outside NetSim must record Prng.VERSION
+alongside it and supply that version when restoring.
 """
 
 from __future__ import annotations
@@ -21,8 +24,10 @@ from hashlib import blake2b
 from operator import index
 from typing import TypeAlias, TypeVar
 
-PrngState: TypeAlias = tuple[tuple[int, int], ...] | None
+PrngCounters: TypeAlias = tuple[tuple[int, int], ...]
+PrngState: TypeAlias = tuple[int, PrngCounters]
 _T = TypeVar('_T')
+_MASK = 0xFFFFFFFFFFFFFFFF
 
 
 def _field(value: bytes) -> bytes:
@@ -45,36 +50,56 @@ def _splitmix64(stream: int, counter: int) -> int:
     return word ^ (word >> 31)
 
 
+def _check_version(version: object) -> None:
+    if type(version) is not int or version != 1:
+        raise ValueError('unsupported PRNG version')
+
+
+def _check_key(key: object) -> int:
+    if type(key) is not int or not 0 <= key <= _MASK:
+        raise ValueError('PRNG base key must be a 64-bit unsigned integer')
+    return key
+
+
+def _check_counters(counters: object) -> PrngCounters:
+    """Accept only the exact v1 shape: sorted exact-int pairs in 64-bit range."""
+    if type(counters) is not tuple:
+        raise ValueError('invalid v1 PRNG state')
+    previous = -1
+    for pair in counters:
+        if type(pair) is not tuple or len(pair) != 2:
+            raise ValueError('invalid v1 PRNG stream entry')
+        stream, counter = pair
+        if (
+            type(stream) is not int
+            or type(counter) is not int
+            or not previous < stream <= _MASK
+            or not 0 <= counter <= _MASK
+        ):
+            raise ValueError('invalid v1 PRNG stream id/counter')
+        previous = stream
+    return counters
+
+
 class _Bank:
-    """Invocation-local cursors shared by named handles; never enter the tree."""
+    """Invocation-local cursors shared by named handles; never enter the tree.
+
+    ``state`` is the committed ``(key, counters)`` object, kept by identity
+    until a draw dirties it; the restored object itself is returned while
+    nothing was drawn.
+    """
 
     __slots__ = ('state', 'counters', 'dirty')
 
     def __init__(self, state: PrngState) -> None:
-        if state is not None:
-            if not isinstance(state, tuple) or not state:
-                raise ValueError('invalid v1 PRNG state')
-            previous = -1
-            for pair in state:
-                if not isinstance(pair, tuple) or len(pair) != 2:
-                    raise ValueError('invalid v1 PRNG stream entry')
-                stream, counter = pair
-                if (
-                    type(stream) is not int
-                    or type(counter) is not int
-                    or not previous < stream <= 0xFFFFFFFFFFFFFFFF
-                    or not 0 <= counter <= 0xFFFFFFFFFFFFFFFF
-                ):
-                    raise ValueError('invalid v1 PRNG stream id/counter')
-                previous = stream
         self.state = state
         self.counters: dict[int, int] | None = None
         self.dirty = False
 
     def word(self, stream: int) -> int:
         if self.counters is None:
-            self.counters = dict(self.state or ())
-        counter = (self.counters.get(stream, 0) + 1) & 0xFFFFFFFFFFFFFFFF
+            self.counters = dict(self.state[1])
+        counter = (self.counters.get(stream, 0) + 1) & _MASK
         self.counters[stream] = counter
         self.dirty = True
         return _splitmix64(stream, counter)
@@ -82,7 +107,7 @@ class _Bank:
     def getstate(self) -> PrngState:
         if self.dirty:
             assert self.counters is not None
-            self.state = tuple(sorted(self.counters.items()))
+            self.state = (self.state[0], tuple(sorted(self.counters.items())))
             self.dirty = False
         return self.state
 
@@ -90,40 +115,57 @@ class _Bank:
 class Prng:
     """A v1 SplitMix64 family with independent, persistent named streams.
 
-    ``Prng(key, state=None, version=1)`` restores a family under a 64-bit
-    base key. ``for_agent`` derives that key from the four agent seed fields.
+    ``Prng(key, counters=(), version=1)`` creates a family under a 64-bit base
+    key. ``for_agent`` derives that key from the four agent seed fields for a
+    fresh family; ``restore(state)`` resumes a committed ``(key, counters)``
+    under its own key, so the seeds it was derived from no longer matter.
     ``stream(name)`` returns a handle sharing this invocation's counters;
     repeated calls for the same path return the same private stream object.
-    Nested names
-    are length-delimited paths, so stream('a/b') differs from stream('a').
-    stream('b'). Merely obtaining a handle consumes nothing.
+    Nested names are length-delimited paths, so stream('a/b') differs from
+    stream('a').stream('b'). Merely obtaining a handle consumes nothing.
 
-    ``getstate`` snapshots all drawn streams and preserves the original object
-    when no word was drawn. Restore with the same key/version in the next run;
-    handles and lists passed to ``shuffle`` must stay invocation-local.
-    Supported draw methods are random, uniform, randrange, randint, choice,
-    sample, shuffle and getrandbits. They follow random.Random's argument/range
-    semantics, without its sequence compatibility or sample(counts=...) API.
-    Other random.Random methods are unsupported and raise AttributeError.
-    There are no distribution caches. reset_agent starts fresh counters under
-    the new generation's key; rejection preserves every pre-run counter.
-    Each word advances only its stream; a k-bit draw uses ceil(k/64) words.
+    ``getstate`` returns ``(key, counters)`` for all drawn streams and
+    preserves the restored object when no word was drawn. Restore with the
+    same version in the next run; handles and lists passed to ``shuffle`` must
+    stay invocation-local. Supported draw methods are random, uniform,
+    randrange, randint, choice, sample, shuffle and getrandbits. They follow
+    random.Random's argument/range semantics, without its sequence
+    compatibility or sample(counts=...) API. Other random.Random methods are
+    unsupported and raise AttributeError. There are no distribution caches.
+    reset_agent starts a fresh family under the new generation's key;
+    rejection preserves every pre-run counter. Each word advances only its
+    stream; a k-bit draw uses ceil(k/64) words.
     """
 
     VERSION = 1
     __slots__ = ('_key', '_path', '_bank', '_id', '_children')
 
-    def __init__(self, key: int, state: PrngState = None, *, version: int = 1) -> None:
-        if type(version) is not int or version != 1:
-            raise ValueError('unsupported PRNG version')
-        key = index(key)
-        if not 0 <= key <= 0xFFFFFFFFFFFFFFFF:
-            raise ValueError('PRNG base key must be a 64-bit unsigned integer')
+    def __init__(
+        self, key: int, counters: PrngCounters = (), *, version: int = 1
+    ) -> None:
+        _check_version(version)
+        key = _check_key(index(key))
+        self._attach(key, _Bank((key, _check_counters(counters))))
+
+    def _attach(self, key: int, bank: _Bank) -> None:
         self._key = key
         self._path = b''
-        self._bank = _Bank(state)
+        self._bank = bank
         self._id: int | None = None
         self._children: dict[str, Prng] | None = None
+
+    @classmethod
+    def restore(cls, state: PrngState, *, version: int = 1) -> Prng:
+        """Resume a committed family; ``getstate`` returns ``state`` itself until a draw."""
+        _check_version(version)
+        if type(state) is not tuple or len(state) != 2:
+            raise ValueError('invalid v1 PRNG state')
+        key, counters = state
+        _check_key(key)
+        _check_counters(counters)
+        self = object.__new__(cls)
+        self._attach(key, _Bank(state))
+        return self
 
     @classmethod
     def for_agent(
@@ -132,12 +174,13 @@ class Prng:
         device_seed: int,
         agent_name: str,
         generation: int,
-        state: PrngState = None,
     ) -> Prng:
         """Hash sign/magnitude integers and length-prefixed UTF-8, big-endian.
 
         BLAKE2b uses an 8-byte digest and the v1 personalization shown below.
-        There is no normalization of names and no delimiter ambiguity.
+        There is no normalization of names and no delimiter ambiguity. The
+        runtime calls this once per agent generation, at its first
+        publication; afterwards it restores the committed state.
         """
         encoded = (
             _integer(network_seed)
@@ -149,7 +192,7 @@ class Prng:
             blake2b(encoded, digest_size=8, person=b'NetSim.PRNG.v1').digest(),
             'big',
         )
-        return cls(key, state)
+        return cls(key)
 
     def stream(self, name: str) -> Prng:
         """Derive a name/path under the base key, independent of every cursor."""
@@ -209,6 +252,8 @@ class Prng:
         return a + (b - a) * self.random()
 
     def _randbelow(self, n: int) -> int:
+        if n <= 0:  # Rejection sampling below a non-positive bound never ends.
+            raise ValueError('empty range for _randbelow()')
         bits = n.bit_length()
         value = self.getrandbits(bits)
         while value >= n:

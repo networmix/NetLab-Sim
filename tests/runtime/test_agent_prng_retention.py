@@ -47,5 +47,7 @@ def test_idle_publications_retain_constant_rng_objects_and_bytes(runs, initial_d
     values = [node.rng for node in nodes]
     # Keep every publication alive: bounded timeline eviction cannot mask G18.
     assert len({id(value) for value in values}) == 1
-    assert retained_size(values) <= 256
+    # (key, counters) with at most one drawn stream: two tuples, a pair and three
+    # ints, about 300 bytes; object headers differ between interpreter builds.
+    assert retained_size(values) <= 512
     assert nodes[-1].runs == runs + 1

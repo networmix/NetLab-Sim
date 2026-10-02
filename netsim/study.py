@@ -513,6 +513,12 @@ def _drop_reasons(network: Network) -> dict[str, float]:
     return dict(report.dropped_by_reason.sorted_items()) if report is not None else {}
 
 
+def _default_events(keep: Mapping[str, Any]) -> int | None:
+    """Series and exported rows come from retained events: asking for them
+    selects full event history unless ``events`` is given explicitly."""
+    return None if keep.get('arrays') or keep.get('timeline') else 100_000
+
+
 class Study:
     def __init__(
         self, network: Network, *, keep: Mapping[str, Any] | None = None
@@ -577,7 +583,7 @@ class Study:
             'arrays': False,
             'reports': False,
             'timeline': False,
-            'events': 100_000,
+            'events': _default_events(self.keep),
             'records': 10_000,
             **self.keep,
         }
@@ -621,7 +627,7 @@ class Study:
             keep_deltas=self.keep.get('deltas', 0),
             keep_arrays=self.keep.get('arrays', False),
             keep_reports=self.keep.get('reports', False),
-            keep_events=self.keep.get('events', 100_000),
+            keep_events=self.keep.get('events', _default_events(self.keep)),
             keep_records=self.keep.get('records', 10_000),
         )
         sim._study_observation = _StudyObservation(sim, start)  # type: ignore[attr-defined]
