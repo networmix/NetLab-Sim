@@ -32,9 +32,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/networmix/NetSim"
-Documentation = "https://github.com/networmix/NetSim/blob/main/docs/reference.md"
-Issues = "https://github.com/networmix/NetSim/issues"
+Homepage = "https://github.com/networmix/NetGraph-Sim"
+Documentation = "https://github.com/networmix/NetGraph-Sim/blob/main/docs/reference.md"
+Issues = "https://github.com/networmix/NetGraph-Sim/issues"
 
 [project.scripts]
 ngraph-sim = "ngraph_sim.cli:main"

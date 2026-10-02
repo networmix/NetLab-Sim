@@ -1,6 +1,6 @@
 # NetGraph-Sim
 
-[![CI](https://github.com/networmix/NetSim/actions/workflows/python-test.yml/badge.svg?branch=main)](https://github.com/networmix/NetSim/actions/workflows/python-test.yml)
+[![CI](https://github.com/networmix/NetGraph-Sim/actions/workflows/python-test.yml/badge.svg?branch=main)](https://github.com/networmix/NetGraph-Sim/actions/workflows/python-test.yml)
 
 Discrete-event simulation for IP networks. Zero dependencies. Python 3.11+,
 including free-threaded builds.
@@ -19,7 +19,7 @@ Two layers:
 ## Install
 
 ```bash
-pip install git+https://github.com/networmix/NetSim
+pip install git+https://github.com/networmix/NetGraph-Sim
 ```
 
 The distribution is `ngraph-sim`, part of the NetGraph family (`ngraph`), and
