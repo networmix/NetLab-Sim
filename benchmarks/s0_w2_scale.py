@@ -157,7 +157,7 @@ def main():
         ['git', 'rev-parse', args.baseline], cwd=repo, text=True
     ).strip()
     archive = subprocess.check_output(
-        ['git', 'archive', '--format=tar', baseline, 'netsim'], cwd=repo
+        ['git', 'archive', '--format=tar', baseline, 'ngraph_sim'], cwd=repo
     )
     result: dict[str, object] = {'baseline': baseline, 'python': sys.version}
     runs = []

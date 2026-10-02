@@ -1,12 +1,11 @@
 """Manual deadline benchmark; run old/new/old with the same Python executable.
 
-Save the baseline with ``git show <base>:netsim/runtime/pipeline.py > /tmp/old.py``.
+Save the baseline with ``git show <base>:ngraph_sim/runtime/pipeline.py > /tmp/old.py``.
 Run ``python benchmarks/verify_pending.py --pipeline-source /tmp/old.py``,
 then without that option, then with it again. Add ``--carrier --repeats 1``
 to run the carrier-debounce workload (which also measures derivations,
 commits and delta dispatch). Construction and initial convergence are untimed.
-Handles are captured once; --legacy-link-lookup reproduces the original
-quadratic net.links[id] handle-map construction inside fail_all.
+Link handles are captured once, before timing.
 --deadline-only excludes the initial failures and zero-delay work from timing.
 --derive-source can accompany --pipeline-source to compare scoped L3 changes.
 """
@@ -77,7 +76,7 @@ def isolated(n):
     return elapsed, {'calls': calls}
 
 
-def carrier(n, *, legacy_link_lookup=False, deadline_only=False):
+def carrier(n, *, deadline_only=False):
     net = Network()
     a, b = net.add_device('A'), net.add_device('B')
     a.add_loopback('lo', ipv4=['10.0.0.1/32'])
@@ -91,10 +90,7 @@ def carrier(n, *, legacy_link_lookup=False, deadline_only=False):
 
     def fail_all():
         for link in links:
-            if legacy_link_lookup:
-                net.links[link.id].fail()
-            else:
-                link.fail()
+            link.fail()
 
     sim.at(1, fail_all)
     deadline_start = []
@@ -119,7 +115,6 @@ def main():
     parser.add_argument('--pipeline-source')
     parser.add_argument('--derive-source')
     parser.add_argument('--carrier', action='store_true')
-    parser.add_argument('--legacy-link-lookup', action='store_true')
     parser.add_argument('--deadline-only', action='store_true')
     parser.add_argument('--repeats', type=int, default=7)
     parser.add_argument(
@@ -144,7 +139,6 @@ def main():
                 'pipeline': args.pipeline_source or 'working tree',
                 'derive': args.derive_source or 'working tree',
                 'workload': 'carrier' if args.carrier else 'isolated',
-                'legacy_link_lookup': args.legacy_link_lookup,
                 'deadline_only': args.deadline_only,
             }
         ),
@@ -153,11 +147,7 @@ def main():
 
     def measure(n):
         return (
-            carrier(
-                n,
-                legacy_link_lookup=args.legacy_link_lookup,
-                deadline_only=args.deadline_only,
-            )
+            carrier(n, deadline_only=args.deadline_only)
             if args.carrier
             else isolated(n)
         )

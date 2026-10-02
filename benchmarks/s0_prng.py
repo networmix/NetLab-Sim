@@ -66,7 +66,8 @@ def main():
     args = parser.parse_args()
     if args.runtime_ref:
         source = subprocess.check_output(
-            ['git', 'show', f'{args.runtime_ref}:netsim/runtime/agents.py'], text=True
+            ['git', 'show', f'{args.runtime_ref}:ngraph_sim/runtime/agents.py'],
+            text=True,
         )
         module = types.ModuleType('ngraph_sim.runtime._s0_benchmark_agents')
         sys.modules[module.__name__] = module

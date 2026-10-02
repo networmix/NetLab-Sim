@@ -42,11 +42,11 @@ def main() -> None:
     parser.add_argument('--repeats', type=int, default=20)
     args = parser.parse_args()
     source = subprocess.check_output(
-        ['git', 'show', f'{args.old}:netsim/study.py'], text=True
+        ['git', 'show', f'{args.old}:ngraph_sim/study.py'], text=True
     )
     old = types.ModuleType('_t6b_old_study')
     sys.modules[old.__name__] = old
-    exec(compile(source, f'{args.old}:netsim/study.py', 'exec'), old.__dict__)
+    exec(compile(source, f'{args.old}:ngraph_sim/study.py', 'exec'), old.__dict__)
     print(
         json.dumps(
             {

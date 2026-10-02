@@ -40,12 +40,8 @@ def _nonnegative(value: float, name: str) -> None:
 
 
 def derive_seed(master: int, kind: str, name: str) -> int:
-    """NetGraph SeedManager(master).derive_seed('netsim', kind, name).
-
-    The ``netsim`` label is a frozen part of the seed derivation, kept from the
-    project's former name so that failure draws stay reproducible.
-    """
-    digest = hashlib.sha256(f'{master}:netsim:{kind}:{name}'.encode()).digest()
+    """NetGraph SeedManager(master).derive_seed('sim', kind, name)."""
+    digest = hashlib.sha256(f'{master}:sim:{kind}:{name}'.encode()).digest()
     return int.from_bytes(digest[:4], 'big') & 0x7FFFFFFF
 
 

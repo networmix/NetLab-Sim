@@ -15,11 +15,11 @@ Streams are independent in that each has its own draw position; distinct
 SplitMix64 seeds are offsets in one period, not disjoint sequences.
 
 - **Family key.** An 8-byte BLAKE2b digest with personalization
-  `NetSim.PRNG.v1` over network seed, device seed, agent name and generation.
+  `ngraph_sim.prng1` over network seed, device seed, agent name and generation.
   Integers are a sign byte, an eight-byte big-endian length and the
   big-endian magnitude. The name is an eight-byte length and UTF-8.
 - **Stream id.** An 8-byte BLAKE2b digest with personalization
-  `NetSim.stream.v1` over the eight-byte key and the length-prefixed name
+  `ngraph_sim.strm1` over the eight-byte key and the length-prefixed name
   path. The empty path is the base stream, and the empty name is a separate
   stream. As with any 64-bit hash, two ids can collide.
 - **State.** `(key, counters)`, where `counters` is a sorted tuple of
@@ -73,10 +73,8 @@ need the new module, so they cannot run against the baseline.
 `benchmarks/s0_prng_determinism.json` holds a 100-run script that uses every
 draw method, named streams and state restore, with its output on CPython
 3.14.5 and 3.14.5t under hash seeds 1 and 987654321. All four outputs are
-13,036 bytes with SHA-256
-`e2970cfff88ce21760a462bac72961fd469bb7dee20010db35fe3e380d6c747e`. The draws
-and counters are identical to the output before `9d53746`, whose state lacked
-the key. To check:
+13,003 bytes with SHA-256
+`75bdd2c54a72e5c03d84bc8f335db3a66c8b2f38b357cf2b4220e92b2a9f96a9`. To check:
 
 ```sh
 venv/bin/python - <<'PY'

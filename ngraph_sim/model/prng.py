@@ -178,8 +178,7 @@ class Prng:
             + _integer(generation)
         )
         key = int.from_bytes(
-            # Frozen v1 personalization, kept from the project's former name.
-            blake2b(encoded, digest_size=8, person=b'NetSim.PRNG.v1').digest(),
+            blake2b(encoded, digest_size=8, person=b'ngraph_sim.prng1').digest(),
             'big',
         )
         return cls(key)
@@ -208,7 +207,7 @@ class Prng:
                 blake2b(
                     self._key.to_bytes(8, 'big') + self._path,
                     digest_size=8,
-                    person=b'NetSim.stream.v1',  # frozen v1 personalization
+                    person=b'ngraph_sim.strm1',
                 ).digest(),
                 'big',
             )

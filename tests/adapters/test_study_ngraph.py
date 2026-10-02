@@ -162,7 +162,7 @@ def test_seed_formula_and_policy_process_reproducibility():
     from ngraph_sim.runtime.failures import derive_seed
 
     assert derive_seed(42, 'link', 'x') == SeedManager(42).derive_seed(
-        'netsim', 'link', 'x'
+        'sim', 'link', 'x'
     )
     scenario = scenario_from(scenario_doc())
     kwargs = {

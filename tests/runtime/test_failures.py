@@ -146,7 +146,7 @@ def test_renewal_unavailability_and_seed(kind):
 
 def test_distribution_means_and_seed_formula():
     expected = (
-        int.from_bytes(hashlib.sha256(b'42:netsim:link:x').digest()[:4], 'big')
+        int.from_bytes(hashlib.sha256(b'42:sim:link:x').digest()[:4], 'big')
         & 0x7FFFFFFF
     )
     assert derive_seed(42, 'link', 'x') == expected

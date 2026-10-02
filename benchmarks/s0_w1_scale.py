@@ -35,11 +35,11 @@ from ngraph_sim.model import srv6
 def load_baseline(revision: str) -> str:
     commit = subprocess.check_output(['git', 'rev-parse', revision], text=True).strip()
     source = subprocess.check_output(
-        ['git', 'show', f'{commit}:netsim/model/network.py'], text=True
+        ['git', 'show', f'{commit}:ngraph_sim/model/network.py'], text=True
     )
-    exec(compile(source, f'{commit}:netsim/model/network.py', 'exec'), nw.__dict__)
+    exec(compile(source, f'{commit}:ngraph_sim/model/network.py', 'exec'), nw.__dict__)
     source = subprocess.check_output(
-        ['git', 'show', f'{commit}:netsim/model/srv6.py'], text=True
+        ['git', 'show', f'{commit}:ngraph_sim/model/srv6.py'], text=True
     )
     function = next(
         node
@@ -47,7 +47,7 @@ def load_baseline(revision: str) -> str:
         if isinstance(node, ast.FunctionDef) and node.name == 'consumer_index'
     )
     module = ast.Module(body=[function], type_ignores=[])
-    exec(compile(module, f'{commit}:netsim/model/srv6.py', 'exec'), srv6.__dict__)
+    exec(compile(module, f'{commit}:ngraph_sim/model/srv6.py', 'exec'), srv6.__dict__)
     return commit
 
 

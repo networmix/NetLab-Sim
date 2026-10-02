@@ -339,7 +339,7 @@ def test_repeatability_fingerprint():
     document = json.dumps(first.to_ngraph(), sort_keys=True, allow_nan=False)
     assert (
         hashlib.sha256(document.encode()).hexdigest()
-        == '4c9c48440bc0cb7685d99f5f9202f531efed2a3fec5f7ba066ab522faf2d88d4'
+        == 'a07257d5a7bae85af753638d6b62581415d1659a5eb7e1fd0ce3ba4c414b2cdf'
     )
 
 
