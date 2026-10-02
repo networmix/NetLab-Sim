@@ -1,10 +1,11 @@
 # T2: scoped batches and NetGraph construction
 
-This is the original implementation report. The convergence-in-batch contract
-is superseded by [T2C](T2C-batch.md): commit before `converge()` or `place()`.
+The convergence-in-batch contract described here is superseded by
+[T2C](t2c-committed-root-derivations.md): commit before `converge()` or
+`place()`.
 
 Base: `c2d658e67e62a8df1fe99aa3cae5a1f9f3656630` (`network-layer-gate-a`).
-Worktree/branch: `scale/t2-batch`. No other worktree was modified.
+Branch: `scale/t2-batch`.
 
 ## Behavior
 
@@ -57,9 +58,10 @@ commits. The first batch/equivalence regression tests failed on the base with
 Final A/B/A measurements used separate, sequential subprocesses on this Mac,
 CPython 3.14.5 with the GIL enabled, `PYTHONHASHSEED=0`, three fresh builds per
 measurement, and no overlapping test/benchmark jobs. The base came from a
-`git archive` in `/tmp`, not another worktree. A1 and A2 are the unmodified base;
+`git archive` of that revision. A1 and A2 are the unmodified base;
 B is this implementation. Values below are medians in seconds. All raw samples,
-interpreter/source paths and fingerprints are in [t2-results.json](t2-results.json).
+interpreter/source paths and fingerprints are in
+[t2-results.json](../../benchmarks/t2-results.json).
 
 | Workload | A1 old | B batch | A2 old | Commits old → batch |
 |---|---:|---:|---:|---:|
@@ -71,15 +73,15 @@ interpreter/source paths and fingerprints are in [t2-results.json](t2-results.js
 The 10,000-device result is below the 0.5 s acceptance threshold. Device build
 cost scales approximately linearly over the measured batch sizes. Import timing
 excludes package imports, YAML expansion and convergence. The scenario runs used
-`/Users/networmix/ws/NetGraph/venv/bin/python` as requested.
+an interpreter with NetGraph installed.
 
 Reproduce each A/B/A leg using the same interpreter and the desired revision's
 absolute path (the script prints the actual imported Network source):
 
 ```sh
-PYTHONPATH=<revision> <worktree>/venv/bin/python <worktree>/benchmarks/batch.py devices --count 10000 --repeat 3
-PYTHONPATH=<revision> /Users/networmix/ws/NetGraph/venv/bin/python <worktree>/benchmarks/batch.py scenario --repeat 3
-PYTHONPATH=<revision> /Users/networmix/ws/NetGraph/venv/bin/python <worktree>/benchmarks/batch.py scenario --repeat 1 --fingerprint
+PYTHONPATH=<revision> <repo>/venv/bin/python <repo>/benchmarks/batch.py devices --count 10000 --repeat 3
+PYTHONPATH=<revision> <netgraph-venv>/bin/python <repo>/benchmarks/batch.py scenario --repeat 3
+PYTHONPATH=<revision> <netgraph-venv>/bin/python <repo>/benchmarks/batch.py scenario --repeat 1 --fingerprint
 ```
 
 The real scenario's construction tree, converged FIBs and full placement report
@@ -92,11 +94,10 @@ have deterministic ordering. In particular:
 
 ## Checks and remaining scope
 
-- `bash .superset/workspace.sh setup`: passed; shared hooks were not replaced.
 - `make check-ci`: lint and pyright passed; 429 passed, 1 skipped; 95.18% coverage.
 - `make venv-ft` and `make check-ft`: free-threaded 3.14.5, GIL disabled;
   lint and pyright passed; 429 passed, 1 skipped; 95.18% coverage.
-- Real NetGraph adapter suite, with its interpreter and this worktree's
+- Real NetGraph adapter suite, with NetGraph's interpreter and this tree on
   `PYTHONPATH`: 9 passed (including the integration test skipped without ngraph).
 - Regression coverage includes equal sequential/batched trees before and after
   convergence; one hook/validation; runtime integration; commit-time clock;
@@ -106,8 +107,7 @@ have deterministic ordering. In particular:
   no-op canonicalization; pure update and convergence within a batch; and
   exceptions during final validation or post-commit observation.
 
-Existing out-of-scope issue, independently reproduced on the base: setting
-Historical note: at the time of this measurement, `net.debug_validate = True` followed by adding a route raised `TypeError: unrecognized object FrozenPrefixTable`; the validator now accepts frozen prefix tables and rejects the mutable builder (fixed on the integration branch).
-
-Local checks do not replace CI. Integration with the other scale branches still
-needs the integrator's combined test run.
+A separate defect reproduced on the base: setting `net.debug_validate = True`
+and then adding a route raised `TypeError: unrecognized object
+FrozenPrefixTable`. It was fixed later on the integration branch; the
+validator now accepts frozen prefix tables and rejects the mutable builder.

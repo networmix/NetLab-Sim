@@ -91,7 +91,7 @@ class FibEntry:
     """Row keys of the rows that produced this entry."""
     depends_on: DependsOn = field(default_factory=DependsOn)
     program: Any = None
-    """SR action program (Gate B); ``None`` for plain forwarding."""
+    """SR action program; ``None`` for plain forwarding."""
     sid: Any = field(default=None, repr=False)
     """LocalSid for SRV6_LOCAL; hidden from repr to preserve plain-IP fingerprints."""
 
@@ -134,7 +134,7 @@ class NeighborTable:
 
 
 # ---------------------------------------------------------------------------
-# Action program (plain IP in Gate A)
+# Action program
 # ---------------------------------------------------------------------------
 
 from typing import Protocol  # noqa: E402
@@ -625,7 +625,7 @@ def _transmit(
         return StepResult(DROP, EGRESS_DOWN, egress=adj.interface)
     if adj.mac is None:
         return StepResult(DROP, ADJ_UNRESOLVED, egress=adj.interface)
-    # Preserve Gate A's MTU-before-member drop precedence for plain IP.
+    # Plain IP checks MTU before LAG membership when choosing the drop reason.
     if not sr and ip_bytes(packet) > egress.config.mtu:
         return StepResult(DROP, MTU_EXCEEDED, egress=adj.interface)
     member = adj.interface

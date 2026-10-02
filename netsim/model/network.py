@@ -526,7 +526,7 @@ class Network:
     def add_agent(
         self, device: Device | str, agent: DeviceAgent, name: str | None = None
     ) -> AgentNode:
-        """Register a protocol plugin on a device (Gate C contract).
+        """Register a protocol agent on a device (``netsim.model.contracts``).
 
         Validates the plugin, registers its client profile (or checks it
         against an existing registration of the same client), and commits an

@@ -61,8 +61,8 @@ are in `t3b_rib_updates_results.json`.
 
 Bulk sync is slower because it constructs/updates the additional persistent
 maps; this trade-off is reported, not a claimed bulk-write improvement.
-No tests or other benchmarks from this worker ran during these measurements.
-Timing sequences that overlapped another worker were discarded. The reported
+No tests or other benchmarks ran during these measurements, and timing
+sequences that overlapped other jobs were discarded. The reported
 sequence followed a two-second idle window and was monitored every 0.2 seconds;
 no other Python process above 1% CPU was observed during any leg. The monitor
 and normal desktop applications remained running, so this is not a dedicated

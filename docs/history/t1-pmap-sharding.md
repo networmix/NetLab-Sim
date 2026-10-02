@@ -4,7 +4,7 @@ Base: `network-layer-gate-a`, commit `c2d658e67e62a8df1fe99aa3cae5a1f9f3656630`.
 Candidate implementation: `0659d1e50162ce9f8e1a708f4b3d9ea062331a71`.
 Measured on 2026-09-20, Apple M4 Max (14 CPU cores), macOS 26.6.1 arm64,
 CPython 3.14.5 with the GIL enabled. All A/B comparisons use the same
-worktree interpreter, separate serial processes, and `PYTHONHASHSEED=1`.
+interpreter, separate serial processes, and `PYTHONHASHSEED=1`.
 
 ## Representation and compatibility
 
@@ -50,14 +50,14 @@ replace the device with a distinct object, rather than timing an identity no-op.
 Each timing is the median of seven rounds after warmup. A round uses 25
 epoch/delta/commit operations, 50 sets, or 500 batches of 1,000 lookups. GC is
 disabled only during timing. Both prebuilt-key and formatted-key lookups are
-reported; the latter matches the supplied prototype's lookup workload.
+reported.
 Coverage and pytest instrumentation are absent.
 
 Retained memory is `tracemalloc`'s live allocation increase after retaining
 64 successive committed roots plus the original baseline, followed by GC.
 The baseline tree is created before tracing starts. Values are decimal MB,
 not peak RSS or total network footprint. Debug tree validation and observers
-are disabled, as in the supplied empty-device reproducer.
+are disabled.
 
 To reproduce, archive the base into a temporary directory, then run the same
 interpreter and script in A/B/A order. `--repo` explicitly selects the source
@@ -92,19 +92,18 @@ Final monitored A/B/A, with the selected 256-shard implementation:
 Lookup is 1.823x the mean of the surrounding prebuilt-key baselines (1.686x
 including key formatting). The commit meets both the <0.5 ms acceptance
 limit and 0.1 ms target; delta time is below 0.1 ms and retained memory is
-below 10 MB. The local baseline differs from the supplied 16.5 ms result;
-the table uses this interpreter's fresh before/after measurements.
+below 10 MB. The baseline here differs from the 16.5 ms measured earlier in
+the scale review; the table uses fresh before/after runs on one interpreter.
 
 The final series waited for other benchmark work to become idle, then sampled
 process CPU usage every 0.5 seconds throughout all three runs. No other Python
 process above 20% CPU was observed. The monitor would discard an overlapping
 run. Normal desktop processes remained active; the two baseline commit
 medians differ by 9.3%, so these are local measurements, not exact timing
-guarantees. No tests or other workloads were launched by this worker during
-the series.
+guarantees. No tests or other workloads ran during the series.
 
 The earlier serial layout trials were `A1 / B256 / A2 / B512 / A3 / B256-repeat
-/ A4`; other workers were active around that exploratory series. Both layouts
+/ A4`; other jobs were running around that exploratory series. Both layouts
 were bracketed by fresh base runs:
 
 | Metric | A1 | B256 | A2 | B512 | A3 | B256 repeat | A4 |
@@ -118,7 +117,7 @@ were bracketed by fresh base runs:
 on promotion. The 512-shard trial reduced commit and retention costs, but its
 prebuilt lookup was already near the 2x limit. The default remains 256.
 Full precision and interpreter metadata for every run are in
-[`pmap_scale_results.json`](pmap_scale_results.json).
+[`pmap_scale_results.json`](../../benchmarks/pmap_scale_results.json).
 
 ## Correctness evidence
 
@@ -142,5 +141,4 @@ to those same base fingerprints.
   Ruff and pyright passed; coverage 94.78% (state.py 98%).
 - `make venv-ft`, then `make check-ft`: same results on CPython 3.14.5t,
   with `sys._is_gil_enabled()` verified false.
-- Local checks do not replace CI. These measurements concern empty-device
-  commits, not full-network convergence or a claim of 100k routed-device capacity.
+- These measurements concern empty-device commits, not full-network convergence or a claim of 100k routed-device capacity.

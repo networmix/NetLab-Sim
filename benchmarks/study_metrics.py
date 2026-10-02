@@ -1,6 +1,6 @@
 """T6B metrics A/B/A against the pre-fix integrated implementation.
 
-Run: venv/bin/python -m tests.runtime.benchmark_study_metrics
+Run: venv/bin/python -m benchmarks.study_metrics
 Loads only the old study module from git; does not change any checkout.
 Both implementations see the same immutable network and placement samples.
 Construction and operation counting are outside timing. No counter wrappers

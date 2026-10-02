@@ -3,8 +3,7 @@
 Baseline: `c2d658e` (`network-layer-gate-a`). Measured on 2026-09-20,
 Apple M4 Max / macOS arm64, CPython 3.14.5 with the GIL enabled. Each
 A/B/A leg used the same interpreter in a fresh process. Benchmarks ran
-serially, without this worker's tests or other benchmarks running alongside
-them. This is a shared desktop, not an isolated benchmark host; background
+serially, with no tests or other benchmarks alongside them. This is a shared desktop, not an isolated benchmark host; background
 desktop activity was not disabled. The two baseline legs bracket drift.
 
 | Measurement | A1: baseline | B: indexed | A2: baseline |
@@ -24,8 +23,9 @@ ring script reports one run per leg, at its original 0.01 s precision; all
 Maintaining the additional indexes increases the cost of the empty-RIB sync;
 this change does not claim a write-speed improvement or accelerate oracle SPF.
 
-The copied `verify_converge.py` has the same workloads as the supplied script;
-only formatting, unused imports and explicit lambda captures were adjusted.
+`benchmarks/verify_converge.py` keeps the workloads of the original
+convergence probe; only formatting, unused imports and explicit lambda captures
+were adjusted.
 Initial convergence at the smaller ring sizes was:
 
 | Devices | A1 | B | A2 |
@@ -36,7 +36,7 @@ Initial convergence at the smaller ring sizes was:
 
 ## Reproduction
 
-The baseline is an archive inside this worktree; no other worktree is used.
+The baseline is a `git archive` of `c2d658e` under `build/`.
 
 ```sh
 mkdir -p build/t3-baseline
@@ -91,7 +91,6 @@ instances, distinguishers, withdrawal of the final row, combined
 sync/delete/add ordering, no-op identity, failed-sync isolation, and 80 seeded
 mixed batches checked against a flat reference with all snapshots retained.
 
-- `bash .superset/workspace.sh setup`: passed.
 - `make check-ci`: lint and pyright passed; 416 passed, 1 skipped;
   coverage 94.68%.
 - `make venv-ft`: created CPython 3.14.5t; confirmed the GIL is disabled.

@@ -39,7 +39,7 @@ class BalancerKind(IntEnum):
 
 class HashMode(IntEnum):
     HASH_THRESHOLD = 1
-    RESILIENT = 2  # deferred past Gate C
+    RESILIENT = 2  # not implemented: LoadBalancer.mode is never read
 
 
 _PERSON = {BalancerKind.ECMP: b'ecmp', BalancerKind.AGGREGATE_PORT: b'lag'}

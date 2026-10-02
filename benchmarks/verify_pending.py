@@ -1,7 +1,7 @@
 """Manual deadline benchmark; run old/new/old with the same Python executable.
 
 Save the baseline with ``git show <base>:netsim/runtime/pipeline.py > /tmp/old.py``.
-Run ``python tests/runtime/verify_pending.py --pipeline-source /tmp/old.py``,
+Run ``python benchmarks/verify_pending.py --pipeline-source /tmp/old.py``,
 then without that option, then with it again. Add ``--carrier --repeats 1``
 to run the carrier-debounce workload (which also measures derivations,
 commits and delta dispatch). Construction and initial convergence are untimed.

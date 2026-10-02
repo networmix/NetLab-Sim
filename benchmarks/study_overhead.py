@@ -1,6 +1,6 @@
 """Reproducible manual-loop / Study / manual-loop timing (no pytest overhead).
 
-Run: venv/bin/python -m tests.runtime.benchmark_study
+Run: venv/bin/python -m benchmarks.study_overhead
 Build/converge and source selection are outside all timed regions. Fifty
 unique draws prevent deduplication from making Study appear faster. Both paths
 fork, fail at 1, sample at 2, restore at 2, and run to 3 with identical timeline

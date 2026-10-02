@@ -95,7 +95,7 @@ class Demand:
     def class_key(self) -> tuple:
         base = (self.af, self.dst, self.dscp, self.payload_size)
         if self.template is None and self.steer is None:
-            return base  # Preserve Gate A cache keys exactly.
+            return base  # Plain-IP keys keep their original shape.
         template = _ordered_value(self.template) if self.template is not None else ()
         steer = (
             (self.steer.color, self.steer.endpoint) if self.steer is not None else ()
@@ -147,7 +147,7 @@ class SourceResult:
     policy_outcomes: tuple[tuple[str, int, int, str, str, Fraction], ...] = field(
         default=(), repr=False
     )
-    """Internal accounting metadata; omitted from the stable Gate A repr."""
+    """Internal accounting metadata; omitted from the stable plain-IP repr."""
 
 
 @record
@@ -309,7 +309,7 @@ class _PacketState(NamedTuple):
     def encap(
         self, active_da: int, srh_entries: int = 0, continuation: tuple[int, ...] = ()
     ) -> _PacketState:
-        """Push the Gate B outer IPv6 stack; the SR step supplies its continuation."""
+        """Push the outer IPv6 header stack; the SR step supplies its continuation."""
         if self.outer:
             raise ValueError(NESTED_ENCAP_UNSUPPORTED)
         if srh_entries < 0:
@@ -1139,7 +1139,7 @@ def _wire_rates(
     """Scale each transmission's packet rate by its own frame length.
 
     When all transmissions have the same framing, aggregate the exact
-    fractions first, preserving Gate A's floating-point arithmetic and bytes.
+    fractions first, so plain-IP results keep their exact floating-point values.
     """
     frames = {t.frame_bytes for t in result.transmissions}
     if len(frames) == 1:

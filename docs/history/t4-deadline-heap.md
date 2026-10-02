@@ -1,4 +1,4 @@
-# T4 deadline heap verification
+# T4: deadline heap
 
 Measured on 2026-09-20 against baseline `c2d658e`, using the same local
 CPython 3.14.5 executable (`venv/bin/python`) for separate A/B/A processes.
@@ -14,9 +14,9 @@ does not modify those derivations or broaden T4 into incremental L3.
 
 ```sh
 git show c2d658e:netsim/runtime/pipeline.py > /tmp/t4-pipeline-old.py
-venv/bin/python tests/runtime/verify_pending.py --pipeline-source /tmp/t4-pipeline-old.py
-venv/bin/python tests/runtime/verify_pending.py
-venv/bin/python tests/runtime/verify_pending.py --pipeline-source /tmp/t4-pipeline-old.py
+venv/bin/python benchmarks/verify_pending.py --pipeline-source /tmp/t4-pipeline-old.py
+venv/bin/python benchmarks/verify_pending.py
+venv/bin/python benchmarks/verify_pending.py --pipeline-source /tmp/t4-pipeline-old.py
 ```
 
 Repeat the three benchmark commands with `--carrier --repeats 1` for the
@@ -46,7 +46,7 @@ The structural regression test counts pending-map visits: the old scan
 visits 8,002,000 entries at n=4,000, versus zero with the heap in the same
 no-reschedule case.
 
-Other Python workers were visible during the first measurement pass.
+Other Python jobs were running during the first measurement pass.
 The isolated A/B/A above was repeated after they stopped; process sampling
 then showed no competing Python workload. Normal desktop applications
 remained running. Local tests and benchmark processes were run sequentially.
@@ -57,7 +57,7 @@ Two devices, n parallel unnumbered links, distinct down-debounce delays on
 one side; all links fail at t=1. Construction and initial convergence are
 untimed. The timed region is exactly the original `sim.run_until(...)`,
 including the individual link failures and their derived updates. One sample
-per size per A/B/A process. The initial pass overlapped other workers at
+per size per A/B/A process. The initial pass overlapped other jobs at
 some points, so small timing differences are not treated as a speedup.
 
 | Deadlines | Old A1 (s) | Heap B (s) | Old A2 (s) | Heap per deadline (ms) |
@@ -107,7 +107,6 @@ Only the original exact-key consumption paths remove `scheduled` and
 - `make venv-ft`, then `make check-ft`: Python 3.14.5 free-threaded, GIL disabled;
   lint and pyright pass; 432 passed, 1 skipped; 94.69% coverage.
 
-Local checks do not replace CI. The integrator should retain the original
-carrier benchmark as an open performance acceptance item for incremental L3
-and the workload's repeated link-handle lookup, rather than claiming T4 alone
-makes it linear.
+T4 alone does not make the carrier workload linear. Incremental L3 and the
+workload's repeated link-handle lookup were left open and addressed in
+[T7](t7-scoped-l3.md).

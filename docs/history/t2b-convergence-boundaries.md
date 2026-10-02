@@ -1,13 +1,12 @@
 # T2B: convergence boundaries and incremental RIB snapshots
 
-The convergence-in-batch contract below is historical and superseded by
-[T2C](T2C-batch.md): `converge()` and `place()` now reject active batches.
-The incremental RIB snapshot behavior remains in place.
+The convergence-in-batch contract below is superseded by
+[T2C](t2c-committed-root-derivations.md): `converge()` and `place()` now
+reject active batches. The incremental RIB snapshot behavior remains.
 
-Base: `7d4976ad79693663cb3b604f7e0fef1727f812d2`, after the requested
-`git merge network-layer-gate-a`. The merge fast-forwarded this worktree and
-included all integrated worker changes. Initial `make check-ci` passed:
-555 passed, 3 skipped, 94.07% coverage.
+Base: `7d4976ad79693663cb3b604f7e0fef1727f812d2`, after merging
+`network-layer-gate-a`. The initial `make check-ci` passed: 555 passed,
+3 skipped, 94.07% coverage.
 
 ## Reproductions
 
@@ -27,8 +26,8 @@ independently recorded 803 RIB applications submitting 4,015,000 rows for just
 
 ## Fix and epoch semantics
 
-This uses the review's alternative of comparing against the **last staged
-inputs**, instead of changing the global `derive.bump_epochs` guard.
+The fix compares against the **last staged inputs** instead of changing the
+global `derive.bump_epochs` guard.
 
 `_Edits.base` is the immutable result of the last explicit staged `update()` or
 `converge()`. Snapshot reads preserve that reference. At batch exit, when this
@@ -76,13 +75,13 @@ unchanged-row resubmission, and replay of already-frozen operations.
 
 ## A/B/A measurement
 
-[batch_snapshots.py](batch_snapshots.py) uses two devices with 5,000 initial
-IPv4 routes each, one mutation on B, then 200 one-row edits on A, with two
+[batch_snapshots.py](../../benchmarks/batch_snapshots.py) uses two devices
+with 5,000 initial IPv4 routes each, one mutation on B, then 200 one-row edits on A, with two
 explicit state reads after each edit. Setup, imports, GC and the final
 fingerprint are outside the timer. All runs use the same normal CPython 3.14.5
 interpreter on this Mac, `PYTHONHASHSEED=0`, three fresh forks per leg, and
 sequential subprocesses with no overlapping test or benchmark jobs. The base
-was extracted with `git archive` under `/tmp`; no other worktree was touched.
+was extracted with `git archive`.
 
 | Leg | Median seconds | rib_apply calls | Submitted add rows |
 |---|---:|---:|---:|
@@ -91,12 +90,12 @@ was extracted with `git archive` under `/tmp`; no other worktree was touched.
 | A2 integrated base | 6.082024 | 803 | 4,015,000 |
 
 All three final RIB fingerprints match. Raw samples, interpreter/source paths,
-and the SHA-256 digest are in [t2b-results.json](t2b-results.json).
+and the SHA-256 digest are in [t2b-results.json](../../benchmarks/t2b-results.json).
 
 Reproduce each leg with the same interpreter and the desired revision:
 
 ```sh
-PYTHONPATH=<revision> PYTHONHASHSEED=0 <worktree>/venv/bin/python <worktree>/benchmarks/batch_snapshots.py --rows 5000 --edits 200 --repeat 3
+PYTHONPATH=<revision> PYTHONHASHSEED=0 <repo>/venv/bin/python <repo>/benchmarks/batch_snapshots.py --rows 5000 --edits 200 --repeat 3
 ```
 
 ## Validation
@@ -112,5 +111,4 @@ fingerprint fixtures remain part of the full suite.
 Final `make check-ci` and `make check-ft` both passed lint, pyright and the
 full suite: 571 passed, 3 skipped, 94.11% coverage. The latter used free-threaded
 CPython 3.14.5. The real NetGraph interpreter also passed all 19 tests in
-`tests/adapters` with this worktree on `PYTHONPATH`. Local checks do not replace
-CI or the next integrated branch run.
+`tests/adapters` with this tree on `PYTHONPATH`.

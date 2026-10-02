@@ -1,10 +1,8 @@
 # C2R: detached queries and generation-bound NHT scopes
 
-Merged `main` into `gatec/c2-nht` before changes. Main had advanced from the
-requested `89677eb` to `32563fb` (C5 merge); the merge was a fast-forward.
-Read the adversarial review and both NHT probes, the integrator contract commit
-`f2afd16`, and revision 16 of the design. C4's scoped EUI-64 resolution change
-is retained. No other worktree or main was modified; nothing was pushed.
+Base: `main` at `32563fb` (after the C5 merge), merged into `gatec/c2-nht`.
+The work answers two findings of an adversarial review and builds on the
+contract commit `f2afd16`. C4's scoped EUI-64 resolution change is retained.
 
 ## Reproduction and regression evidence
 
@@ -38,7 +36,7 @@ present in the initial agent publication; removal wakes the agent with
 CAUSE_NHT/SCOPE_STALE, recreation preserves both result and agent identities,
 and explicit purge/re-registration binds the replacement incarnation.
 
-## API handoff to C1R
+## API for C1R
 
 `nht.local_context(dev: DeviceState) -> LocalContext` implements the existing
 ResolutionContext protocol, including `interface_generation(name)`. Its frozen
@@ -65,8 +63,8 @@ The existing `nht.installed(state, device, key)` form remains supported.
 `NhtClient.resolve(key, *, exclude_rows=..., ctx=None)` and
 `NhtClient.installed(key, *, ctx=None)` accept a captured LocalContext; without
 one, they construct it from the current device. These handle-backed convenience
-clients are not objects to expose to plugins. C1R still owns the runtime
-Context wrappers; this change deliberately does not edit that worker's files.
+clients are not objects to expose to plugins. The runtime Context wrappers
+belong to C1R and are unchanged here.
 
 The resolver accepts `ctx.srv6_policies` directly and retains its previous
 DeviceContext fallback. This preserves policy resolution without placing a
@@ -101,7 +99,6 @@ No additions or changes to `contracts.py`. New public model records/helpers:
 
 ## Validation
 
-- `bash .superset/workspace.sh setup`: passed.
 - Focused NHT suites: 48 passed in 0.42 s.
 - `make check-ci`: formatting/lint and Pyright clean; 1,544 passed, 14 skipped,
   1 existing expected failure in 38.19 s; 95.38% coverage.

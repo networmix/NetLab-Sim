@@ -1,7 +1,7 @@
-# C4 reference protocol handoff
+# C4: reference link-state protocol
 
 Implemented on `gatec/c4-reference`, merged with main through `f2dae73`.
-No runtime dependencies. No push. Revision 16 is the design of record.
+No runtime dependencies.
 
 ## API and protocol decisions
 
@@ -96,8 +96,7 @@ Main's `f2dae73` now supplies that fix; C4 carries no separate listener edit.
 ## Scale qualification
 
 Reproduce with `tests.agents.fixtures.measure_ring(n)` on n=16,32,64.
-Three sequential trials per size, with no test/check process running in this
-worktree. CPython 3.14.5, macOS 26.6.1 arm64, 14 logical CPUs. Desktop remained
+Three sequential trials per size, with no test or check process running. CPython 3.14.5, macOS 26.6.1 arm64, 14 logical CPUs. Desktop remained
 active: one-minute system load 3.30 before, 4.23 after. These are same-machine
 size-versus-time qualification results, not an old/new speedup claim or an
 isolated-machine CPU benchmark.
@@ -137,11 +136,9 @@ timeout. It makes no wall-time threshold assertion.
 
 This teaching implementation does not claim a larger scale envelope,
 authenticated peers, Open/R compatibility, or runtime checkpoint/restore.
-Local checks do not replace CI.
 
 ## Final checks
 
-- `bash .superset/workspace.sh setup`: passed (per-worktree Python 3.14.5).
 - `make check-ci`: lint and pyright passed; **1470 passed, 10 skipped**,
   **95.33% coverage**, 42.25 s. Existing fingerprints remain green.
 - `make venv-ft`: created Python 3.14.5t; verified GIL disabled.

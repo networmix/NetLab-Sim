@@ -1,9 +1,8 @@
 # C2F: runtime seam tests and scoped SR invalidation
 
-Base: `main` at `2ab9d7d`, merged by fast-forward into `gatec/c2-nht`.
-The integration commit was read before work. Its NHT refresh, profile propagation
-and result-identity wakeup seams are used unchanged. No other worktree or main
-was edited, and no runtime implementation or existing SR test was changed.
+Base: `main` at `2ab9d7d`, merged into `gatec/c2-nht`. The integration
+commit's NHT refresh, profile propagation and result-identity wakeup seams are
+used unchanged, and no runtime implementation or existing SR test changed.
 
 ## End-to-end evidence
 
@@ -73,8 +72,8 @@ venv/bin/python -m tests.model.test_srv6_invalidation --benchmark
 
 The baseline was measured on the merged `2ab9d7d` implementation before changing
 `srv6.py`; the after measurement used the scoped implementation. Both ran
-sequentially on this Apple M4 Max / macOS arm64 machine with CPython 3.14.5;
-this worker launched no concurrent checks or benchmarks during the timing.
+sequentially on an Apple M4 Max / macOS arm64 machine with CPython 3.14.5,
+with no concurrent checks or benchmarks.
 
 Workload: 64 devices, 64 uniform-metric unnumbered ring links, 12,288 total
 IPv4/IPv6 RIB rows, 8 headends with classic terminal-SID policies to nodes two
@@ -96,7 +95,6 @@ or updates that touch a recorded path.
 
 ## Checks and integration
 
-- Setup succeeded with `bash .superset/workspace.sh setup`.
 - `make check-ci`: Ruff formatting/lint and Pyright clean; all tests passed.
 - `make check-ft`: same checks on free-threaded CPython 3.14.5 with GIL disabled.
 - Both suites: 1,411 passed, 10 skipped, 95.27% coverage, including unchanged
@@ -104,6 +102,5 @@ or updates that touch a recorded path.
 - New focused tests: 12 passed (6 runtime seam cases and 6 invalidation cases).
 - `git diff --check`: clean.
 
-No contract additions and no changes required in C1/C3. Their merged seams are
-now covered by the real-plugin tests. No known C2F blocker. Local checks do not
-replace CI.
+No contract additions and no changes were required in C1 or C3; their merged
+seams are now covered by the real-plugin tests.

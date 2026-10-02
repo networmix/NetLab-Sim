@@ -70,7 +70,7 @@ class Simulation:
         self.stats = Stats(samples=stats_samples)
         self.bus = EventBus(env, network)
         ref: dict[str, Any] = {}
-        # Runtime-owned bands (Gate C): agents and transport keep their
+        # Runtime-owned bands: agents and transport keep their
         # inboxes, timers and queues outside the tree; their kinds join the
         # pipeline next to the model-owned derivations.
         self.agents = AgentRuntime(self)

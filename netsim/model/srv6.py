@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 END = 1
 END_X = 2
 END_DT46 = 3
-# Post-Gate-C behaviours are named so configuration can reject them by name.
+# Unsupported behaviours are named so configuration can reject them by name.
 END_DT4 = 4
 END_DT6 = 5
 END_DX4 = 6
@@ -44,7 +44,7 @@ USP = 2
 USD = 4
 NEXT_CSID = 8
 GATE_B_FLAVORS = PSP | USD | NEXT_CSID
-"""USP is rejected in Gate B; PSP and USD may be combined with NEXT_CSID."""
+"""USP is rejected; PSP and USD may be combined with NEXT_CSID."""
 
 # Headend behaviours (RFC 8986 §5).
 H_ENCAPS = 1
@@ -335,7 +335,7 @@ class Srv6Policies:
     steering: tuple[SteeringRule, ...] = ()
     """Ordered by longest dst prefix, exact DSCP before wildcard, exact sport before wildcard, id."""
     bsids: PMap[int, tuple[int, int]] = field(default_factory=empty_pmap)
-    """Binding SID → policy key (one owner per BSID in Gate B)."""
+    """Binding SID → policy key (one owner per BSID)."""
     steering_by_client: PMap[ClientId, tuple[SteeringRule, ...]] = field(
         default_factory=empty_pmap
     )
@@ -416,8 +416,8 @@ def behavior_name(behavior: int) -> str:
 
 
 def check_gate_b(behavior: int, flavors: int) -> str | None:
-    """``None`` when the (behaviour, flavors) pair is in the Gate B set, else
-    the rejection reason."""
+    """``None`` when the (behaviour, flavors) pair is supported (see
+    ``GATE_B_BEHAVIORS``), else the rejection reason."""
     if behavior not in GATE_B_BEHAVIORS:
         return UNSUPPORTED_BEHAVIOR
     if flavors & ~GATE_B_FLAVORS:
@@ -528,7 +528,7 @@ def flavor_names(flavors: int) -> tuple[str, ...]:
 
 def require_gate_b(behavior: int, flavors: int = 0, **options: Any) -> None:
     if 'vrf' in options or 'table' in options:
-        raise ValueError('VRF/table selection is unsupported in Gate B')
+        raise ValueError('VRF/table selection is unsupported')
     if options:
         raise ValueError(f'unsupported SR options: {", ".join(sorted(options))}')
     reason = check_gate_b(behavior, flavors)

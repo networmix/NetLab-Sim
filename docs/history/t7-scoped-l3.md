@@ -44,7 +44,7 @@ round semantics, FIB/placement APIs, or neighbor key shapes changed.
 
 ## Benchmark method
 
-The original `verify_pending.py` does `net.links[id]` inside a loop of n
+The original `verify_pending.py` called `net.links[id]` inside a loop of n
 failures. `Network.links` materializes **all** link handles on every access;
 that setup callback is independently quadratic. The default harness now
 captures handles once before timing. `--legacy-link-lookup` preserves the
@@ -58,9 +58,9 @@ outputs. Construction and initial convergence remain outside all timed regions.
 ```sh
 git show 34c031d:netsim/model/derive.py > /tmp/t7-derive-old.py
 git show 34c031d:netsim/runtime/pipeline.py > /tmp/t7-pipeline-old.py
-venv/bin/python tests/runtime/verify_pending.py --carrier --repeats 1 --derive-source /tmp/t7-derive-old.py --pipeline-source /tmp/t7-pipeline-old.py
-venv/bin/python tests/runtime/verify_pending.py --carrier --repeats 3
-venv/bin/python tests/runtime/verify_pending.py --carrier --repeats 1 --derive-source /tmp/t7-derive-old.py --pipeline-source /tmp/t7-pipeline-old.py
+venv/bin/python benchmarks/verify_pending.py --carrier --repeats 1 --derive-source /tmp/t7-derive-old.py --pipeline-source /tmp/t7-pipeline-old.py
+venv/bin/python benchmarks/verify_pending.py --carrier --repeats 3
+venv/bin/python benchmarks/verify_pending.py --carrier --repeats 1 --derive-source /tmp/t7-derive-old.py --pipeline-source /tmp/t7-pipeline-old.py
 ```
 
 Separate processes, same CPython 3.14.5 executable, sequential A/B/A on this
@@ -117,7 +117,7 @@ two internal ownership/membership indexes are excluded from this digest;
 FIBs, RIBs, interface state, versions, timestamps and timeline records are
 included. The unchanged fingerprint suites separately cover placement.
 Raw samples, exact interpreter details, configuration and complete hashes:
-[scoped_l3_results.json](scoped_l3_results.json).
+[t7_scoped_l3_results.json](../../benchmarks/t7_scoped_l3_results.json).
 
 
 ## Verification and boundaries
@@ -139,5 +139,4 @@ Scope costs still include the underlying persistent-map updates and RIB index
 maintenance in `rib_apply`. Full-device causes and clock-free convergence may
 walk the device, and a router-ID change must consider all loopbacks. The timing
 workload is the specified unnumbered carrier-debounce scenario, not a claim of
-constant time for arbitrary large addressed RIB mutations. Local checks do not
-replace CI.
+constant time for arbitrary large addressed RIB mutations.

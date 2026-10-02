@@ -53,7 +53,7 @@ class SRH:
 
     The following header is stored in ``IPv6Packet.payload``; ``next_header``
     identifies it. Its UDP default preserves the five positional arguments.
-    TLVs are not represented by this fixed-size Gate B header model.
+    TLVs are not represented by this fixed-size header model.
     """
 
     entries: tuple[int, ...]
@@ -143,7 +143,7 @@ class EthernetFrame:
 
 
 def srh_bytes(srh: SRH) -> int:
-    """RFC 8754 §2 fixed header and Segment List (no TLVs in Gate B)."""
+    """RFC 8754 §2 fixed header and Segment List (no TLVs)."""
     return SRH_BASE + SRH_ENTRY * len(srh.entries)
 
 

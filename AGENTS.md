@@ -15,3 +15,15 @@ Confirm suspected defects with source and a reproducer, then pin the fix with
 a test that fails on the old code. Design rules live in
 `tests/test_invariants.py`. Performance claims need an old-vs-new comparison
 on the same quiet machine. Local checks do not replace CI.
+
+# Documentation
+
+- `README.md` and `docs/reference.md` are the user documentation. Change
+  them in the same commit as the behaviour they describe.
+- Docstrings and comments state behaviour. They do not cite plans, reviews
+  or milestones that live outside this repository.
+- A slice's report goes in `docs/history/` as `<slice>-<topic>.md`, with a
+  row in its README: what changed, the evidence, measurements and limits.
+  Leave out process notes such as worktrees, ownership and log paths.
+- `tests/` holds tests, fixtures and test data. Benchmark scripts and their
+  raw results go in `benchmarks/`.

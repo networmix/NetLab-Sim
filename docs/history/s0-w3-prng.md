@@ -121,7 +121,7 @@ were taken at `d468e6a`, before the key joined the state:
 | Old 2 | 189.17 | 66,965,782 | 26,786 |
 
 The retention result is the acceptance evidence. The timings are indicative
-only: other workers' checks were running, the first two legs come from one
+only: other checks were running, the first two legs come from one
 attempt and the third from the next, and no load average was recorded.
 
 `make check-ci` and `make check-ft` passed on the branch: 1,718 passed,

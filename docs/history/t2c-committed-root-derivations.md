@@ -1,6 +1,6 @@
 # T2C: committed-root derivations and complete observer dispatch
 
-Base: `2b028cc`, after the requested `git merge network-layer-gate-a`.
+Base: `2b028cc`, after merging `network-layer-gate-a`.
 The initial `make check-ci` passed with 627 tests, 4 skipped and 94.22% coverage.
 
 ## Reproductions on the integrated base
@@ -70,4 +70,3 @@ recording despite a preceding failing observer.
 the full suite: **639 passed, 4 skipped, 94.23% coverage**. The free-threaded
 interpreter is CPython 3.14.5, with `Py_GIL_DISABLED=1` and
 `sys._is_gil_enabled() == False`. `git diff --check` also passed.
-These local checks do not replace CI or the next integrated branch run.

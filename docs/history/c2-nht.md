@@ -1,8 +1,6 @@
-# Gate C slice C2: local query, NHT and learned SR validation
+# C2: local query, NHT and learned SR validation
 
-Base: `9032ea8` (C0, design revision 16). Worktree branch: `gatec/c2-nht`.
-The supplied worktree started at `02c9fbb` and was fast-forwarded to the
-requested C0 base before implementation. No other worktree or main was edited.
+Base: `9032ea8` (the C0 contract commit). Branch: `gatec/c2-nht`.
 
 ## APIs for integration
 
@@ -101,7 +99,7 @@ lookups, cross-AF recursion, delayed FIB, purge and withdrawal/recovery.
 `tests/runtime/test_srv6_events.py` has one minimal fixture adaptation outside
 the C2 model files: its existing `srdb_source=('agent', 'test')` invalidation
 case now registers that agent before configuring the source. Its original
-assertions remain unchanged. No other worker-owned implementation was edited.
+assertions remain unchanged.
 
 Final checks: `make check-ci` and `make check-ft` (CPython 3.14.5 / 3.14.5t,
 GIL disabled on the latter). Both include lint, pyright, all existing SR tests,
@@ -111,7 +109,7 @@ plain-IP FIB/placement fingerprints and coverage:
 - `make check-ft`: 1,322 passed, 10 skipped, 94.98% coverage; test phase 16.07 s.
 - Both: Ruff formatting/lint clean; Pyright 0 errors / 0 warnings.
 - New exit matrix: 32 NHT cases and 10 agent-SR cases.
-- `git diff --check`: clean. Local checks do not replace CI.
+- `git diff --check`: clean.
 
 Reproducible size comparison:
 `venv/bin/python -m tests.model.test_nht --benchmark`.

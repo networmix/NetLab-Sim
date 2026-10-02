@@ -67,7 +67,7 @@ _SPECIAL_ACTION = {
 @record
 class Nexthop:
     """Exactly one legal shape: interface only; interface + address;
-    address only (recursive); special; (Gate B) srv6 encap; policy."""
+    address only (recursive); special; SRv6 encap; policy."""
 
     interface: str | None = None
     address: int | None = None
@@ -79,7 +79,7 @@ class Nexthop:
     weight: int = 1
     onlink: bool = False
     behavior: Any = None
-    """SRV6_LOCAL behaviour record (Gate B)."""
+    """SRV6_LOCAL behaviour record."""
 
     def __post_init__(self) -> None:
         if self.weight < 1:
@@ -616,7 +616,7 @@ class _Resolver:
             return tuple(
                 _Leg(leg.interface, leg.nexthop, leg.mac, leg.share, nh.srv6, leg.af)
                 for leg in self._resolve_outer(packet, set())
-                if leg.encap is None  # Gate B rejects nested encapsulation.
+                if leg.encap is None  # Nested encapsulation is rejected.
             )
         if nh.interface is not None:
             self.frames[-1].interfaces.add(nh.interface)

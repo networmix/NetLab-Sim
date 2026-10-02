@@ -1,9 +1,9 @@
-# Gate C / C5 study windows and qualification
+# C5: study windows and qualification
 
-Initial qualification base: `9032ea8` (revision 16 / C0). Integration update:
-main `6ff26e9` was merged after C5 commit `e003e4a`; see the update below.
-C5's own changes do not modify model, routing, forwarding, placement or
-protocol implementations. Local checks do not replace CI.
+Initial qualification base: `9032ea8` (the C0 contract commit). Integration
+update: main `6ff26e9` was merged after C5 commit `e003e4a`; see the update
+below. C5's own changes do not modify model, routing, forwarding, placement or
+protocol implementations.
 
 ## API and clock rules
 
@@ -122,7 +122,7 @@ original qualification evidence, not refreshed timings for main `6ff26e9`.
 CPython 3.14.5, macOS 26.6.1 arm64, GC enabled. Builds and convergence are
 outside timed regions. Default-path A/B/A loads the C0 study module using
 `git show 9032ea8:netsim/study.py` into an isolated Python module, without
-checking out or modifying another worktree. Both versions use identical
+a checkout. Both versions use identical
 immutable baselines, four lexically first distinct link-failure draws, default
 `iterations(draws)` arguments and retention, with recovery enabled. Each phase
 runs 30 calls / 120 iterations. Result summaries are compared for equality.
@@ -237,7 +237,7 @@ it is not guessed from the baseline. Retention is identical to the warm-up
 experiment. These small topologies define the measured envelope; they make no
 claim about flat-domain large-scale protocol state, LSDBs or transport queues.
 
-## Integration handoff
+## Integration notes
 
 - No shared C0 records, validation semantics, network lifecycle, agent scheduler,
   transport scheduler or derivation kinds were changed.
@@ -255,16 +255,13 @@ claim about flat-domain large-scale protocol state, LSDBs or transport queues.
 
 ## Initial C5 checks (before main integration)
 
-- `bash .superset/workspace.sh setup`: passed; worktree venv configured without
-  replacing shared hooks. This branch was first fast-forwarded from its older
-  checkout to the requested `9032ea8` base.
 - `make check-ci`: format, Ruff and pyright passed; **1,317 passed, 14 skipped**,
   **94.85%** coverage, 16.98 s pytest time.
 - `make venv-ft`: installed free-threaded CPython 3.14.5 and verified the GIL
   disabled. `make check-ft`: format, Ruff and pyright passed;
   **1,317 passed, 14 skipped**, **94.85%** coverage, 16.28 s pytest time.
   Both include the existing plain-IP FIB and placement fingerprint tests.
-- `PYTHONPATH=. /Users/networmix/ws/NetGraph/venv/bin/python -m pytest
+- `PYTHONPATH=. <netgraph-venv>/bin/python -m pytest
   tests/adapters tests/runtime/test_study_windows.py -q -p no:cacheprovider
   -o addopts=''`: **172 passed**, 1.62 s (134 adapter tests plus 38 window tests).
 - Enabled workload benchmark command above: **3 passed, 9 deselected**.
@@ -387,7 +384,7 @@ C5R verification (with main `7d51a18`):
   **95.29%** coverage, 38.86 s pytest time.
 - `make check-ft`: format, Ruff and pyright pass; **1,613 passed, 14 skipped**,
   **95.29%** coverage, 33.58 s pytest time; GIL-disabled interpreter confirmed.
-- `PYTHONPATH=. /Users/networmix/ws/NetGraph/venv/bin/python -m pytest
+- `PYTHONPATH=. <netgraph-venv>/bin/python -m pytest
   tests/adapters tests/runtime/test_study_windows.py -q -p no:cacheprovider
   -o addopts=''`: **197 passed**, 3.20 s.
 - Review reproducer: baseline/no-fault totals 2,000/2,000 and warm-up events 208

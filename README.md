@@ -210,7 +210,9 @@ make venv-ft      # free-threaded venv (python3.14t)
 make check-ft     # the same checks without the GIL
 ```
 
-CI runs Python 3.11 to 3.14 and the free-threaded 3.14t build.
+CI runs Python 3.11 to 3.14 and the free-threaded 3.14t build. Reports on
+each development slice, with their evidence and measurements, are in
+[docs/history](docs/history/README.md).
 
 ## License
 

@@ -1,6 +1,6 @@
-# T6 validation (2026-09-20)
+# T6: failure sources, leases and serial studies
 
-Base: `c2d658e` (the worktree's original `network-layer-gate-a` base).
+Base: `c2d658e` (`network-layer-gate-a`).
 Scope: failure sources/leases, serial studies, NetGraph integration and CLI.
 No routing, forwarding or placement derivation was changed.
 
@@ -11,7 +11,7 @@ No routing, forwarding or placement derivation was changed.
 - `make venv-ft`, then `make check-ft`: lint/format and pyright pass;
   **446 passed, 2 skipped**, **92.92%** coverage on free-threaded 3.14.5
   (setup verified the GIL was disabled).
-- `PYTHONPATH="$PWD" /Users/networmix/ws/NetGraph/venv/bin/python -m pytest
+- `PYTHONPATH="$PWD" <netgraph-venv>/bin/python -m pytest
   tests/adapters -p no:cacheprovider -o addopts=''`: **14 passed**.
   Includes an actual 50-draw `TrafficMatrixPlacement` run using a verbatim copy
   of NetGraph's `scenarios/square_mesh.yaml` fixture, failure ID and count
@@ -31,11 +31,9 @@ No routing, forwarding or placement derivation was changed.
   `test_existing_schedule_matches_policy_seed_fallback` used zero instead of
   the policy seed. Both now pass.
 
-Local checks do not replace integrator CI.
-
 ## Performance experiment
 
-Command: `venv/bin/python -m tests.runtime.benchmark_study`.
+Command: `venv/bin/python -m benchmarks.study_overhead`.
 CPython 3.14.5 with the GIL, macOS 26.6.1 arm64, 14 logical CPUs, GC enabled.
 One interpreter; A/B/A order; collection before each block. The old approach
 is a manual `Network.fork` + `Simulation.at` loop. The new approach is
@@ -55,7 +53,7 @@ All three delivered-placement result sequences have SHA-256
 
 The timed run started after three quiet observations two seconds apart. A
 monitor sampled process CPU usage every second during A/B/A and detected no
-other Python worker above 10% CPU; no local tests ran concurrently. Normal
+other Python process above 10% CPU; no local tests ran concurrently. Normal
 desktop applications remained open. Study cost is **2.59% above** the mean
 manual-loop cost on this workload; A1/A2 differ by 0.49%. These numbers describe
 serial overhead, not a claim that NetSim competes with NetGraph static Monte
@@ -121,7 +119,7 @@ Changes:
   their `keep_events`/`keep_records` aliases to `Study(keep=...)`.
 
 Metrics A/B/A command:
-`venv/bin/python -m tests.runtime.benchmark_study_metrics --old 7d4976a`.
+`venv/bin/python -m benchmarks.study_metrics --old 7d4976a`.
 One CPython 3.14.5 process, GC enabled, 20 repetitions per block, 16 identical
 placement samples, setup excluded. Old and new per-demand results and total
 loss agree on the benchmark's exactly representable rates.
@@ -132,7 +130,7 @@ loss agree on the benchmark's exactly representable rates.
 | 1,000 | 64.972983 | 2.892677 | 65.658633 | 500,500 → 1,000 |
 
 The run began after three quiet observations two seconds apart; a monitor
-sampled every second and found no other Python worker above 10% CPU during
+sampled every second and found no other Python process above 10% CPU during
 A/B/A. No local tests ran concurrently; normal desktop applications remained
 open. These timings isolate metrics extraction, not end-to-end simulation.
 The operation-count regressions establish linear tuple visitation without
@@ -143,6 +141,7 @@ reproduced `ZeroDivisionError` in `model/flows.py` source-share normalization
 when `Fraction.limit_denominator` rounded the class total to zero. This is a
 placement-layer issue, unchanged here; the absolute-floor test uses `1e-4`
 bit/s to exercise the study tolerance without depending on that defect.
+Commit `01591de` later fixed it with exact class shares.
 
 Final T6B verification:
 
@@ -150,8 +149,8 @@ Final T6B verification:
   **94.14%** coverage on CPython 3.14.5.
 - `make check-ft`: format/lint/types pass; **581 passed, 3 skipped**;
   **94.14%** coverage on free-threaded 3.14.5.
-- `PYTHONPATH="$PWD" /Users/networmix/ws/NetGraph/venv/bin/python -m pytest
+- `PYTHONPATH="$PWD" <netgraph-venv>/bin/python -m pytest
   tests/adapters -p no:cacheprovider -o addopts='' -q`: **19 passed**.
 - `git diff --check`: clean. No public model/routing/placement API was changed;
   `LeaseRegistry.active_leases` is the new recovery inspection property, and
-  consumed release tokens are now safe to retry. Local checks do not replace CI.
+  consumed release tokens are now safe to retry.

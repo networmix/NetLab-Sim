@@ -1,5 +1,5 @@
 """Agent scheduler: the AGENT kind, subscriptions, inboxes, timers and
-publication (Gate C slice C1).
+publication.
 
 This module owns every runtime object of an agent that is not in the tree:
 the inbox deque and its captured prefix, armed timers, the per-run RNG
