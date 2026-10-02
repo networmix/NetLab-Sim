@@ -3,7 +3,7 @@ bank renege). These cover real-world interaction patterns between primitives."""
 
 import random
 
-import netsim
+import ngraph_sim
 
 # ---------------------------------------------------------------------------
 # Renege pattern: request | timeout, then check which fired
@@ -14,8 +14,8 @@ class TestRenegePattern:
     """Customer waits for a resource OR gives up after a patience timeout."""
 
     def test_customer_served_when_resource_free(self):
-        env = netsim.Environment()
-        counter = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        counter = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def customer(env):
@@ -31,8 +31,8 @@ class TestRenegePattern:
         assert log == [('served', 0)]
 
     def test_customer_reneges_when_resource_busy(self):
-        env = netsim.Environment()
-        counter = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        counter = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def holder(env):
@@ -55,8 +55,8 @@ class TestRenegePattern:
 
     def test_renege_cancels_request(self):
         """After reneging, the request should be removed from the queue."""
-        env = netsim.Environment()
-        counter = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        counter = ngraph_sim.Resource(env, capacity=1)
 
         def holder(env):
             with counter.request() as req:
@@ -85,7 +85,7 @@ class TestInterruptResume:
     """Process tracks remaining work across interrupts."""
 
     def test_remaining_work_after_interrupt(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def worker(env):
@@ -95,7 +95,7 @@ class TestInterruptResume:
                 try:
                     yield env.timeout(done_in)
                     done_in = 0
-                except netsim.Interrupt:
+                except ngraph_sim.Interrupt:
                     done_in -= env.now - start
                     log.append(('interrupted', env.now, done_in))
                     yield env.timeout(5)  # repair time
@@ -115,7 +115,7 @@ class TestInterruptResume:
         assert log[2] == ('finished', 15)
 
     def test_multiple_interrupts_track_remaining(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def worker(env):
@@ -125,7 +125,7 @@ class TestInterruptResume:
                 try:
                     yield env.timeout(done_in)
                     done_in = 0
-                except netsim.Interrupt:
+                except ngraph_sim.Interrupt:
                     done_in -= env.now - start
                     log.append(('break', env.now, round(done_in, 1)))
                     yield env.timeout(2)  # repair
@@ -155,9 +155,9 @@ class TestResourceAndContainer:
     """Processes use both a Resource (pump) and Container (fuel tank)."""
 
     def test_pump_and_fuel(self):
-        env = netsim.Environment()
-        pumps = netsim.Resource(env, capacity=2)
-        tank = netsim.Container(env, capacity=100, init=100)
+        env = ngraph_sim.Environment()
+        pumps = ngraph_sim.Resource(env, capacity=2)
+        tank = ngraph_sim.Container(env, capacity=100, init=100)
         log = []
 
         def refuel(env, name, amount):
@@ -179,8 +179,8 @@ class TestResourceAndContainer:
         assert log == [('A', 15.0, 30), ('B', 20.0, 10), ('C', 25.0, 10)]
 
     def test_container_blocks_until_refilled(self):
-        env = netsim.Environment()
-        tank = netsim.Container(env, capacity=50, init=10)
+        env = ngraph_sim.Environment()
+        tank = ngraph_sim.Container(env, capacity=50, init=10)
         log = []
 
         def consumer(env):
@@ -210,8 +210,8 @@ class TestPreemptiveRepairCycle:
     """Machine breaks, preempts repairman's other job, gets repaired."""
 
     def test_repair_preempts_other_job(self):
-        env = netsim.Environment()
-        repairman = netsim.PreemptiveResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        repairman = ngraph_sim.PreemptiveResource(env, capacity=1)
         log = []
 
         def other_job(env):
@@ -221,7 +221,7 @@ class TestPreemptiveRepairCycle:
                     try:
                         yield env.timeout(30)
                         log.append(('other_done', env.now))
-                    except netsim.Interrupt:
+                    except ngraph_sim.Interrupt:
                         log.append(('other_preempted', env.now))
 
         def machine(env):
@@ -248,8 +248,8 @@ class TestCarwashPatterns:
 
     def test_yield_process_while_holding_resource(self):
         """A process holds a resource and yields a sub-process inside."""
-        env = netsim.Environment()
-        machine = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        machine = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def wash(env, name):
@@ -278,7 +278,7 @@ class TestCarwashPatterns:
 
     def test_continuous_spawning(self):
         """A generator process continuously spawns new processes."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         arrived = []
 
         def visitor(env, name):
@@ -311,7 +311,7 @@ class TestRepeatedFailures:
     """A worker process is repeatedly interrupted by a separate failure process."""
 
     def test_worker_with_failure_generator(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         parts_made = [0]
         repairs = [0]
 
@@ -323,7 +323,7 @@ class TestRepeatedFailures:
                     try:
                         yield env.timeout(done_in)
                         done_in = 0
-                    except netsim.Interrupt:
+                    except ngraph_sim.Interrupt:
                         done_in -= env.now - start
                         yield env.timeout(5)  # repair
                         repairs[0] += 1
@@ -353,8 +353,8 @@ class TestMultipleCustomerRenege:
 
     def test_mixed_serve_and_renege(self):
         random.seed(42)
-        env = netsim.Environment()
-        counter = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        counter = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def customer(env, name, patience, service_time):
@@ -398,8 +398,8 @@ class TestContainerMonitoring:
     """A monitoring process watches a container level and triggers refill."""
 
     def test_monitor_triggers_refill(self):
-        env = netsim.Environment()
-        tank = netsim.Container(env, capacity=100, init=100)
+        env = ngraph_sim.Environment()
+        tank = ngraph_sim.Container(env, capacity=100, init=100)
         log = []
 
         def consumer(env):
@@ -439,9 +439,9 @@ class TestSequentialResources:
     """A job acquires multiple resources in sequence."""
 
     def test_patient_registration_then_doctor(self):
-        env = netsim.Environment()
-        desk = netsim.Resource(env, capacity=1)
-        doctor = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        desk = ngraph_sim.Resource(env, capacity=1)
+        doctor = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def patient(env, name):
@@ -477,8 +477,8 @@ class TestFilterStoreScenario:
     """Processes request specific item types from a shared store."""
 
     def test_workers_request_specific_parts(self):
-        env = netsim.Environment()
-        warehouse = netsim.FilterStore(env)
+        env = ngraph_sim.Environment()
+        warehouse = ngraph_sim.FilterStore(env)
         log = []
 
         def supplier(env):
@@ -510,7 +510,7 @@ class TestBarrierSync:
     """N workers must all complete before any proceeds to next phase."""
 
     def test_barrier_with_processes(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def worker(env, name, duration):
@@ -553,9 +553,9 @@ class TestMessagePassing:
     """Processes communicate by passing messages through a Store."""
 
     def test_request_response(self):
-        env = netsim.Environment()
-        requests = netsim.Store(env)
-        responses = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        requests = ngraph_sim.Store(env)
+        responses = ngraph_sim.Store(env)
         log = []
 
         def server(env):
@@ -587,8 +587,8 @@ class TestBatchProcessing:
     """Accumulate items in a store, process them in batches."""
 
     def test_batch_of_three(self):
-        env = netsim.Environment()
-        buffer = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        buffer = ngraph_sim.Store(env)
         log = []
 
         def producer(env):
@@ -627,8 +627,8 @@ class TestDeterministicOrdering:
     def test_same_time_resource_claim(self):
         """Two processes arrive at t=0 for a capacity-1 resource.
         First created process wins."""
-        env = netsim.Environment()
-        res = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def worker(env, name):
@@ -647,7 +647,7 @@ class TestDeterministicOrdering:
     def test_timeout_and_event_at_same_time(self):
         """A timeout and a manual event trigger at the same time.
         Order follows scheduling order."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def waiter(env, evt):
@@ -684,9 +684,9 @@ class TestCascadingStall:
     """A blockage in one stage stalls the entire pipeline."""
 
     def test_blocked_stage_stalls_upstream(self):
-        env = netsim.Environment()
-        s1 = netsim.Store(env, capacity=2)
-        s2 = netsim.Store(env, capacity=2)
+        env = ngraph_sim.Environment()
+        s1 = ngraph_sim.Store(env, capacity=2)
+        s2 = ngraph_sim.Store(env, capacity=2)
         log = []
 
         def producer(env):
@@ -732,9 +732,9 @@ class TestFirstAvailableResource:
     """Process waits for whichever of two resources is free first."""
 
     def test_any_of_two_resources(self):
-        env = netsim.Environment()
-        res_a = netsim.Resource(env, capacity=1)
-        res_b = netsim.Resource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res_a = ngraph_sim.Resource(env, capacity=1)
+        res_b = ngraph_sim.Resource(env, capacity=1)
         log = []
 
         def holder(env, res, name, duration):
@@ -777,8 +777,8 @@ class TestPreemptionChain:
     """Three priority levels: each preempts the one below."""
 
     def test_three_level_preemption(self):
-        env = netsim.Environment()
-        res = netsim.PreemptiveResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PreemptiveResource(env, capacity=1)
         log = []
 
         def job(env, name, prio, duration):
@@ -787,7 +787,7 @@ class TestPreemptionChain:
                 try:
                     yield env.timeout(duration)
                     log.append(('done', name, env.now))
-                except netsim.Interrupt:
+                except ngraph_sim.Interrupt:
                     log.append(('preempted', name, env.now))
 
         # Low priority starts at t=0
@@ -821,8 +821,8 @@ class TestAdaptiveRate:
     """Consumer slows down when queue is deep, speeds up when shallow."""
 
     def test_rate_adapts_to_queue_depth(self):
-        env = netsim.Environment()
-        queue = netsim.Store(env, capacity=100)
+        env = ngraph_sim.Environment()
+        queue = ngraph_sim.Store(env, capacity=100)
         rates = []
 
         def producer(env):
@@ -874,9 +874,9 @@ class TestConditionalDispatch:
     """Dispatcher assigns jobs to workers based on current load."""
 
     def test_load_based_routing(self):
-        env = netsim.Environment()
-        q1 = netsim.Store(env, capacity=10)
-        q2 = netsim.Store(env, capacity=10)
+        env = ngraph_sim.Environment()
+        q1 = ngraph_sim.Store(env, capacity=10)
+        q2 = ngraph_sim.Store(env, capacity=10)
         log = []
 
         def worker(env, name, queue):
@@ -919,7 +919,7 @@ class TestDynamicTopology:
 
     def test_result_driven_spawning(self):
         """Process return value determines what gets spawned next."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def probe(env, target):
@@ -950,7 +950,7 @@ class TestDynamicTopology:
 
     def test_fan_out_fan_in_with_dynamic_count(self):
         """Spawn variable number of workers, wait for all, use results."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def worker(env, wid, duration):
@@ -979,13 +979,13 @@ class TestDynamicTopology:
 
     def test_dynamic_resource_creation(self):
         """Resources created mid-simulation based on demand."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         pools = {}
         log = []
 
         def get_pool(env, name):
             if name not in pools:
-                pools[name] = netsim.Resource(env, capacity=1)
+                pools[name] = ngraph_sim.Resource(env, capacity=1)
                 log.append(('created', name, env.now))
             return pools[name]
 
@@ -1014,7 +1014,7 @@ class TestDynamicTopology:
 
     def test_process_death_triggers_respawn(self):
         """When a worker dies, a watcher spawns a replacement."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
         generation = [0]
 
@@ -1045,7 +1045,7 @@ class TestDynamicTopology:
 
     def test_process_watching_multiple_processes(self):
         """A coordinator watches process A, then conditionally starts B or C."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         log = []
 
         def fast_task(env):

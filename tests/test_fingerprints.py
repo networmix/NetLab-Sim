@@ -6,8 +6,8 @@ from __future__ import annotations
 import hashlib
 import json
 
-from netsim.model.igp import oracle_igp
-from netsim.model.network import Network
+from ngraph_sim.model.igp import oracle_igp
+from ngraph_sim.model.network import Network
 from tests.model.clos import build_clos
 from tests.model.test_network import build_diamond
 

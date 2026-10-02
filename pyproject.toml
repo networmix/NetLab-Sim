@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "netsim"
+name = "ngraph-sim"
 version = "0.1.0"
 description = "Discrete-event simulation for IP networks."
 readme = "README.md"
@@ -37,7 +37,7 @@ Documentation = "https://github.com/networmix/NetSim/blob/main/docs/reference.md
 Issues = "https://github.com/networmix/NetSim/issues"
 
 [project.scripts]
-netsim = "netsim.cli:main"
+ngraph-sim = "ngraph_sim.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -54,14 +54,14 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["netsim*"]
+include = ["ngraph_sim*"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-"netsim" = ["py.typed"]
+"ngraph_sim" = ["py.typed"]
 
 [tool.pytest.ini_options]
-addopts = "--cov=netsim --cov-fail-under=85 --cov-report term-missing --benchmark-disable --benchmark-disable-gc --benchmark-min-rounds=5 --benchmark-warmup=on"
+addopts = "--cov=ngraph_sim --cov-fail-under=85 --cov-report term-missing --benchmark-disable --benchmark-disable-gc --benchmark-min-rounds=5 --benchmark-warmup=on"
 timeout = 60  # a hang guard: shared CI runners take up to 10x longer than a workstation
 markers = [
     "slow: marks tests as slow",
@@ -69,7 +69,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["netsim"]
+source = ["ngraph_sim"]
 omit = ["*/tests/*", "*/test_*"]
 
 [tool.coverage.report]
@@ -89,7 +89,7 @@ select = ["E4", "E7", "E9", "F", "B", "I"]
 fixable = ["ALL"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["netsim"]
+known-first-party = ["ngraph_sim"]
 
 [tool.ruff.format]
 quote-style = "single"

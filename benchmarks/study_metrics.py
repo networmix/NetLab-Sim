@@ -19,9 +19,9 @@ import time
 import types
 from dataclasses import replace
 
-from netsim import Environment
-from netsim.runtime import Schedule, Simulation
-from netsim.study import Study
+from ngraph_sim import Environment
+from ngraph_sim.runtime import Schedule, Simulation
+from ngraph_sim.study import Study
 from tests.runtime.test_study import two_rate_network
 
 

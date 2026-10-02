@@ -4,8 +4,8 @@ import dataclasses
 
 import pytest
 
-from netsim.model import srv6
-from netsim.model.state import validate_immutable
+from ngraph_sim.model import srv6
+from ngraph_sim.model.state import validate_immutable
 
 
 def test_structures_and_formats():
@@ -41,7 +41,7 @@ def test_records_are_immutable_tree_leaves():
     )
     policy = srv6.SrPolicy(
         srv6.SrPolicy.__dataclass_fields__['owner'].type
-        and __import__('netsim.model.contracts', fromlist=['STATIC']).STATIC,
+        and __import__('ngraph_sim.model.contracts', fromlist=['STATIC']).STATIC,
         10,
         0x20010DB8 << 96 | 4,
         candidate_paths=(

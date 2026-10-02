@@ -3,7 +3,7 @@ import random
 
 import pytest
 
-from netsim.model.lpm import FrozenPrefixTable, PrefixTable
+from ngraph_sim.model.lpm import FrozenPrefixTable, PrefixTable
 
 
 def _brute(prefixes, addr_int, bits, *, exclude=(), min_len=0):
@@ -114,7 +114,7 @@ class TestPrefixTable:
 def test_frozen_shards_are_not_writable():
     from types import MappingProxyType
 
-    from netsim.model.lpm import PrefixTable
+    from ngraph_sim.model.lpm import PrefixTable
 
     t = PrefixTable(32)
     t.insert(10, 32, 'a')
@@ -129,7 +129,7 @@ def test_frozen_shards_are_not_writable():
 
 
 def test_frozen_table_copies_constructor_input():
-    from netsim.model.lpm import FrozenPrefixTable
+    from ngraph_sim.model.lpm import FrozenPrefixTable
 
     tables = {32: {10: 'a'}}
     frozen = FrozenPrefixTable(32, tables)
@@ -140,7 +140,7 @@ def test_frozen_table_copies_constructor_input():
 
 
 def test_persistent_prefix_shards_keep_frozen_contract():
-    from netsim.model.state import PMap
+    from ngraph_sim.model.state import PMap
 
     rows = PMap({i: str(i) for i in range(1000)})
     frozen = FrozenPrefixTable._owned(32, {32: rows})

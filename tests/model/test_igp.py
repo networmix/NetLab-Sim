@@ -4,14 +4,14 @@ from collections import Counter
 
 import pytest
 
-from netsim.model import forwarding as fw
-from netsim.model import igp
-from netsim.model.addressing import IPV4, IPV6, to_int
-from netsim.model.contracts import IGP, IGP_PROFILE
-from netsim.model.igp import oracle_igp, shortest_path_routes
-from netsim.model.network import Network
-from netsim.model.routing import Nexthop, RibState, Route, rib_apply
-from netsim.model.state import NetworkState
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model import igp
+from ngraph_sim.model.addressing import IPV4, IPV6, to_int
+from ngraph_sim.model.contracts import IGP, IGP_PROFILE
+from ngraph_sim.model.igp import oracle_igp, shortest_path_routes
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.routing import Nexthop, RibState, Route, rib_apply
+from ngraph_sim.model.state import NetworkState
 from tests.model.clos import build_clos
 
 

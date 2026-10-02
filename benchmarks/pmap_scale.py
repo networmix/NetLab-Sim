@@ -43,9 +43,9 @@ def main():
     args = parser.parse_args()
     sys.path.insert(0, os.path.abspath(args.repo))
 
-    from netsim.model import derive
-    from netsim.model.network import Network
-    from netsim.model.state import DeviceState, NetworkState, PMap, StateDelta
+    from ngraph_sim.model import derive
+    from ngraph_sim.model.network import Network
+    from ngraph_sim.model.state import DeviceState, NetworkState, PMap, StateDelta
 
     if args.shards:
         PMap._SHARD_COUNT = args.shards

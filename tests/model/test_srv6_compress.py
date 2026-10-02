@@ -5,9 +5,9 @@ from random import Random
 
 import pytest
 
-from netsim.model import packets as pk
-from netsim.model import srv6_compress as c
-from netsim.model.srv6 import (
+from ngraph_sim.model import packets as pk
+from ngraph_sim.model import srv6_compress as c
+from ngraph_sim.model.srv6 import (
     F3216_COMPOSITE,
     F3216_GIB,
     F3216_LIB,

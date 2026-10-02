@@ -2,12 +2,12 @@
 
 import pytest
 
-import netsim
+import ngraph_sim
 
 
 class TestProcessStartAndYield:
     def test_process_starts_immediately(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         started = []
 
         def proc(env):
@@ -19,7 +19,7 @@ class TestProcessStartAndYield:
         assert started == [True]
 
     def test_process_yields_timeout(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def proc(env):
             yield env.timeout(5)
@@ -32,7 +32,7 @@ class TestProcessStartAndYield:
 
 class TestProcessResumeWithValue:
     def test_yield_returns_event_value(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         received = []
 
         def proc(env):
@@ -46,7 +46,7 @@ class TestProcessResumeWithValue:
 
 class TestProcessReturn:
     def test_return_value_via_stop_iteration(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def child(env):
             yield env.timeout(1)
@@ -61,7 +61,7 @@ class TestProcessReturn:
 
     def test_process_is_event_yield_gets_return(self):
         """Process IS Event: yielding a process from another gets the return value."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         results = []
 
         def worker(env):
@@ -80,7 +80,7 @@ class TestProcessReturn:
 
 class TestProcessExceptionPropagation:
     def test_generator_exception_propagates(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def bad_proc(env):
             yield env.timeout(1)
@@ -93,7 +93,7 @@ class TestProcessExceptionPropagation:
 
 class TestProcessName:
     def test_explicit_name(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def my_gen(env):
             yield env.timeout(0)
@@ -102,7 +102,7 @@ class TestProcessName:
         assert p.name == 'custom'
 
     def test_name_from_generator(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def my_generator(env):
             yield env.timeout(0)
@@ -113,7 +113,7 @@ class TestProcessName:
 
 class TestProcessIsAlive:
     def test_is_alive_before_completion(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def proc(env):
             yield env.timeout(10)
@@ -122,7 +122,7 @@ class TestProcessIsAlive:
         assert p.is_alive
 
     def test_is_alive_after_completion(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def proc(env):
             yield env.timeout(1)
@@ -134,7 +134,7 @@ class TestProcessIsAlive:
 
 class TestProcessTarget:
     def test_target_property(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def proc(env):
             yield env.timeout(5)
@@ -148,7 +148,7 @@ class TestProcessTarget:
 
 class TestProcessNotAGenerator:
     def test_non_generator_raises(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         with pytest.raises(ValueError, match='is not a generator'):
             env.process('not a generator')
 
@@ -157,7 +157,7 @@ class TestProcessYieldsAlreadyProcessedEvent:
     def test_process_yields_already_processed_event(self):
         """A process that yields an already-processed event should immediately
         receive the value without blocking."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         results = []
 
         def proc(env):
@@ -176,7 +176,7 @@ class TestProcessYieldsAlreadyProcessedEvent:
 class TestProcessYieldsNonEventRaisesRuntimeError:
     def test_process_yields_non_event_raises_runtime_error(self):
         """A process that yields a string (not an Event) should raise RuntimeError."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def bad_proc(env):
             yield 'not an event'
@@ -189,7 +189,7 @@ class TestProcessYieldsNonEventRaisesRuntimeError:
 class TestProcessGeneratorClearedAfterTermination:
     def test_process_generator_cleared_after_termination(self):
         """After a process terminates, process._generator should be None."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def proc(env):
             yield env.timeout(1)
@@ -203,7 +203,7 @@ class TestProcessGeneratorClearedAfterTermination:
 class TestProcessNameAfterGeneratorCleared:
     def test_process_name_after_generator_cleared(self):
         """After termination with no explicit name, process.name should not crash."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def my_proc(env):
             yield env.timeout(1)
@@ -217,7 +217,7 @@ class TestProcessNameAfterGeneratorCleared:
         assert repr(p) == f'<Process(my_proc) object at {id(p):#x}>'
 
     def test_name_fallback_for_nameless_generator(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         class Gen:
             """A generator-like object without __name__."""
@@ -239,7 +239,7 @@ class TestProcessNameAfterGeneratorCleared:
 
 class TestInvalidYieldResetsActiveProcess:
     def test_active_process_cleared_after_invalid_yield(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         def bad_proc(env):
             yield 'not an event'
@@ -252,7 +252,7 @@ class TestInvalidYieldResetsActiveProcess:
 
 class TestExceptionCopy:
     def test_reconstructable_exception_is_copied_with_cause(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         original = ValueError('boom')
         caught = []
 
@@ -275,7 +275,7 @@ class TestExceptionCopy:
     def test_unreconstructable_exception_is_passed_through_without_cycle(self):
         """An exception whose __init__ cannot be called with *args is reused
         as-is; it must not end up as its own __cause__."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         class Custom(Exception):
             def __init__(self, msg, *, code):
@@ -303,7 +303,7 @@ class TestExceptionCopy:
         assert e.__cause__ is not e
 
     def test_unreconstructable_exception_crashes_run_cleanly(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
 
         class Custom(Exception):
             def __init__(self, msg, *, code):

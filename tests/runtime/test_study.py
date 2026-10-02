@@ -4,8 +4,8 @@ import sys
 
 import pytest
 
-from netsim.runtime import Draws, FailureSet, Process, Schedule
-from netsim.study import Study
+from ngraph_sim.runtime import Draws, FailureSet, Process, Schedule
+from ngraph_sim.study import Study
 from tests.model.test_network import build_diamond
 
 
@@ -48,7 +48,7 @@ def test_exact_transient_loss_fib_delay_and_short_settle():
         [FailureSet(excluded_links=('R1:eth1--R2:eth1',))], settle=0.01
     )
     row = result.flow_results[0]
-    extras = row['data']['netsim']
+    extras = row['data']['sim']
     assert row['summary']['total_placed'] == 100e6
     assert extras['settle_time'] == pytest.approx(0.05)
     assert extras['bits_lost_transient'] == pytest.approx(50e6 * 0.05)
@@ -68,7 +68,7 @@ def test_process_integral_availability_and_concurrent_union():
         ]
     )
     result = Study(net).process(events, 6)
-    metrics = result.netsim
+    metrics = result.sim
     # The source fails [1,4); destination fails [3,5): union [1,5).
     assert metrics['per_demand']['d']['downtime'] == 4
     assert metrics['per_demand']['d']['unavailability'] == pytest.approx(4 / 6)
@@ -84,8 +84,8 @@ def test_process_horizon_does_not_run_future_repairs():
     result = Study(net).process(
         Schedule([((('device', 'R1'),), 1, 100), ((('device', 'R4'),), 4, 1)]), 3
     )
-    assert result.netsim['fault_events'] == 1
-    assert result.netsim['per_demand']['d']['downtime'] == 2
+    assert result.sim['fault_events'] == 1
+    assert result.sim['per_demand']['d']['downtime'] == 2
     assert result.flow_results[0]['failure_state']['excluded_nodes'] == ['R1']
     assert result.flow_results[0]['summary']['total_placed'] == 0
 
@@ -98,11 +98,11 @@ def test_enumerate_replay_retention_and_empty_cases(tmp_path):
     result = study.enumerate('devices', restore=False)
     assert len(result.flow_results) == 4
     assert all(
-        row['data']['netsim']['recovery_settle_time'] is None
+        row['data']['sim']['recovery_settle_time'] is None
         for row in result.flow_results
     )
-    assert result.flow_results[0]['data']['netsim']['utilization_series']
-    assert result.flow_results[0]['data']['netsim']['timeline']
+    assert result.flow_results[0]['data']['sim']['utilization_series']
+    assert result.flow_results[0]['data']['sim']['timeline']
     path = tmp_path / 'results.json'
     path.write_text(
         json.dumps({'steps': {'test': result.to_ngraph()}}, allow_nan=False)
@@ -111,10 +111,10 @@ def test_enumerate_replay_retention_and_empty_cases(tmp_path):
     assert replay.flow_results[0]['flows'] == result.flow_results[0]['flows']
     assert replay.metadata['mode'] == 'replay'
     assert study.iterations([]).flow_results == []
-    assert (
-        study.process(Process({}), 1).netsim['per_demand']['d']['unavailability'] == 0
+    assert study.process(Process({}), 1).sim['per_demand']['d']['unavailability'] == 0
+    empty = Study(
+        __import__('ngraph_sim.model.network', fromlist=['Network']).Network()
     )
-    empty = Study(__import__('netsim.model.network', fromlist=['Network']).Network())
     assert (
         empty.iterations([FailureSet()]).flow_results[0]['summary']['overall_ratio']
         == 1
@@ -144,8 +144,9 @@ def test_core_import_and_native_study_without_site_packages():
             sys.executable,
             '-S',
             '-c',
-            'import sys; from netsim.study import Study; from netsim.runtime import Process; '
-            'assert not any(m.startswith("ngraph") for m in sys.modules)',
+            'import sys; from ngraph_sim.study import Study; '
+            'from ngraph_sim.runtime import Process; '
+            'assert not any(m == "ngraph" or m.startswith("ngraph.") for m in sys.modules)',
         ],
         capture_output=True,
         text=True,
@@ -155,7 +156,7 @@ def test_core_import_and_native_study_without_site_packages():
 
 def test_cli_missing_optional_dependency():
     result = subprocess.run(
-        [sys.executable, '-S', '-m', 'netsim', 'run', 'unused.yaml'],
+        [sys.executable, '-S', '-m', 'ngraph_sim', 'run', 'unused.yaml'],
         capture_output=True,
         text=True,
     )
@@ -164,7 +165,7 @@ def test_cli_missing_optional_dependency():
 
 
 def two_rate_network(rates=(15, 7)):
-    from netsim.model.network import Network
+    from ngraph_sim.model.network import Network
 
     net = Network()
     with net.batch():
@@ -188,10 +189,10 @@ def test_healthy_roundoff_is_not_loss_or_downtime():
         assert row['summary']['overall_ratio'] == 1
         assert all(flow['dropped'] == 0 for flow in row['flows'])
         assert all(flow['placed'] == flow['demand'] for flow in row['flows'])
-    assert result.netsim['loss_integral'] == 0
+    assert result.sim['loss_integral'] == 0
     assert all(
         metric == {'downtime': 0, 'unavailability': 0, 'loss_integral': 0}
-        for metric in result.netsim['per_demand'].values()
+        for metric in result.sim['per_demand'].values()
     )
 
 
@@ -199,9 +200,9 @@ def test_healthy_roundoff_is_not_loss_or_downtime():
 def test_metrics_visit_delivery_tuples_linearly(size):
     from dataclasses import replace
 
-    from netsim import Environment
-    from netsim.runtime import Simulation
-    from netsim.runtime.timeline import PlacementEvent
+    from ngraph_sim import Environment
+    from ngraph_sim.runtime import Simulation
+    from ngraph_sim.runtime.timeline import PlacementEvent
 
     class Visits:
         def __init__(self, pairs):
@@ -238,12 +239,12 @@ def test_study_history_budgets_preserve_full_run_metrics(keys):
     sim = bounded._simulation()
     assert sim.timeline.keep_events == sim.timeline.keep_records == 0
     result = bounded.process(events, 82)
-    assert result.netsim['per_demand'] == full.netsim['per_demand']
-    assert result.netsim['loss_integral'] == full.netsim['loss_integral']
-    assert result.netsim['per_demand']['d0000']['downtime'] == 40
-    assert result.netsim['commits'] == full.netsim['commits']
-    assert result.netsim['dropped_events'] > 0
-    assert result.netsim['dropped_records'] > 0
+    assert result.sim['per_demand'] == full.sim['per_demand']
+    assert result.sim['loss_integral'] == full.sim['loss_integral']
+    assert result.sim['per_demand']['d0000']['downtime'] == 40
+    assert result.sim['commits'] == full.sim['commits']
+    assert result.sim['dropped_events'] > 0
+    assert result.sim['dropped_records'] > 0
 
 
 def test_bounded_records_preserve_settle_time():
@@ -252,12 +253,12 @@ def test_bounded_records_preserve_settle_time():
     full = Study(net).iterations(draws)
     bounded = Study(net, keep={'events': 0, 'records': 0}).iterations(draws)
     assert (
-        bounded.flow_results[0]['data']['netsim']['settle_time']
-        == full.flow_results[0]['data']['netsim']['settle_time']
+        bounded.flow_results[0]['data']['sim']['settle_time']
+        == full.flow_results[0]['data']['sim']['settle_time']
     )
     assert (
-        bounded.flow_results[0]['data']['netsim']['bits_lost_transient']
-        == full.flow_results[0]['data']['netsim']['bits_lost_transient']
+        bounded.flow_results[0]['data']['sim']['bits_lost_transient']
+        == full.flow_results[0]['data']['sim']['bits_lost_transient']
     )
 
 
@@ -276,7 +277,7 @@ def test_same_shortfall_tolerance_for_exports_and_integrals(
 ):
     from dataclasses import replace
 
-    from netsim.study import _DeliveryIntegrals
+    from ngraph_sim.study import _DeliveryIntegrals
 
     study = Study(two_rate_network([rate]))
     study.capacity_unit = capacity_unit
@@ -303,7 +304,7 @@ def test_same_shortfall_tolerance_for_exports_and_integrals(
 
 
 def test_integrals_timestamp_coalescing_missing_demand_and_window_edges():
-    from netsim.study import _DeliveryIntegrals
+    from ngraph_sim.study import _DeliveryIntegrals
 
     integral = _DeliveryIntegrals({'large': 1e12, 'small': 1}, 1)
     integral.sample(0, [('large', 1e12), ('small', 1)])
@@ -328,9 +329,9 @@ def test_conflicting_retention_aliases_are_rejected():
 def test_iterations_end_at_the_observation_window_despite_recurring_timers():
     """A periodic timer (a protocol hello) never empties the heap; the
     iteration must stop at t0 + settle, not drain the queue."""
-    from netsim.model.network import Network
-    from netsim.runtime.failures import FailureSet
-    from netsim.study import Study
+    from ngraph_sim.model.network import Network
+    from ngraph_sim.runtime.failures import FailureSet
+    from ngraph_sim.study import Study
 
     net = Network()
     net.add_device('R')

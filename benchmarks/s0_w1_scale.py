@@ -28,8 +28,8 @@ import time
 import tracemalloc
 from dataclasses import replace
 
-from netsim.model import network as nw
-from netsim.model import srv6
+from ngraph_sim.model import network as nw
+from ngraph_sim.model import srv6
 
 
 def load_baseline(revision: str) -> str:

@@ -2,8 +2,8 @@ import dataclasses
 
 import pytest
 
-from netsim.model import state as st
-from netsim.model.state import (
+from ngraph_sim.model import state as st
+from ngraph_sim.model.state import (
     Allocators,
     DeviceState,
     FloatArray,
@@ -194,7 +194,7 @@ class TestDelta:
 
 
 def test_builder_detaches_from_published_map():
-    from netsim.model.state import PMap
+    from ngraph_sim.model.state import PMap
 
     b = PMap({'a': 1}).builder()
     b.set('a', 2)
@@ -222,7 +222,7 @@ def test_traffic_class_change_is_not_empty():
 
 
 def test_debug_validation_accepts_frozen_prefix_tables():
-    from netsim.model.addressing import to_int
+    from ngraph_sim.model.addressing import to_int
     from tests.model.test_network import build_diamond
 
     net, R = build_diamond()
@@ -235,8 +235,8 @@ def test_debug_validation_accepts_frozen_prefix_tables():
 def test_debug_validation_rejects_mutable_prefix_table_builders():
     import dataclasses
 
-    from netsim.model.lpm import PrefixTable
-    from netsim.model.state import validate_immutable
+    from ngraph_sim.model.lpm import PrefixTable
+    from ngraph_sim.model.state import validate_immutable
     from tests.model.test_network import build_diamond
 
     net, R = build_diamond()

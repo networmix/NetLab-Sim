@@ -4,9 +4,9 @@ from dataclasses import replace
 
 import pytest
 
-from netsim.model import contracts as c
-from netsim.model.addressing import MacAddress
-from netsim.model.state import validate_immutable
+from ngraph_sim.model import contracts as c
+from ngraph_sim.model.addressing import MacAddress
+from ngraph_sim.model.state import validate_immutable
 from tests.model.test_network import A, build_diamond
 from tests.runtime.test_transport import bind, deliveries, pair, register
 
@@ -388,7 +388,7 @@ def test_listener_reset_during_handshake_does_not_accept_old_request():
 
 
 def test_transport_publication_survives_observer_failure_exactly_once():
-    from netsim.model.network import published_failure
+    from ngraph_sim.model.network import published_failure
 
     sim, ga, _, cid = open_pair()
 

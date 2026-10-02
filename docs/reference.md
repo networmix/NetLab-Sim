@@ -73,7 +73,7 @@ or `quiet`, `settle` is a minimum window after which derivations drain.
 Otherwise the observation window is a hard limit: `horizon`, or `settle` when
 `horizon` is absent. `iterations` also takes `parallelism`, which must be 1.
 
-Each iteration's `data.netsim` reports `status` (`converged`,
+Each iteration's `data.sim` reports `status` (`converged`,
 `deadline_exceeded`, `budget_exceeded`), `converged_at`, transient and
 full-window loss in bits, per-demand downtime, drop reasons, engine events
 and rounds; with agents, the baseline is prepared on a warmed runtime and
@@ -91,7 +91,7 @@ It maps nodes to devices with loopbacks, links to Ethernets (parallel links
 tagged `lag` to a PortChannel), costs to metrics and the demand set to
 demands. `pairwise` demands split the volume over the pairs; `combine`
 demands become one anycast prefix. NetGraph priorities (lower first) map to
-NetSim priorities (higher first). The failure policy becomes a
+NetGraph-Sim priorities (higher first). The failure policy becomes a
 `FailureSchedule` only when `iterations > 0`; for studies, use
 `Draws.from_policy`. With `srv6=True` every device gets an F3216 locator, uN
 and uDT46, every L3 link end a uA, and a pairwise demand with one explicit
@@ -103,7 +103,7 @@ modes, the `flatten` group mode, and static paths only with `srv6=True`.
 
 Per-entity settings are read from `attrs`:
 
-| Entity | In `attrs.netsim` only | In `attrs` or `attrs.netsim` |
+| Entity | In `attrs.sim` only | In `attrs` or `attrs.sim` |
 |---|---|---|
 | node | `fib_delay`, `fast_failover`, `mtbf`, `mttr`, `ttf`, `ttr` | `loopback_ipv4`, `loopback_ipv6` |
 | link | `carrier_delay_down`, `carrier_delay_up`, `mtbf`, `mttr`, `ttf`, `ttr` | `source_interface`, `target_interface`, `lag`, `min_links`, `reverse_cost` |
@@ -111,13 +111,13 @@ Per-entity settings are read from `attrs`:
 | demand | | `allow_bundle_pins` |
 
 Entities that set both `mtbf` and `mttr` form `Study.failure_parameters`,
-the renewal process of the `NetSimStudy` process mode.
+the renewal process of the `SimStudy` process mode.
 
-Importing `netsim.adapters.ngraph` registers the `NetSimStudy` workflow step:
+Importing `ngraph_sim.adapters.ngraph` registers the `SimStudy` workflow step:
 
 ```yaml
 workflow:
-  - type: NetSimStudy
+  - type: SimStudy
     name: transients
     demand_set: traffic
     failure_policy: single_link_failure
@@ -129,7 +129,7 @@ workflow:
     keep: {roots: 0, deltas: 0, arrays: false, timeline: false}
 ```
 
-`netsim run scenario.yaml --results results.json` runs the scenario with
+`ngraph-sim run scenario.yaml --results results.json` runs the scenario with
 NetGraph and writes the complete results.
 
 ## SONiC adapter

@@ -7,9 +7,9 @@ inboxes, timers and sessions never existed in the new runtime, so binding
 restarts them with a fresh generation and runs ``on_init`` again.
 """
 
-import netsim
-from netsim.model import contracts as c
-from netsim.runtime import Simulation
+import ngraph_sim
+from ngraph_sim.model import contracts as c
+from ngraph_sim.runtime import Simulation
 from tests.model.test_network import build_diamond
 
 REF = c.ClientId('ref', 0)
@@ -35,7 +35,7 @@ def running_network():
     net, R = build_diamond()
     net.add_agent('R1', Counter())
     net.add_agent('R2', Counter())
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     sim.run_until(2)
     return net, sim
 
@@ -46,7 +46,7 @@ def test_fork_bound_to_a_new_simulation_restarts_agents_cold():
     assert all(n.initialized and n.runs >= 2 for n in warm.values())
     fork = net.fork()
     assert fork.state is net.state  # nothing copied
-    env2 = netsim.Environment()
+    env2 = ngraph_sim.Environment()
     sim2 = Simulation(env2, fork)
     fresh = {d: fork.state.devices[d].agents['ref'] for d in ('R1', 'R2')}
     for d in ('R1', 'R2'):
@@ -69,7 +69,7 @@ def test_a_network_without_initialized_agents_is_not_rewritten():
     net, R = build_diamond()
     net.add_agent('R1', Counter())
     before = net.state
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     # Only derivations touched the tree: the agent node is the registered one.
     assert net.state.devices['R1'].agents['ref'] is before.devices['R1'].agents['ref']
     sim.settle()
@@ -81,7 +81,7 @@ def test_restart_is_deterministic_across_forks():
 
     def outcome():
         fork = net.fork()
-        sim2 = Simulation(netsim.Environment(), fork)
+        sim2 = Simulation(ngraph_sim.Environment(), fork)
         sim2.run_until(1.2)
         return tuple(
             (d, fork.state.devices[d].agents['ref'].state) for d in ('R1', 'R2')

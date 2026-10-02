@@ -2,47 +2,47 @@
 
 import pytest
 
-import netsim
+import ngraph_sim
 
 
 class TestEventCreate:
     def test_new_event_is_pending(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         assert not evt.triggered
         assert not evt.processed
         assert not evt.ok
 
     def test_event_belongs_to_env(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         assert evt.env is env
 
 
 class TestEventSucceed:
     def test_succeed_sets_triggered(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.succeed(value=42)
         assert evt.triggered
         assert evt.ok
 
     def test_succeed_with_default_value(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.succeed()
         env.step()
         assert evt.value is None
 
     def test_succeed_with_value(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.succeed(value='hello')
         env.step()
         assert evt.value == 'hello'
 
     def test_succeed_returns_self(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         result = evt.succeed()
         assert result is evt
@@ -50,33 +50,33 @@ class TestEventSucceed:
 
 class TestEventFail:
     def test_fail_sets_triggered(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.fail(ValueError('boom'))
         assert evt.triggered
         assert not evt.ok
 
     def test_fail_value_is_exception(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         exc = ValueError('boom')
         evt.fail(exc)
         assert evt.value is exc
 
     def test_fail_requires_exception_instance(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         with pytest.raises(TypeError):
             evt.fail('not an exception')
 
     def test_fail_returns_self(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         result = evt.fail(RuntimeError('oops'))
         assert result is evt
 
     def test_undefused_failed_event_raises_on_step(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.fail(ValueError('boom'))
         with pytest.raises(ValueError, match='boom'):
@@ -85,7 +85,7 @@ class TestEventFail:
 
 class TestEventTrigger:
     def test_trigger_chains_success(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         source = env.event()
         target = env.event()
         source.callbacks.append(target.trigger)
@@ -96,7 +96,7 @@ class TestEventTrigger:
         assert target.value == 99
 
     def test_trigger_chains_failure(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         source = env.event()
         target = env.event()
         source.callbacks.append(target.trigger)
@@ -111,21 +111,21 @@ class TestEventTrigger:
         assert target.value is exc
 
     def test_double_trigger_raises(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.succeed()
         with pytest.raises(RuntimeError):
             evt.succeed()
 
     def test_double_fail_raises(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.fail(ValueError('first'))
         with pytest.raises(RuntimeError):
             evt.fail(ValueError('second'))
 
     def test_succeed_after_fail_raises(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.fail(ValueError('first'))
         with pytest.raises(RuntimeError):
@@ -134,7 +134,7 @@ class TestEventTrigger:
 
 class TestEventCallbacks:
     def test_callbacks_executed_on_processing(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         results = []
         evt.callbacks.append(lambda e: results.append(e.value))
@@ -143,7 +143,7 @@ class TestEventCallbacks:
         assert results == [10]
 
     def test_callbacks_set_to_none_after_processing(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.succeed()
         env.step()
@@ -151,7 +151,7 @@ class TestEventCallbacks:
         assert evt.processed
 
     def test_multiple_callbacks_all_called(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         called = []
         evt.callbacks.append(lambda e: called.append('a'))
@@ -163,7 +163,7 @@ class TestEventCallbacks:
 
 class TestEventValueAccess:
     def test_value_before_trigger_raises_attribute_error(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         with pytest.raises(AttributeError):
             _ = evt.value
@@ -171,18 +171,18 @@ class TestEventValueAccess:
 
 class TestEventDefused:
     def test_defused_flag_default(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         assert not evt.defused
 
     def test_defused_flag_can_be_set(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.defused = True
         assert evt.defused
 
     def test_defused_failed_event_does_not_raise(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         evt = env.event()
         evt.fail(ValueError('boom'))
         evt.defused = True
@@ -194,7 +194,7 @@ class TestEventDefused:
 class TestTriggerDoubleTriggerRaises:
     def test_trigger_double_trigger_raises(self):
         """Calling event.trigger(source) on an already-triggered event raises RuntimeError."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         source = env.event()
         target = env.event()
         source.succeed(value=1)
@@ -211,7 +211,7 @@ class TestTriggerDoubleTriggerRaises:
 class TestTriggerUsedAsCallbackChaining:
     def test_trigger_used_as_callback_chaining(self):
         """Register target.trigger as a callback on source; after step, target has same value."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         source = env.event()
         target = env.event()
         source.callbacks.append(target.trigger)
@@ -225,10 +225,10 @@ class TestTriggerUsedAsCallbackChaining:
 
 class TestTriggerRequiresTriggeredSource:
     def test_trigger_from_untriggered_source_raises(self):
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         src = env.event()
         dst = env.event()
         with pytest.raises(RuntimeError, match='not been triggered'):
             dst.trigger(src)
         assert not dst.triggered
-        assert env.peek() == netsim.Infinity
+        assert env.peek() == ngraph_sim.Infinity

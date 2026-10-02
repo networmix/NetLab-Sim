@@ -4,13 +4,13 @@ from ipaddress import IPv6Address
 
 import pytest
 
-import netsim
-from netsim.model import forwarding as fw
-from netsim.model import srv6 as sr
-from netsim.model.routing import Nexthop
-from netsim.model.state import tree_equal
-from netsim.runtime import Simulation
-from netsim.runtime.timeline import PolicyEvent
+import ngraph_sim
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model import srv6 as sr
+from ngraph_sim.model.routing import Nexthop
+from ngraph_sim.model.state import tree_equal
+from ngraph_sim.runtime import Simulation
+from ngraph_sim.runtime.timeline import PolicyEvent
 from tests.model.test_policies import diamond, policy, state_of
 
 
@@ -22,7 +22,7 @@ def test_timed_failover_preserves_old_program_and_visible_drops(backup):
         [sr.SteeringRule('class', p.key, dscp=10)]
     )
     net.add_demand('d', 'R1', '10.0.0.4', 100e6, dscp=10)
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     routers['R1'].configure(fib_delay=0.05)
     sim.run_until(1)
     old_fib = routers['R1'].fib(6)
@@ -74,7 +74,7 @@ def test_owner_blackhole_validates_rib_before_delayed_fib_programming():
     )
     p = policy(routers, lists=(sr.SegmentList((sr.TermSeg('R4'),)),))
     net.add_demand('d', 'R1', '10.0.0.4', 100e6, steer=sr.PolicyRef(*p.key))
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     routers['R1'].configure(fib_delay=2)
     routers['R4'].configure(fib_delay=0.5)
     sim.run_until(3)
@@ -117,7 +117,7 @@ def test_policy_clock_free_equals_settled_timed_execution():
         p = policy(routers, backup=True)
         net.add_demand('d', 'R1', '10.0.0.4', 100e6, steer=sr.PolicyRef(*p.key))
     instant.converge()
-    sim = Simulation(netsim.Environment(), timed)
+    sim = Simulation(ngraph_sim.Environment(), timed)
     assert tree_equal(instant.state, timed.state)
     for t, action in ((10, 'fail'), (20, 'restore')):
         getattr(instant.links['R1:eth1--R2:eth1'], action)()
@@ -130,15 +130,15 @@ def test_policy_clock_free_equals_settled_timed_execution():
 def test_study_exports_failure_policy_status_and_observed_delivery():
     import json
 
-    from netsim.runtime.failures import FailureSet
-    from netsim.study import Study
+    from ngraph_sim.runtime.failures import FailureSet
+    from ngraph_sim.study import Study
 
     net, routers = diamond()
     p = policy(routers)
     net.add_demand('d', 'R1', '10.0.0.4', 100e6, steer=sr.PolicyRef(*p.key))
     result = Study(net).iterations([FailureSet(excluded_links=('R1:eth1--R2:eth1',))])
-    before = result.baseline['data']['netsim']['policies'][0]
-    after = result.flow_results[0]['data']['netsim']['policies'][0]
+    before = result.baseline['data']['sim']['policies'][0]
+    after = result.flow_results[0]['data']['sim']['policies'][0]
     assert before['status'] == 'UP'
     assert before['observed_delivery'][0]['delivered'] == 100e6
     assert after['basic_valid'] is after['first_valid'] is False
@@ -153,7 +153,7 @@ def test_study_exports_failure_policy_status_and_observed_delivery():
 def test_prefer_installed_uses_fib_identity_during_failure_and_restore():
     from dataclasses import replace
 
-    from netsim.model.routing import ResolutionPolicy
+    from ngraph_sim.model.routing import ResolutionPolicy
     from tests.model.test_policies import path
 
     net, routers = diamond()
@@ -166,7 +166,7 @@ def test_prefer_installed_uses_fib_identity_during_failure_and_restore():
     routers['R1'].policy_client().replace(replace(p, candidate_paths=(first, second)))
     net.converge()
     assert state_of(routers, p).active_path == 0
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     routers['R1'].configure(fib_delay=2)
     sim.run_until(3)
     link = net.links['R1:eth1--R2:eth1']

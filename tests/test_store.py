@@ -2,13 +2,13 @@
 
 import pytest
 
-import netsim
+import ngraph_sim
 
 
 class TestStorePutAndGet:
     def test_put_and_get_basic(self):
-        env = netsim.Environment()
-        store = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env)
         results = []
 
         def producer(env):
@@ -29,8 +29,8 @@ class TestStorePutAndGet:
 
 class TestStoreFIFO:
     def test_fifo_order(self):
-        env = netsim.Environment()
-        store = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env)
         results = []
 
         def producer(env):
@@ -52,8 +52,8 @@ class TestStoreFIFO:
 
 class TestStoreBlockingWhenEmpty:
     def test_consumer_waits_for_producer(self):
-        env = netsim.Environment()
-        store = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env)
         log = []
 
         def consumer(env):
@@ -78,8 +78,8 @@ class TestStoreBlockingWhenEmpty:
 
 class TestStoreCapacity:
     def test_producer_blocks_when_full(self):
-        env = netsim.Environment()
-        store = netsim.Store(env, capacity=2)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env, capacity=2)
         log = []
 
         def producer(env):
@@ -105,8 +105,8 @@ class TestStoreCapacity:
 
 class TestStoreUnlimitedCapacity:
     def test_unlimited_capacity(self):
-        env = netsim.Environment()
-        store = netsim.Store(env)  # default is inf
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env)  # default is inf
         results = []
 
         def producer(env):
@@ -129,8 +129,8 @@ class TestStorePutFireAndForget:
     def test_store_put_fire_and_forget(self):
         """Call store.put(item) without yielding. Then yield store.get().
         Verify the item is retrieved."""
-        env = netsim.Environment()
-        store = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env)
         results = []
 
         def proc(env):
@@ -146,17 +146,17 @@ class TestStorePutFireAndForget:
 class TestStoreZeroCapacityRaises:
     def test_store_zero_capacity_raises(self):
         """Store(env, capacity=0) raises ValueError."""
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         with pytest.raises(ValueError):
-            netsim.Store(env, capacity=0)
+            ngraph_sim.Store(env, capacity=0)
 
 
 class TestStorePutCancel:
     def test_store_put_cancel(self):
         """Put into a full store (capacity=1, already has item). Cancel the
         pending put. Verify put_queue is empty."""
-        env = netsim.Environment()
-        store = netsim.Store(env, capacity=1)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env, capacity=1)
         results = []
 
         def proc(env):
@@ -175,8 +175,8 @@ class TestStorePutCancel:
 class TestStoreGetCancel:
     def test_store_get_cancel(self):
         """Get from an empty store. Cancel the pending get. Verify get_queue is empty."""
-        env = netsim.Environment()
-        store = netsim.Store(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.Store(env)
         results = []
 
         def proc(env):

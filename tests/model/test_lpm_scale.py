@@ -5,7 +5,7 @@ import tracemalloc
 
 import pytest
 
-from netsim.model.lpm import PrefixTable
+from ngraph_sim.model.lpm import PrefixTable
 
 
 @pytest.mark.parametrize('bits', [32, 128])

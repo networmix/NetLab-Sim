@@ -1,8 +1,8 @@
 import pytest
 
-from netsim.model import interfaces as ifc
-from netsim.model.addressing import IPV4, IPV6
-from netsim.model.interfaces import (
+from ngraph_sim.model import interfaces as ifc
+from ngraph_sim.model.addressing import IPV4, IPV6
+from ngraph_sim.model.interfaces import (
     AdminState,
     BundleInput,
     EthernetConfig,
@@ -23,7 +23,7 @@ from netsim.model.interfaces import (
     derive_loopback,
     l3_usable,
 )
-from netsim.model.links import (
+from ngraph_sim.model.links import (
     LINK_FAILED,
     LINK_UP,
     LinkConfig,

@@ -4,16 +4,16 @@ from dataclasses import replace
 
 import pytest
 
-import netsim
-from netsim.model import derive, srv6
-from netsim.model.addressing import IPV4, IPV6
-from netsim.model.contracts import SRV6_LOCAL, STATIC
-from netsim.model.network import Network
-from netsim.model.routing import SRV6_LOCAL_NH
-from netsim.model.state import StateDelta
-from netsim.runtime import Simulation
-from netsim.runtime.pipeline import fib_affected, placement_affected
-from netsim.runtime.timeline import LocatorEvent, PolicyEvent, SidEvent, Timeline
+import ngraph_sim
+from ngraph_sim.model import derive, srv6
+from ngraph_sim.model.addressing import IPV4, IPV6
+from ngraph_sim.model.contracts import SRV6_LOCAL, STATIC
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.routing import SRV6_LOCAL_NH
+from ngraph_sim.model.state import StateDelta
+from ngraph_sim.runtime import Simulation
+from ngraph_sim.runtime.pipeline import fib_affected, placement_affected
+from ngraph_sim.runtime.timeline import LocatorEvent, PolicyEvent, SidEvent, Timeline
 
 
 def topology():
@@ -60,7 +60,7 @@ def test_adjacency_withdrawal_persists_sid_and_invalidates_remote_consumer():
 
 def test_timed_pipeline_schedules_both_families_and_honors_delay():
     net, head, a, _, link, sid = topology()
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     epochs = head.node.resolver_input_epoch
     sim.at(10, link.fail)
     sim.run_until(10.5)
@@ -221,8 +221,8 @@ def test_numbered_neighbor_required_and_scoped_l3():
 
 
 def test_unknown_cover_returns_on_sid_withdrawal_and_yields_on_restore():
-    from netsim.model import forwarding as fw
-    from netsim.model import packets
+    from ngraph_sim.model import forwarding as fw
+    from ngraph_sim.model import packets
 
     net = Network()
     a, b = net.add_device('a'), net.add_device('b')
@@ -250,7 +250,7 @@ def test_unknown_cover_returns_on_sid_withdrawal_and_yields_on_restore():
         flow_label=0,
         transit=False,
     )
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     assert net.trace('a', packet).outcome == fw.DELIVER
     assert a.fib(IPV6).lookup(adjacency.sid).action == fw.SRV6_LOCAL
     sim.at(10, link.fail)

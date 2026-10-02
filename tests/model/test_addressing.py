@@ -2,7 +2,7 @@ import ipaddress
 
 import pytest
 
-from netsim.model import addressing as a
+from ngraph_sim.model import addressing as a
 
 
 class TestMacAddress:

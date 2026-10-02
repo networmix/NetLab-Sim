@@ -5,14 +5,14 @@ from ipaddress import IPv6Address, IPv6Network
 
 import pytest
 
-from netsim.model import derive, srv6
-from netsim.model.addressing import IPV6
-from netsim.model.contracts import SRV6_LOCAL, STATIC, ClientId, ClientProfile
-from netsim.model.igp import oracle_igp
-from netsim.model.network import Network
-from netsim.model.routing import SRV6_LOCAL_NH, UNREACHABLE
-from netsim.model.srv6 import END, END_X, F3216_GIB, F3216_LIB, NEXT_CSID
-from netsim.model.state import PMap, validate_immutable
+from ngraph_sim.model import derive, srv6
+from ngraph_sim.model.addressing import IPV6
+from ngraph_sim.model.contracts import SRV6_LOCAL, STATIC, ClientId, ClientProfile
+from ngraph_sim.model.igp import oracle_igp
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.routing import SRV6_LOCAL_NH, UNREACHABLE
+from ngraph_sim.model.srv6 import END, END_X, F3216_GIB, F3216_LIB, NEXT_CSID
+from ngraph_sim.model.state import PMap, validate_immutable
 
 
 def test_allocator_is_atomic_and_fork_local():
@@ -453,8 +453,8 @@ def test_policy_index_tracks_fork_batch_and_device_deletion():
 def test_active_sid_takes_precedence_over_unknown_cover(
     ranges, structure, sid_text, cover_length
 ):
-    from netsim.model import forwarding as fw
-    from netsim.model import packets
+    from ngraph_sim.model import forwarding as fw
+    from ngraph_sim.model import packets
 
     net = Network()
     dev = f3216(net, ranges=ranges)
@@ -567,7 +567,7 @@ def test_unknown_cover_subtracts_overlapping_exclusions_across_blocks():
 
 
 def deletion_network(mode, dependent):
-    from netsim.model.packets import PacketTemplate
+    from ngraph_sim.model.packets import PacketTemplate
 
     net = Network()
     victim, peer = net.add_device('R1'), net.add_device('R2')
@@ -706,7 +706,7 @@ def test_device_deletion_uses_configured_ownership_even_when_unreachable(
 
 @pytest.mark.parametrize('mode', [1, 2], ids=['FLUID', 'HASH'])
 def test_deletion_does_not_claim_peer_subnet_or_overridden_destination(mode):
-    from netsim.model.packets import PacketTemplate
+    from ngraph_sim.model.packets import PacketTemplate
 
     net, victim = deletion_network(mode, 'destination-v4')
     net.remove_demand('dependent')

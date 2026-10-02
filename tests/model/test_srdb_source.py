@@ -4,9 +4,9 @@ from dataclasses import replace
 
 import pytest
 
-from netsim.model import srv6 as sr
-from netsim.model.contracts import AgentNode, ClientId, RemoteSid, SrDbView
-from netsim.model.state import PMap
+from ngraph_sim.model import srv6 as sr
+from ngraph_sim.model.contracts import AgentNode, ClientId, RemoteSid, SrDbView
+from ngraph_sim.model.state import PMap
 from tests.model.test_policies import diamond, policy, state_of
 
 
@@ -31,7 +31,7 @@ def publish(net, view):
 
 def claims(routers):
     sids, locators = [], []
-    from netsim.model.srv6 import _PolicyValidator
+    from ngraph_sim.model.srv6 import _PolicyValidator
 
     oracle = _PolicyValidator(routers['R1'].network.state, 'R1')
     for name, dev in routers.items():
@@ -130,7 +130,7 @@ def test_view_advertisements_and_adjacency_down(compressed):
 def test_stale_view_stays_valid_when_oracle_rejects_remote_shadowing():
     from ipaddress import IPv6Address
 
-    from netsim.model.routing import Nexthop
+    from ngraph_sim.model.routing import Nexthop
 
     net, routers = diamond(compressed=False)
     p, terminal = literal_policy(routers)
@@ -150,7 +150,7 @@ def test_stale_view_stays_valid_when_oracle_rejects_remote_shadowing():
 
 
 def test_agent_validation_never_reads_remote_rib_or_interfaces(monkeypatch):
-    from netsim.model.derive import DeviceContext
+    from ngraph_sim.model.derive import DeviceContext
 
     net, routers = diamond(compressed=False)
     p, _ = literal_policy(routers)
@@ -186,7 +186,7 @@ def test_missing_locator_and_endpoint_claims_are_unknown():
 
 
 def test_relaxed_local_resolution_never_upgrades_unknown_agent_claim():
-    from netsim.model.routing import ResolutionPolicy
+    from ngraph_sim.model.routing import ResolutionPolicy
 
     net, routers = diamond(compressed=False)
     p, _ = literal_policy(routers)
@@ -202,7 +202,7 @@ def test_relaxed_local_resolution_never_upgrades_unknown_agent_claim():
 
 
 def test_unpublished_view_and_nht_registration_do_not_advance_epochs():
-    from netsim.model.contracts import STATIC, NhtKey
+    from ngraph_sim.model.contracts import STATIC, NhtKey
     from tests.model.test_network import A
 
     net, routers = diamond(compressed=False)

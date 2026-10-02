@@ -10,8 +10,8 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from netsim.model.prng import Prng, _splitmix64
-from netsim.model.state import validate_admitted, validate_immutable
+from ngraph_sim.model.prng import Prng, _splitmix64
+from ngraph_sim.model.state import validate_admitted, validate_immutable
 
 
 def test_splitmix64_reference_known_answers():
@@ -345,7 +345,7 @@ def test_independent_instances_are_thread_local():
 def test_subprocess_hash_seed_does_not_change_streams():
     script = """
 import json
-from netsim.model.prng import Prng
+from ngraph_sim.model.prng import Prng
 state = None
 values = []
 for run in range(3):

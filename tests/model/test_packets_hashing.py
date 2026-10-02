@@ -3,10 +3,10 @@ import dataclasses
 
 import pytest
 
-from netsim.model import hashing as h
-from netsim.model import packets as pk
-from netsim.model.addressing import IPV4, IPV6
-from netsim.model.state import validate_immutable
+from ngraph_sim.model import hashing as h
+from ngraph_sim.model import packets as pk
+from ngraph_sim.model.addressing import IPV4, IPV6
+from ngraph_sim.model.state import validate_immutable
 
 
 class TestPackets:

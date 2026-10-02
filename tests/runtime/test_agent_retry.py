@@ -2,12 +2,12 @@
 
 import pytest
 
-from netsim import Environment
-from netsim.model import contracts as c
-from netsim.model import derive
-from netsim.model.network import Network
-from netsim.runtime import Simulation, pipeline
-from netsim.runtime.agents import AgentBatchError
+from ngraph_sim import Environment
+from ngraph_sim.model import contracts as c
+from ngraph_sim.model import derive
+from ngraph_sim.model.network import Network
+from ngraph_sim.runtime import Simulation, pipeline
+from ngraph_sim.runtime.agents import AgentBatchError
 from tests.runtime.test_agents import Plugin, fixture
 
 

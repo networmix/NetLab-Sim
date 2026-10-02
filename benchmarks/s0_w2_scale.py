@@ -24,7 +24,7 @@ from pathlib import Path
 
 
 def lookup():
-    from netsim.model.lpm import PrefixTable
+    from ngraph_sim.model.lpm import PrefixTable
 
     results = {}
     for bits in (32, 128):
@@ -91,7 +91,7 @@ def lookup():
 def converge():
     import tracemalloc
 
-    from netsim.model.network import Network
+    from ngraph_sim.model.network import Network
 
     count = 2000
     net = Network(seed=1)
@@ -145,11 +145,11 @@ def main():
     if args.case:
         assert args.source is not None
         sys.path.insert(0, str(args.source))
-        # No NetSim import is allowed before selecting the source snapshot.
+        # No NetGraph-Sim import is allowed before selecting the source snapshot.
         data = lookup() if args.case == 'lookup' else converge()
-        import netsim
+        import ngraph_sim
 
-        print(json.dumps({'source': netsim.__file__, 'data': data}))
+        print(json.dumps({'source': ngraph_sim.__file__, 'data': data}))
         return
     assert args.output is not None, '--output is required for the comparison'
     repo = Path(__file__).resolve().parents[1]
@@ -162,7 +162,7 @@ def main():
     result: dict[str, object] = {'baseline': baseline, 'python': sys.version}
     runs = []
     result['runs'] = runs
-    with tempfile.TemporaryDirectory(prefix='netsim-s0-w2-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='ngraph-sim-s0-w2-') as temporary:
         old = Path(temporary)
         with tarfile.open(fileobj=io.BytesIO(archive)) as source:
             source.extractall(old, filter='data')

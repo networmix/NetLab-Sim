@@ -1,12 +1,12 @@
 """Tests for PriorityResource and PreemptiveResource."""
 
-import netsim
+import ngraph_sim
 
 
 class TestPriorityOrdering:
     def test_priority_ordering_of_requests(self):
-        env = netsim.Environment()
-        res = netsim.PriorityResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PriorityResource(env, capacity=1)
         log = []
 
         def user(env, name, priority, hold_time):
@@ -35,8 +35,8 @@ class TestPriorityOrdering:
 
 class TestPreemption:
     def test_preemption_interrupts_lower_priority(self):
-        env = netsim.Environment()
-        res = netsim.PreemptiveResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PreemptiveResource(env, capacity=1)
         log = []
 
         def user_low(env):
@@ -46,7 +46,7 @@ class TestPreemption:
                 log.append(('low', 'acquired', env.now))
                 yield env.timeout(100)
                 log.append(('low', 'finished', env.now))
-            except netsim.Interrupt:
+            except ngraph_sim.Interrupt:
                 log.append(('low', 'preempted', env.now))
             finally:
                 res.release(req)
@@ -60,7 +60,7 @@ class TestPreemption:
                 log.append(('high', 'acquired', env.now))
                 yield env.timeout(3)
                 log.append(('high', 'finished', env.now))
-            except netsim.Interrupt:
+            except ngraph_sim.Interrupt:
                 pass
             finally:
                 res.release(req)
@@ -77,8 +77,8 @@ class TestPreemption:
 
 class TestPreemptedCause:
     def test_preempted_cause_attributes(self):
-        env = netsim.Environment()
-        res = netsim.PreemptiveResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PreemptiveResource(env, capacity=1)
         causes = []
 
         def user_low(env):
@@ -86,7 +86,7 @@ class TestPreemptedCause:
             try:
                 yield req
                 yield env.timeout(100)
-            except netsim.Interrupt as e:
+            except ngraph_sim.Interrupt as e:
                 causes.append(e.cause)
             finally:
                 res.release(req)
@@ -103,7 +103,7 @@ class TestPreemptedCause:
 
         assert len(causes) == 1
         preempted = causes[0]
-        assert isinstance(preempted, netsim.Preempted)
+        assert isinstance(preempted, ngraph_sim.Preempted)
         assert preempted.resource is res
         assert preempted.usage_since == 0
         assert preempted.by is not None  # The high-priority process
@@ -113,8 +113,8 @@ class TestPreemptiveResourceNoPreemptFlag:
     def test_preemptive_resource_no_preempt_flag(self):
         """Request with priority=0, preempt=False arrives while a priority=10
         user holds the resource. The priority=10 user should NOT be interrupted."""
-        env = netsim.Environment()
-        res = netsim.PreemptiveResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PreemptiveResource(env, capacity=1)
         log = []
 
         def user_low(env):
@@ -124,7 +124,7 @@ class TestPreemptiveResourceNoPreemptFlag:
                 log.append(('low', 'acquired', env.now))
                 yield env.timeout(5)
                 log.append(('low', 'finished', env.now))
-            except netsim.Interrupt:
+            except ngraph_sim.Interrupt:
                 log.append(('low', 'preempted', env.now))
             finally:
                 res.release(req)
@@ -137,7 +137,7 @@ class TestPreemptiveResourceNoPreemptFlag:
                 log.append(('high_no_preempt', 'acquired', env.now))
                 yield env.timeout(2)
                 log.append(('high_no_preempt', 'finished', env.now))
-            except netsim.Interrupt:
+            except ngraph_sim.Interrupt:
                 log.append(('high_no_preempt', 'preempted', env.now))
             finally:
                 res.release(req)
@@ -158,8 +158,8 @@ class TestPreemptionOfRequestOutsideProcess:
     def test_holder_without_process_is_not_preempted(self):
         """A request made outside any process has no process to interrupt,
         so it keeps its slot; the preempting request waits for release."""
-        env = netsim.Environment()
-        res = netsim.PreemptiveResource(env, capacity=1)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PreemptiveResource(env, capacity=1)
         holder = res.request(priority=10)  # env.active_process is None here
         log = []
 
@@ -181,8 +181,8 @@ class TestPreemptionOfRequestOutsideProcess:
     def test_preemption_skips_processless_user_and_picks_lowest_priority_process(
         self,
     ):
-        env = netsim.Environment()
-        res = netsim.PreemptiveResource(env, capacity=2)
+        env = ngraph_sim.Environment()
+        res = ngraph_sim.PreemptiveResource(env, capacity=2)
         outside = res.request(priority=0)  # highest priority, no process
         log = []
 
@@ -191,7 +191,7 @@ class TestPreemptionOfRequestOutsideProcess:
             try:
                 yield req
                 yield env.timeout(100)
-            except netsim.Interrupt:
+            except ngraph_sim.Interrupt:
                 log.append(('low_preempted', env.now))
             finally:
                 res.release(req)

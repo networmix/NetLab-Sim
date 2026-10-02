@@ -6,6 +6,12 @@ snapshot of its date. The code, its docstrings and the
 [reference](../reference.md) define current behaviour; where a report
 disagrees with them, the report is out of date.
 
+The project was called NetSim, with the package `netsim`, until 2026-10-02,
+when it became NetGraph-Sim (`ngraph-sim`, imported as `ngraph_sim`). The
+reports keep the old names. Benchmark scripts now import `ngraph_sim`, so a
+comparison against a revision from before the rename needs the script from
+that revision.
+
 Gate A is the plain-IP simulator, Gate B adds SRv6 and Gate C adds protocol
 agents. The T slices are scale fixes made after Gate A. S0 is scale hygiene
 before the Open/R and BGP work. Benchmark scripts and raw results are in

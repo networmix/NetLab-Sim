@@ -24,10 +24,10 @@ def main():
     project = Path(__file__).resolve().parents[1]
     sys.path[:0] = [str(args.source.resolve()), str(project)]
 
-    import netsim
-    from netsim.model.addressing import IPV4
-    from netsim.model.contracts import STATIC
-    from netsim.model.routing import Nexthop, RibState, Route, rib_apply
+    import ngraph_sim
+    from ngraph_sim.model.addressing import IPV4
+    from ngraph_sim.model.contracts import STATIC
+    from ngraph_sim.model.routing import Nexthop, RibState, Route, rib_apply
     from tests.model.test_routing import routing_fingerprints
 
     nh = (Nexthop.blackhole(),)
@@ -47,7 +47,7 @@ def main():
         'label': args.label,
         'python': platform.python_version(),
         'gil': getattr(sys, '_is_gil_enabled', lambda: True)(),
-        'source': netsim.__file__,
+        'source': ngraph_sim.__file__,
     }
     for name, fn in (('lookup_200_ms', lookups), ('sync_10k_ms', sync)):
         fn()  # warm up; all route creation is outside the timed region

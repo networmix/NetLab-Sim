@@ -1,12 +1,12 @@
 """Tests for FilterStore resource."""
 
-import netsim
+import ngraph_sim
 
 
 class TestFilteredGet:
     def test_filter_matches(self):
-        env = netsim.Environment()
-        store = netsim.FilterStore(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.FilterStore(env)
         results = []
 
         def producer(env):
@@ -27,8 +27,8 @@ class TestFilteredGet:
 
 class TestFilterNoMatchKeepsWaiting:
     def test_no_match_waits(self):
-        env = netsim.Environment()
-        store = netsim.FilterStore(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.FilterStore(env)
         results = []
 
         def producer(env):
@@ -50,8 +50,8 @@ class TestFilterStoreOutOfOrder:
     def test_out_of_order_service(self):
         """A later get request whose filter matches should be served before
         an earlier request that doesn't match yet."""
-        env = netsim.Environment()
-        store = netsim.FilterStore(env)
+        env = ngraph_sim.Environment()
+        store = ngraph_sim.FilterStore(env)
         log = []
 
         def producer(env):

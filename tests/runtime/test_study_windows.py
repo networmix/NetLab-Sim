@@ -2,8 +2,8 @@
 
 import pytest
 
-from netsim.runtime import FailureSet, Schedule
-from netsim.study import Study
+from ngraph_sim.runtime import FailureSet, Schedule
+from ngraph_sim.study import Study
 from tests.runtime.test_study import diamond, two_rate_network
 
 
@@ -15,7 +15,7 @@ def test_horizon_is_a_deadline_for_delayed_fib():
         quiet=0.0625,
         restore=False,
     )
-    metrics = result.flow_results[0]['data']['netsim']
+    metrics = result.flow_results[0]['data']['sim']
     assert metrics['status'] == 'deadline_exceeded'
     assert metrics['converged_at'] is None
     assert metrics['end'] == 1.125
@@ -27,11 +27,11 @@ def test_streaming_event_counts_survive_eviction():
     events = Schedule([((('device', 'a'),), 1 + i * 2, 1) for i in range(40)])
     full = Study(net).process(events, 82)
     bounded = Study(net, keep={'events': 0, 'records': 0}).process(events, 82)
-    assert bounded.netsim['event_counts'] == full.netsim['event_counts']
+    assert bounded.sim['event_counts'] == full.sim['event_counts']
 
 
 def metrics(result):
-    return result.flow_results[0]['data']['netsim']
+    return result.flow_results[0]['data']['sim']
 
 
 def with_timer(study, period=0.001, operation=None):
@@ -78,7 +78,7 @@ def test_periodic_normal_timers_do_not_prevent_convergence(selected):
 
 
 def test_quiet_begins_on_output_change_and_includes_deadline_events():
-    from netsim.study import Stability
+    from ngraph_sim.study import Stability
 
     net, _ = diamond(fib_delay=0.25)
     draws = [FailureSet(excluded_links=('R1:eth1--R2:eth1',))]
@@ -155,13 +155,13 @@ def test_budget_applies_to_warmup_and_process_faults_are_counted_on_dispatch():
     result = study.process(
         Schedule([((('device', 'a'),), 0, 1)]), 2, warmup=1, event_budget=3
     )
-    assert result.netsim['status'] == 'budget_exceeded'
-    assert result.netsim['warmup_events'] == result.costs['warmup_events'] == 3
-    assert result.netsim['fault_events'] == 0
-    assert result.netsim['loss_integral'] == 0
-    assert result.netsim['per_demand']['d0000']['downtime'] == 0
+    assert result.sim['status'] == 'budget_exceeded'
+    assert result.sim['warmup_events'] == result.costs['warmup_events'] == 3
+    assert result.sim['fault_events'] == 0
+    assert result.sim['loss_integral'] == 0
+    assert result.sim['per_demand']['d0000']['downtime'] == 0
     assert result.costs['warmup_seconds'] > 0
-    assert result.netsim['observation_end'] == -0.625
+    assert result.sim['observation_end'] == -0.625
 
 
 def test_process_window_after_warmup_uses_same_failure_clock():
@@ -169,10 +169,10 @@ def test_process_window_after_warmup_uses_same_failure_clock():
     ticks, _ = with_timer(study, period=0.125)
     events = Schedule([((('device', 'a'),), 0.25, 0.25)])
     result = study.process(events, 1, warmup=0.5, quiet=0.25)
-    assert result.netsim['status'] == 'converged'
-    assert result.netsim['converged_at'] == 0.5
-    assert result.netsim['warmup_events'] == 4
-    assert result.netsim['per_demand']['d0000']['downtime'] == 0.25
+    assert result.sim['status'] == 'converged'
+    assert result.sim['converged_at'] == 0.5
+    assert result.sim['warmup_events'] == 4
+    assert result.sim['per_demand']['d0000']['downtime'] == 0.25
     assert min(ticks) == -0.375
     assert max(ticks) == 1
 
@@ -180,8 +180,8 @@ def test_process_window_after_warmup_uses_same_failure_clock():
 def test_fresh_agent_runtime_uses_configuration_and_warms_every_iteration(monkeypatch):
     from dataclasses import replace
 
-    from netsim.model.contracts import TransportState
-    from netsim.runtime.agents import AgentRuntime
+    from ngraph_sim.model.contracts import TransportState
+    from ngraph_sim.runtime.agents import AgentRuntime
     from tests.model.test_agent_contract import Minimal
 
     net = two_rate_network()
@@ -230,11 +230,11 @@ def test_fresh_agent_runtime_uses_configuration_and_warms_every_iteration(monkey
     assert all(
         not node.initialized and node.state is None and node.runs == 0 for node in seen
     )
-    assert [row['data']['netsim']['warmup_events'] for row in result.flow_results] == [
+    assert [row['data']['sim']['warmup_events'] for row in result.flow_results] == [
         4,
         4,
     ]
-    assert result.baseline['data']['netsim']['warmup_events'] == 4
+    assert result.baseline['data']['sim']['warmup_events'] == 4
     assert result.costs['warmup_events'] == 12
     assert result.costs['warmup_seconds'] > 0
     assert [time for i, time in ticks if i == 2] == [
@@ -250,17 +250,17 @@ def test_all_streamed_metrics_equal_with_tiny_retention():
     _, sims = with_timer(study, period=1)
     # Compare counts without a liveness timer first; timers emit no timeline rows.
     bounded = study.process(events, 162, quiet=1)
-    a, b = dict(full.netsim), dict(bounded.netsim)
+    a, b = dict(full.sim), dict(bounded.sim)
     for key in ('dropped_events', 'dropped_records', 'engine_events'):
         a.pop(key)
         b.pop(key)
     assert a == b
-    assert bounded.netsim['rounds'] > 0
+    assert bounded.sim['rounds'] > 0
     assert len(sims[0].timeline.events) <= 65  # amortized retention block
     assert len(sims[0].timeline.records) <= 65
     assert sims[0]._failure_registry.history == []
     assert sims[0]._failure_registry.trace == []
-    assert bounded.netsim['fault_events'] == 80
+    assert bounded.sim['fault_events'] == 80
 
 
 def test_describe_counts_baseline_and_does_not_invent_event_rate():
@@ -315,7 +315,7 @@ def test_enumerate_and_replay_forward_window_options():
     )
     assert result.flow_results == replay.flow_results
     assert all(
-        row['data']['netsim']['status'] == 'converged' for row in result.flow_results
+        row['data']['sim']['status'] == 'converged' for row in result.flow_results
     )
 
 
@@ -323,7 +323,7 @@ def test_repeatability_fingerprint():
     import hashlib
     import json
 
-    from netsim.runtime import Process
+    from ngraph_sim.runtime import Process
 
     def run():
         return Study(two_rate_network(), keep={'events': 1, 'records': 1}).process(
@@ -339,7 +339,7 @@ def test_repeatability_fingerprint():
     document = json.dumps(first.to_ngraph(), sort_keys=True, allow_nan=False)
     assert (
         hashlib.sha256(document.encode()).hexdigest()
-        == '8f7451ae26a6e619312ffe14786c079bc7478fc5bf583e5de7c240e5f8e41ecf'
+        == '4c9c48440bc0cb7685d99f5f9202f531efed2a3fec5f7ba066ab522faf2d88d4'
     )
 
 
@@ -409,8 +409,8 @@ def test_selected_delivery_and_routing_are_independent():
 def test_programming_requires_installed_policies():
     from dataclasses import replace
 
-    from netsim.model import srv6
-    from netsim.study import Stability, _StabilityWindow
+    from ngraph_sim.model import srv6
+    from ngraph_sim.study import Stability, _StabilityWindow
     from tests.runtime.test_study_srv6 import network
 
     net, _ = network()
@@ -459,7 +459,7 @@ def test_actual_ngraph_workflow_forwards_windows():
     doc = scenario_doc()
     doc['workflow'] = [
         {
-            'type': 'NetSimStudy',
+            'type': 'SimStudy',
             'name': 'windows',
             'demand_set': 'traffic',
             'failure_policy': 'single_link_failure',
@@ -472,7 +472,7 @@ def test_actual_ngraph_workflow_forwards_windows():
             'restore': False,
         },
         {
-            'type': 'NetSimStudy',
+            'type': 'SimStudy',
             'name': 'replay',
             'mode': 'replay',
             'step': 'windows',
@@ -485,7 +485,7 @@ def test_actual_ngraph_workflow_forwards_windows():
             'restore': False,
         },
         {
-            'type': 'NetSimStudy',
+            'type': 'SimStudy',
             'name': 'process',
             'mode': 'process',
             'demand_set': 'traffic',
@@ -503,10 +503,10 @@ def test_actual_ngraph_workflow_forwards_windows():
         steps['windows']['data']['flow_results']
         == steps['replay']['data']['flow_results']
     )
-    row = steps['windows']['data']['flow_results'][0]['data']['netsim']
+    row = steps['windows']['data']['flow_results'][0]['data']['sim']
     assert row['status'] == 'converged'
     assert row['end'] == 1.5
-    assert steps['process']['data']['netsim']['end'] == 0.5
+    assert steps['process']['data']['sim']['end'] == 0.5
 
 
 def test_warmup_changes_are_excluded_from_observation_metrics():
@@ -521,12 +521,12 @@ def test_warmup_changes_are_excluded_from_observation_metrics():
 
     study._simulation = simulation
     result = study.process(Schedule(()), 1, warmup=0.5, quiet=0.25)
-    assert result.netsim['warmup_events'] > 2
-    assert result.netsim['loss_integral'] == 0
-    assert result.netsim['observed_drop_reasons'] == []
-    assert result.netsim['event_counts'] == {'PlacementEvent': 1}
-    assert result.netsim['rounds'] == 0
-    assert result.netsim['max_utilization'] > 0
+    assert result.sim['warmup_events'] > 2
+    assert result.sim['loss_integral'] == 0
+    assert result.sim['observed_drop_reasons'] == []
+    assert result.sim['event_counts'] == {'PlacementEvent': 1}
+    assert result.sim['rounds'] == 0
+    assert result.sim['max_utilization'] > 0
 
 
 def test_real_initialized_agents_restart_and_warm_repeatably():
@@ -561,7 +561,7 @@ def test_real_initialized_agents_restart_and_warm_repeatably():
 
 
 def test_default_processing_delay_delivers_during_real_agent_warmup():
-    from netsim.model import contracts as c
+    from ngraph_sim.model import contracts as c
     from tests.model.test_agent_contract import Minimal
 
     class Hello(Minimal):
@@ -605,8 +605,8 @@ def test_default_processing_delay_delivers_during_real_agent_warmup():
 def test_reference_baseline_matches_prepared_no_fault_iteration(
     mode, initialized_until
 ):
-    from netsim import Environment
-    from netsim.runtime import Simulation
+    from ngraph_sim import Environment
+    from ngraph_sim.runtime import Simulation
     from tests.agents.fixtures import topology
 
     network = topology(numbered=False)
@@ -629,7 +629,7 @@ def test_reference_baseline_matches_prepared_no_fault_iteration(
     result = run()
     assert result.baseline['summary']['total_placed'] == 2000
     assert result.baseline['summary'] == result.flow_results[0]['summary']
-    baseline = result.baseline['data']['netsim']
+    baseline = result.baseline['data']['sim']
     assert baseline['baseline_complete'] is True
     assert baseline['preparation_status'] == 'complete'
     assert (
@@ -655,7 +655,7 @@ def test_agent_baseline_runs_to_t0_even_without_warmup_or_draws():
     study = Study(topology(numbered=False))
     result = study.iterations([], t0=0.5)
     assert result.baseline['summary']['total_placed'] == 2000
-    baseline = result.baseline['data']['netsim']
+    baseline = result.baseline['data']['sim']
     assert baseline['baseline_complete'] is True
     assert baseline['preparation_end'] == 0.5
     assert baseline['engine_events'] > 0
@@ -685,11 +685,11 @@ def test_agent_baseline_has_independent_budget_and_its_wall_cost_is_included(
 
     # Exactly enough events for preparation must not mark the baseline partial,
     # even when subsequent observation needs another event and exhausts its budget.
-    budget = run().baseline['data']['netsim']['engine_events']
+    budget = run().baseline['data']['sim']['engine_events']
     times = iter((10.0, 13.0, 20.0, 25.0))
-    monkeypatch.setattr('netsim.study.perf_counter', lambda: next(times))
+    monkeypatch.setattr('ngraph_sim.study.perf_counter', lambda: next(times))
     result = run(budget)
-    baseline = result.baseline['data']['netsim']
+    baseline = result.baseline['data']['sim']
     assert baseline['baseline_complete'] is True
     assert baseline['engine_events'] == budget
     assert metrics(result)['status'] == 'budget_exceeded'
@@ -708,7 +708,7 @@ def test_agent_baseline_does_not_include_later_observation(mode):
         result = study.process(Schedule([]), 1)
     assert result.baseline['summary']['total_placed'] == 0
     assert result.flow_results[0]['summary']['total_placed'] == 2000
-    baseline = result.baseline['data']['netsim']
+    baseline = result.baseline['data']['sim']
     assert baseline['preparation_end'] == 0
     assert baseline['baseline_complete'] is True  # requested zero-time preparation
 
@@ -745,7 +745,7 @@ def test_agent_baseline_marks_incomplete_preparation(mode, warmup, budget):
         )
     else:
         result = study.process(Schedule([]), 1, warmup=warmup, event_budget=budget)
-    baseline = result.baseline['data']['netsim']
+    baseline = result.baseline['data']['sim']
     assert baseline['baseline_complete'] is False
     assert baseline['preparation_status'] == 'budget_exceeded'
     assert baseline['engine_events'] == budget
@@ -753,7 +753,7 @@ def test_agent_baseline_marks_incomplete_preparation(mode, warmup, budget):
     assert result.costs['warmup_events'] == (
         baseline['warmup_events'] + metrics(result)['warmup_events']
     )
-    assert result.to_ngraph()['data']['baseline']['data']['netsim'] == baseline
+    assert result.to_ngraph()['data']['baseline']['data']['sim'] == baseline
 
 
 @pytest.mark.parametrize('mode', ['iterations', 'process'])

@@ -4,10 +4,10 @@ import csv
 import json
 from dataclasses import replace
 
-from netsim.adapters.ngraph import from_scenario
-from netsim.model import srv6 as sr
-from netsim.runtime.failures import FailureSet
-from netsim.study import Study, StudyResult, _policy_rows
+from ngraph_sim.adapters.ngraph import from_scenario
+from ngraph_sim.model import srv6 as sr
+from ngraph_sim.runtime.failures import FailureSet
+from ngraph_sim.study import Study, StudyResult, _policy_rows
 from tests.adapters.test_ngraph_srv6 import bundle_scenario
 
 
@@ -33,11 +33,11 @@ def test_derived_validity_and_exports_are_detached(tmp_path):
     document = result.to_ngraph()
     json.dumps(document, allow_nan=False)
     assert (
-        document['data']['netsim']['policy_iterations'][0]['policies']
-        == result.flow_results[0]['data']['netsim']['policies']
+        document['data']['sim']['policy_iterations'][0]['policies']
+        == result.flow_results[0]['data']['sim']['policies']
     )
-    document['data']['netsim']['policy_iterations'][0]['policies'].clear()
-    assert result.to_ngraph()['data']['netsim']['policy_iterations'][0]['policies']
+    document['data']['sim']['policy_iterations'][0]['policies'].clear()
+    assert result.to_ngraph()['data']['sim']['policy_iterations'][0]['policies']
     result.to_csv(tmp_path / 'flows.csv')
     with (tmp_path / 'flows.csv').open() as f:
         exported = next(csv.DictReader(f))
@@ -135,10 +135,9 @@ def test_failure_snapshot_is_not_replaced_by_recovery_snapshot():
     study._metrics = after_recovery
     result = study.iterations([FailureSet()])
     assert (
-        result.flow_results[0]['data']['netsim']['policies'][0]['name']
-        != 'after-recovery'
+        result.flow_results[0]['data']['sim']['policies'][0]['name'] != 'after-recovery'
     )
-    assert result.baseline['data']['netsim']['policies'][0]['status'] == 'UP'
+    assert result.baseline['data']['sim']['policies'][0]['status'] == 'UP'
 
 
 def test_repeatable_study_and_empty_csv(tmp_path):

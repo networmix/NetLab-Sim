@@ -1,7 +1,7 @@
 """Clos fabric builder shared by tests and benchmarks (unnumbered, oracle IGP)."""
 
-from netsim.model.igp import oracle_igp
-from netsim.model.network import Network
+from ngraph_sim.model.igp import oracle_igp
+from ngraph_sim.model.network import Network
 
 
 def build_clos(

@@ -5,15 +5,15 @@ import random
 
 import pytest
 
-from netsim import Environment
-from netsim.model import derive
-from netsim.model.addressing import IPV4, IPV6, to_int
-from netsim.model.contracts import CONNECTED, LOCAL
-from netsim.model.interfaces import AdminState, OperState
-from netsim.model.network import Network
-from netsim.model.state import PMap, StateDelta, tree_equal, validate_immutable
-from netsim.runtime import Simulation
-from netsim.runtime.pipeline import carrier_affected, l3_affected, lag_affected
+from ngraph_sim import Environment
+from ngraph_sim.model import derive
+from ngraph_sim.model.addressing import IPV4, IPV6, to_int
+from ngraph_sim.model.contracts import CONNECTED, LOCAL
+from ngraph_sim.model.interfaces import AdminState, OperState
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.state import PMap, StateDelta, tree_equal, validate_immutable
+from ngraph_sim.runtime import Simulation
+from ngraph_sim.runtime.pipeline import carrier_affected, l3_affected, lag_affected
 from tests.model.test_network import build_diamond
 
 
@@ -281,8 +281,8 @@ def test_carrier_and_lag_invalidation_do_not_enumerate_unrelated_interfaces(
     def no_scan(*args):
         pytest.fail('an interface change must use its direct bundle/peer lookup')
 
-    monkeypatch.setattr('netsim.runtime.pipeline._ethernets_of', no_scan)
-    monkeypatch.setattr('netsim.runtime.pipeline._bundles_of', no_scan)
+    monkeypatch.setattr('ngraph_sim.runtime.pipeline._ethernets_of', no_scan)
+    monkeypatch.setattr('ngraph_sim.runtime.pipeline._bundles_of', no_scan)
     assert carrier_affected(delta, net.state) == {('R1', 'eth1'), ('R2', 'eth1')}
     assert lag_affected(delta, net.state) == {('R1', 'Po1'), ('R2', 'Po1')}
 

@@ -7,13 +7,13 @@ as a smoke test.
 
 import pytest
 
-import netsim
+import ngraph_sim
 
 pytestmark = pytest.mark.benchmark
 
 
 def _timeout_loop(n):
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
 
     def p(env):
         for _ in range(n):
@@ -25,8 +25,8 @@ def _timeout_loop(n):
 
 
 def _store_pingpong(n):
-    env = netsim.Environment()
-    st = netsim.Store(env, capacity=1)
+    env = ngraph_sim.Environment()
+    st = ngraph_sim.Store(env, capacity=1)
 
     def prod(env):
         for i in range(n):
@@ -43,8 +43,8 @@ def _store_pingpong(n):
 
 
 def _resource_backlog(n):
-    env = netsim.Environment()
-    res = netsim.Resource(env, capacity=1)
+    env = ngraph_sim.Environment()
+    res = ngraph_sim.Resource(env, capacity=1)
 
     def u(env):
         with res.request() as r:
@@ -58,8 +58,8 @@ def _resource_backlog(n):
 
 
 def _anyof_timeout(n):
-    env = netsim.Environment()
-    st = netsim.Store(env)
+    env = ngraph_sim.Environment()
+    st = ngraph_sim.Store(env)
 
     def p(env):
         for _ in range(n):
@@ -74,13 +74,13 @@ def _anyof_timeout(n):
 
 
 def _interrupts(n):
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
 
     def victim(env):
         while True:
             try:
                 yield env.timeout(1000)
-            except netsim.Interrupt:
+            except ngraph_sim.Interrupt:
                 pass
 
     def attacker(env, v):
@@ -128,12 +128,12 @@ def _clos_converge(leaves, spines):
 
 
 def _clos_failure_cascade(leaves, spines):
-    import netsim
-    from netsim.runtime import Simulation
+    import ngraph_sim
+    from ngraph_sim.runtime import Simulation
     from tests.model.clos import build_clos
 
     net = build_clos(leaves, spines)
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
     sim = Simulation(env, net)
     links = list(net.links.values())
     for i, link in enumerate(links[:spines]):
@@ -145,7 +145,7 @@ def _clos_failure_cascade(leaves, spines):
 def _lpm_lookups(n):
     import random
 
-    from netsim.model.lpm import PrefixTable
+    from ngraph_sim.model.lpm import PrefixTable
 
     rng = random.Random(1)
     t = PrefixTable(32)
@@ -185,8 +185,8 @@ def test_study_windows(benchmark, fixture):
         pytest.skip('study qualification requires --benchmark-enable')
     from dataclasses import asdict
 
-    from netsim.runtime import FailureSet
-    from netsim.study import Study
+    from ngraph_sim.runtime import FailureSet
+    from ngraph_sim.study import Study
     from tests.model.clos import build_clos
     from tests.runtime.test_study import diamond
 
@@ -203,5 +203,5 @@ def test_study_windows(benchmark, fixture):
     benchmark.extra_info['iterations_per_call'] = len(draws)
     result = benchmark(study.iterations, draws, horizon=0.25, quiet=0.125)
     assert all(
-        row['data']['netsim']['status'] == 'converged' for row in result.flow_results
+        row['data']['sim']['status'] == 'converged' for row in result.flow_results
     )

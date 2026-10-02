@@ -5,15 +5,15 @@ from ipaddress import IPv6Address
 
 import pytest
 
-from netsim.model import flows
-from netsim.model import forwarding as fw
-from netsim.model import srv6 as sr
-from netsim.model.contracts import STATIC
-from netsim.model.igp import oracle_igp
-from netsim.model.interfaces import EthernetNode, PortChannelNode
-from netsim.model.network import Network
-from netsim.model.packets import IPv4Packet
-from netsim.model.routing import Nexthop, ResolutionPolicy
+from ngraph_sim.model import flows
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model import srv6 as sr
+from ngraph_sim.model.contracts import STATIC
+from ngraph_sim.model.igp import oracle_igp
+from ngraph_sim.model.interfaces import EthernetNode, PortChannelNode
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.packets import IPv4Packet
+from ngraph_sim.model.routing import Nexthop, ResolutionPolicy
 from tests.model.test_network import A, build_diamond
 
 
@@ -346,7 +346,7 @@ def test_strict_validation_queries_the_encoded_address_at_intermediate_owners():
     assert net.placement.delivered_total == 100e6
     status = state_of(routers, p)
     container = status.valid_lists[0][2][0]
-    from netsim.model.srv6_compress import shift_csid
+    from ngraph_sim.model.srv6_compress import shift_csid
 
     head = next(
         s for s in routers['R1'].node.srv6_sids.sids.values() if s.interface == 'Po1'
@@ -602,7 +602,7 @@ def test_candidate_ties_and_opt_in_installed_preference():
 
 @pytest.mark.parametrize('size', [1000, 1220])
 def test_production_fluid_encap_mtu_matches_hash(size):
-    from netsim.model import flows
+    from ngraph_sim.model import flows
     from tests.model.test_forwarding_srv6 import path_network
 
     net, routers, _ = path_network()
@@ -622,7 +622,7 @@ def test_production_fluid_encap_mtu_matches_hash(size):
 
 
 def test_fluid_class_sorting_optional_srh_and_inner_records():
-    from netsim.model.packets import SRH, PacketTemplate
+    from ngraph_sim.model.packets import SRH, PacketTemplate
 
     net, _ = diamond()
     base = PacketTemplate(6, A('2001:db8::1'), A('2001:db8::4'))
@@ -640,9 +640,9 @@ def test_fluid_class_sorting_optional_srh_and_inner_records():
 @pytest.mark.parametrize('mode', [1, 2])
 @pytest.mark.parametrize('lossy', [False, True])
 def test_nested_template_uses_innermost_payload_for_rate(mode, lossy):
-    from netsim.model import flows
-    from netsim.model.network import Network
-    from netsim.model.packets import SRH, PacketTemplate
+    from ngraph_sim.model import flows
+    from ngraph_sim.model.network import Network
+    from ngraph_sim.model.packets import SRH, PacketTemplate
 
     net = Network()
     a, b = net.add_device('a'), net.add_device('b')
@@ -665,8 +665,8 @@ def test_nested_template_uses_innermost_payload_for_rate(mode, lossy):
 
 
 def test_nested_template_validates_innermost_payload_only():
-    from netsim.model.flows import Demand
-    from netsim.model.packets import PacketTemplate
+    from ngraph_sim.model.flows import Demand
+    from ngraph_sim.model.packets import PacketTemplate
 
     outer = PacketTemplate(
         6, 1, 2, payload_size=0, inner=PacketTemplate(4, 1, 2, payload_size=2000)
@@ -686,8 +686,8 @@ def test_nested_template_validates_innermost_payload_only():
 
 
 def test_steering_precedence_and_demand_override():
-    from netsim.model.network import _View
-    from netsim.model.packets import L4Header
+    from ngraph_sim.model.network import _View
+    from ngraph_sim.model.packets import L4Header
 
     net, routers = diamond()
     p = policy(routers)

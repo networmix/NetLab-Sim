@@ -7,11 +7,11 @@ from ipaddress import IPv6Address
 
 import pytest
 
-from netsim.adapters import sonic
-from netsim.model import srv6 as sr
-from netsim.model.contracts import STATIC
-from netsim.model.network import Network
-from netsim.model.state import tree_equal
+from ngraph_sim.adapters import sonic
+from ngraph_sim.model import srv6 as sr
+from ngraph_sim.model.contracts import STATIC
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.state import tree_equal
 
 
 def config():

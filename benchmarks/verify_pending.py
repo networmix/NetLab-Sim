@@ -20,12 +20,12 @@ import statistics
 import sys
 import time
 
-from netsim import Environment
-from netsim.model import derive
-from netsim.model.lpm import FrozenPrefixTable
-from netsim.model.network import Network
-from netsim.model.state import FloatArray, PMap
-from netsim.runtime import pipeline, simulation
+from ngraph_sim import Environment
+from ngraph_sim.model import derive
+from ngraph_sim.model.lpm import FrozenPrefixTable
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.state import FloatArray, PMap
+from ngraph_sim.runtime import pipeline, simulation
 
 
 def freeze(value):

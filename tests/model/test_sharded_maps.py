@@ -7,8 +7,8 @@ import sys
 
 import pytest
 
-from netsim.model.derive import bump_epochs
-from netsim.model.state import (
+from ngraph_sim.model.derive import bump_epochs
+from ngraph_sim.model.state import (
     Allocators,
     DeviceState,
     NetworkState,
@@ -247,7 +247,7 @@ def test_iteration_handles_incomparable_keys_and_is_hash_seed_independent(monkey
     assert list(m.keys()) == keys
     assert list(m.values()) == list(range(4))
     script = """
-from netsim.model.state import PMap
+from ngraph_sim.model.state import PMap
 m = PMap((f'r{i}', i) for i in range(700))
 m = m.remove('r10').set('r10', -1).set('r1', 42)
 assert list(m) == [f'r{i}' for i in range(700) if i != 10] + ['r10']
@@ -264,7 +264,7 @@ print(list(m.items()))
 
 
 def test_placement_cache_comparison_is_shard_scoped():
-    from netsim.model.flows import DepToken, _same_cache
+    from ngraph_sim.model.flows import DepToken, _same_cache
     from tests.model.test_network import build_diamond
 
     net, _ = build_diamond()
@@ -292,9 +292,9 @@ def test_placement_cache_comparison_is_shard_scoped():
 
 
 def test_timeline_route_comparison_does_not_enumerate_whole_row_map(monkeypatch):
-    from netsim.model.contracts import STATIC
-    from netsim.model.routing import Nexthop, RibState, Route, rib_apply
-    from netsim.runtime.timeline import RouteEvent, _route_events
+    from ngraph_sim.model.contracts import STATIC
+    from ngraph_sim.model.routing import Nexthop, RibState, Route, rib_apply
+    from ngraph_sim.runtime.timeline import RouteEvent, _route_events
 
     rows = tuple(
         Route((i, 32), 4, STATIC, 1, (Nexthop.blackhole(),)) for i in range(2000)

@@ -4,8 +4,8 @@ from types import SimpleNamespace as NS
 
 import pytest
 
-from netsim.adapters.ngraph import demands_from, from_scenario
-from netsim.model import srv6 as sr
+from ngraph_sim.adapters.ngraph import demands_from, from_scenario
+from ngraph_sim.model import srv6 as sr
 from tests.adapters.test_ngraph import (
     DemandSet,
     Link,
@@ -25,7 +25,7 @@ def scenario(path=None, **options):
 
 def bundle_scenario():
     """The diamond tests intentionally route over the entire Po1 bundle."""
-    return scenario(attrs={'netsim': {'allow_bundle_pins': True}})
+    return scenario(attrs={'sim': {'allow_bundle_pins': True}})
 
 
 def test_explicit_path_policy_and_steering():
@@ -157,14 +157,14 @@ def test_static_path_requires_srv6_and_ipv6():
 
 def test_bad_followup_import_rolls_back_policies_and_metadata():
     net, _, _ = from_scenario(bundle_scenario(), srv6=True)
-    root, metadata = net.state, dict(net.netsim_demand_destinations)
+    root, metadata = net.state, dict(net.ngraph_sim_demand_destinations)
     sc = bundle_scenario()
     good = sc.demand_set.sets['traffic'][0]
     bad = scenario(path=('R1', 'R4')).demand_set.sets['traffic'][0]
     with pytest.raises(ValueError, match='no enabled link'):
         demands_from(sc.network, net, {'new': [good, bad]})
     assert net.state is root
-    assert net.netsim_demand_destinations == metadata
+    assert net.ngraph_sim_demand_destinations == metadata
 
 
 def real_pinned():
@@ -349,7 +349,7 @@ def test_bundle_member_pins_require_explicit_opt_in(form, strict):
 @pytest.mark.parametrize('form', ['nodes', 'links'])
 def test_explicit_bundle_pin_approximation_uses_and_survives_other_member(form):
     sc, td = pinned_chain(bundle=True)
-    td.attrs = {'netsim': {'allow_bundle_pins': True}}
+    td.attrs = {'sim': {'allow_bundle_pins': True}}
     if form == 'links':
         td.static_paths = (NS(nodes=(), links=('A|B|0', 'B|D|0')),)
     net, _, _ = from_scenario(sc, srv6=True, capacity_unit=1e6)
@@ -374,7 +374,7 @@ def test_real_bundle_pin_approximation_is_distinct_from_core_member_failure():
     assert core_pinned(sc.network, td, {'A|B|0'}).summary.total_placed == 0
     with pytest.raises(ValueError, match='allow_bundle_pins'):
         from_scenario(sc, srv6=True)
-    td.attrs = {'netsim': {'allow_bundle_pins': True}}
+    td.attrs = {'sim': {'allow_bundle_pins': True}}
     net, _, _ = from_scenario(sc, srv6=True, capacity_unit=1e6)
     net.link(net.ngraph_link_ids['A|B|0']).fail()
     net.converge()
@@ -384,7 +384,7 @@ def test_real_bundle_pin_approximation_is_distinct_from_core_member_failure():
 @pytest.mark.parametrize('value', ['true', 1, None])
 def test_bundle_opt_in_requires_boolean_true(value):
     sc, td = pinned_chain(bundle=True)
-    td.attrs = {'netsim': {'allow_bundle_pins': value}}
+    td.attrs = {'sim': {'allow_bundle_pins': value}}
     with pytest.raises(ValueError, match='allow_bundle_pins must be a boolean'):
         from_scenario(sc, srv6=True)
 
@@ -399,8 +399,8 @@ def test_bundle_opt_in_is_per_demand_and_rejected_import_is_atomic():
     with pytest.raises(ValueError, match='allow_bundle_pins'):
         demands_from(sc.network, net, {'rejected': [td]}, strict=False)
     assert net.state is before
-    assert net.netsim_demand_destinations == {}
-    td.attrs = {'netsim': {'allow_bundle_pins': True}}
+    assert net.ngraph_sim_demand_destinations == {}
+    td.attrs = {'sim': {'allow_bundle_pins': True}}
     ids = demands_from(sc.network, net, {'accepted': [td]})
     assert net.state.demands[ids[0]].steer is not None
     td.attrs = {}
@@ -412,6 +412,6 @@ def test_bundle_opt_in_is_per_demand_and_rejected_import_is_atomic():
 
 def test_bundle_opt_in_does_not_enable_te_admission_in_strict_mode():
     sc, td = pinned_chain(bundle=True, policy='TE_WCMP_UNLIM')
-    td.attrs = {'netsim': {'allow_bundle_pins': True}}
+    td.attrs = {'sim': {'allow_bundle_pins': True}}
     with pytest.raises(ValueError, match='admission semantics'):
         from_scenario(sc, srv6=True)

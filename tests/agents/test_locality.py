@@ -5,12 +5,12 @@ from pathlib import Path
 
 import pytest
 
-from netsim import Environment
-from netsim.agents import ReferenceAgent
-from netsim.model import contracts as c
-from netsim.model.network import Network
-from netsim.runtime import Simulation
-from netsim.runtime.agents import AgentBatchError
+from ngraph_sim import Environment
+from ngraph_sim.agents import ReferenceAgent
+from ngraph_sim.model import contracts as c
+from ngraph_sim.model.network import Network
+from ngraph_sim.runtime import Simulation
+from ngraph_sim.runtime.agents import AgentBatchError
 from tests.agents.fixtures import assert_equivalent, topology, twins
 
 
@@ -40,14 +40,14 @@ def guard(monkeypatch, sim):
 
 
 def test_no_oracle_imports_or_network_state_reads():
-    import netsim.agents
+    import ngraph_sim.agents
 
-    for path in Path(netsim.agents.__file__).parent.glob('*.py'):
+    for path in Path(ngraph_sim.agents.__file__).parent.glob('*.py'):
         tree = ast.parse(path.read_text())
         forbidden = (
-            'netsim.model.igp',
-            'netsim.model.network',
-            'netsim.model.entities',
+            'ngraph_sim.model.igp',
+            'ngraph_sim.model.network',
+            'ngraph_sim.model.entities',
         )
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
@@ -84,7 +84,7 @@ def test_reference_callbacks_are_local_on_discovery_failure_restart(monkeypatch)
 def test_cheating_plugin_fails_even_when_its_routes_match_oracle(monkeypatch, access):
     from dataclasses import replace
 
-    from netsim.model.igp import shortest_path_routes
+    from ngraph_sim.model.igp import shortest_path_routes
     from tests.agents.fixtures import normalized_rows
 
     net = topology(agent=False)

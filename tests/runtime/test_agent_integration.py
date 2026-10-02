@@ -8,16 +8,16 @@ from dataclasses import dataclass, field, replace
 
 import pytest
 
-from netsim import Environment
-from netsim.model import contracts as c
-from netsim.model import nht
-from netsim.model.addressing import MacAddress
-from netsim.model.network import published_failure
-from netsim.model.routing import Nexthop, ResolutionPolicy, Route
-from netsim.model.state import PMap, validate_immutable
-from netsim.runtime.agents import AgentBatchError, AgentRuntime
-from netsim.runtime.simulation import Simulation
-from netsim.runtime.transport import TransportRuntime
+from ngraph_sim import Environment
+from ngraph_sim.model import contracts as c
+from ngraph_sim.model import nht
+from ngraph_sim.model.addressing import MacAddress
+from ngraph_sim.model.network import published_failure
+from ngraph_sim.model.routing import Nexthop, ResolutionPolicy, Route
+from ngraph_sim.model.state import PMap, validate_immutable
+from ngraph_sim.runtime.agents import AgentBatchError, AgentRuntime
+from ngraph_sim.runtime.simulation import Simulation
+from ngraph_sim.runtime.transport import TransportRuntime
 from tests.model.test_network import A, build_diamond
 
 

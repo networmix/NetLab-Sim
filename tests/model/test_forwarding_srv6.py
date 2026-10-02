@@ -6,12 +6,12 @@ from random import Random
 
 import pytest
 
-from netsim import Environment
-from netsim.model import forwarding as fw
-from netsim.model.addressing import to_int
-from netsim.model.hashing import flow_label_for
-from netsim.model.network import Network
-from netsim.model.packets import (
+from ngraph_sim import Environment
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model.addressing import to_int
+from ngraph_sim.model.hashing import flow_label_for
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.packets import (
     AFTER_ENCAP,
     ETHERTYPE_IPV4,
     ETHERTYPE_IPV6,
@@ -30,8 +30,8 @@ from netsim.model.packets import (
     encapsulate,
     ip_bytes,
 )
-from netsim.model.routing import SRV6_LOCAL_NH, Nexthop
-from netsim.model.srv6 import (
+from ngraph_sim.model.routing import SRV6_LOCAL_NH, Nexthop
+from ngraph_sim.model.srv6 import (
     END,
     END_B6_ENCAPS,
     END_DT4,
@@ -56,7 +56,7 @@ from netsim.model.srv6 import (
     LocalSid,
     Srv6Encap,
 )
-from netsim.runtime import Simulation
+from ngraph_sim.runtime import Simulation
 
 
 def address(text):
@@ -508,7 +508,7 @@ def test_timed_send_and_trace_share_interpreter(compressed):
 
 
 def test_invalid_csid_structure_becomes_modeled_drop():
-    from netsim.model.srv6 import SidStructure
+    from ngraph_sim.model.srv6 import SidStructure
 
     net, routers, _ = path_network(compressed=True)
     install_sid(
@@ -537,7 +537,7 @@ def test_invalid_csid_structure_becomes_modeled_drop():
     ],
 )
 def test_next_csid_uses_matched_sid_width(structure, da, shifted):
-    from netsim.model import srv6
+    from ngraph_sim.model import srv6
 
     net, routers, _ = path_network(compressed=True)
     layout = getattr(srv6, structure)
@@ -627,7 +627,7 @@ def test_cross_connect_checks_l3_and_neighbor():
 
 
 def test_headend_local_cross_connect_over_bundle_hashes_shifted_outer():
-    from netsim.model.hashing import BalancerKind
+    from ngraph_sim.model.hashing import BalancerKind
 
     net, routers, _ = path_network(compressed=True)
     net.add_lag(
@@ -718,7 +718,7 @@ def test_sr_member_unavailable_precedes_mtu_without_changing_plain_ip(monkeypatc
 
 def srdb_path_network(*, compressed):
     """Use G1's public SR-DB API to produce the same acceptance path."""
-    from netsim.model.contracts import STATIC
+    from ngraph_sim.model.contracts import STATIC
 
     net, routers, encap = path_network(compressed=compressed)
     for name, router in routers.items():
@@ -754,7 +754,7 @@ def srdb_path_network(*, compressed):
 @pytest.mark.parametrize('compressed', [False, True])
 @pytest.mark.parametrize('af', [4, 6])
 def test_public_srdb_rows_drive_trace_and_timed_send(compressed, af):
-    from netsim.model.contracts import SRV6_LOCAL
+    from ngraph_sim.model.contracts import SRV6_LOCAL
 
     net, routers, encap = srdb_path_network(compressed=compressed)
     assert net.validate() == []
@@ -799,7 +799,7 @@ def test_public_srdb_withdrawal_keeps_unknown_cover_and_restore_recovers():
 
 @pytest.mark.parametrize('compressed,wire', [(False, 109.8e6), (True, 107.4e6)])
 def test_public_srdb_hash_placement_uses_actual_transmitted_headers(compressed, wire):
-    from netsim.model import flows
+    from ngraph_sim.model import flows
 
     net, _, _ = srdb_path_network(compressed=compressed)
     net.add_demand(

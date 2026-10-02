@@ -5,10 +5,10 @@ from dataclasses import dataclass, field
 
 import pytest
 
-from netsim.adapters import ngraph as adapter
-from netsim.adapters.core import edge_arrays
-from netsim.model import forwarding as fw
-from netsim.model.addressing import to_int
+from ngraph_sim.adapters import ngraph as adapter
+from ngraph_sim.adapters.core import edge_arrays
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model.addressing import to_int
 
 
 @dataclass
@@ -97,7 +97,7 @@ class TestFromNetwork:
         )
         ids = adapter.demands_from(g, net, scenario.demand_set.sets, capacity_unit=1e6)
         assert ids == ['traffic:0:R1>*']  # combine: one anycast destination
-        assert net.netsim_demand_destinations[ids[0]] == '{R4}'
+        assert net.ngraph_sim_demand_destinations[ids[0]] == '{R4}'
         net.converge()
         rep = net.placement
         assert rep.delivered_total == pytest.approx(100e6)
@@ -117,10 +117,10 @@ class TestFromNetwork:
         assert net.links[net.ngraph_link_ids['R1|R3|0']].state == 0
         assert net.placement.delivered_total == pytest.approx(100e6)  # all via Po1
         schedule = adapter.FailureSchedule((adapter.FailureIteration(0, ('R2',), ()),))
-        import netsim
-        from netsim.runtime import Simulation
+        import ngraph_sim
+        from ngraph_sim.runtime import Simulation
 
-        env = netsim.Environment()
+        env = ngraph_sim.Environment()
         sim = Simulation(env, net)
         schedule.apply(net, sim, start=10, dwell=2)
         sim.run_until(10)
@@ -196,7 +196,7 @@ class TestFromNetwork:
 
 
 def test_real_ngraph_readme_topology():
-    pytest.importorskip('ngraph', reason='netsim[ngraph] extra not installed')
+    pytest.importorskip('ngraph', reason='ngraph is not installed')
     from ngraph import Link as NLink
     from ngraph import Network as NNetwork
     from ngraph import Node as NNode
@@ -220,8 +220,8 @@ def test_real_ngraph_readme_topology():
 def test_adapter_bulk_construction_commits_once(entry, monkeypatch):
     from contextlib import contextmanager
 
-    from netsim.model.network import Network
-    from netsim.model.state import tree_equal
+    from ngraph_sim.model.network import Network
+    from ngraph_sim.model.state import tree_equal
 
     graph = diamond_stub()
     sets = {'traffic': [TrafficDemand('^R1$', '^R[234]$', 100)]}
@@ -262,11 +262,11 @@ def test_adapter_bulk_construction_commits_once(entry, monkeypatch):
 
 
 def test_failure_schedules_share_overlapping_leases():
-    import netsim
-    from netsim.runtime import Simulation
+    import ngraph_sim
+    from ngraph_sim.runtime import Simulation
 
     net = adapter.from_network(diamond_stub())
-    sim = Simulation(netsim.Environment(), net)
+    sim = Simulation(ngraph_sim.Environment(), net)
     lid = 'R1|R3|0'
     schedule = adapter.FailureSchedule((adapter.FailureIteration(0, (), (lid,)),))
     schedule.apply(net, sim, start=1, dwell=8)
@@ -308,8 +308,8 @@ def test_combine_reaches_only_reachable_targets_like_netgraph():
 
 
 def test_netgraph_priority_direction_is_translated():
-    """NetGraph serves lower priority numbers first; NetSim higher ones."""
-    from netsim.model.flows import LOSSY
+    """NetGraph serves lower priority numbers first; NetGraph-Sim higher ones."""
+    from ngraph_sim.model.flows import LOSSY
 
     graph = diamond_stub()
     net = adapter.from_network(graph, capacity_unit=1e6)
@@ -330,13 +330,13 @@ def test_netgraph_priority_direction_is_translated():
     later = net.placement.demands['p:0:R1>R4']
     assert urgent.delivered == pytest.approx(150e6)
     assert later.delivered < 150e6
-    assert net.netsim_demand_priorities == {'p:0:R1>R4': 10, 'p:1:R1>R4': 0}
+    assert net.ngraph_sim_demand_priorities == {'p:0:R1>R4': 10, 'p:1:R1>R4': 0}
     assert net.state.demands['p:1:R1>R4'].priority == 0
     assert net.state.demands['p:0:R1>R4'].priority == -10
 
 
 def test_real_ngraph_total_demand_matches_netgraph():
-    pytest.importorskip('ngraph', reason='netsim[ngraph] extra not installed')
+    pytest.importorskip('ngraph', reason='ngraph is not installed')
     import pathlib
 
     import yaml
@@ -367,7 +367,7 @@ def test_real_ngraph_total_demand_matches_netgraph():
 
 
 def test_real_ngraph_combine_placed_volume_matches_netgraph():
-    pytest.importorskip('ngraph', reason='netsim[ngraph] extra not installed')
+    pytest.importorskip('ngraph', reason='ngraph is not installed')
     from ngraph.scenario import Scenario as NgScenario
 
     text = """
@@ -439,10 +439,10 @@ class TestCombineAllocation:
             capacity_unit=1.0,
         )
         assert fork.state.demands[ids2[0]].dst != net.state.demands[ids[0]].dst
-        assert fork.netsim_demand_priorities[ids[0]] == 3
-        assert fork.netsim_demand_destinations[ids[0]] == '{R4}'
-        assert ids[0] not in net.netsim_demand_destinations or 'b' not in str(
-            net.netsim_anycast.keys()
+        assert fork.ngraph_sim_demand_priorities[ids[0]] == 3
+        assert fork.ngraph_sim_demand_destinations[ids[0]] == '{R4}'
+        assert ids[0] not in net.ngraph_sim_demand_destinations or 'b' not in str(
+            net.ngraph_sim_anycast.keys()
         )
         fork.converge()
         assert fork.placement.demands[ids2[0]].delivered == pytest.approx(30.0)
@@ -467,7 +467,7 @@ class TestCombineAllocation:
             {'p': [TrafficDemand('^R1$', '^R4$', 20.0, mode='pairwise', priority=1)]},
             capacity_unit=1.0,
         )
-        before = dict(net.netsim_demand_priorities)
+        before = dict(net.ngraph_sim_demand_priorities)
         root = net.state
         with pytest.raises(ValueError):
             adapter.demands_from(
@@ -482,7 +482,7 @@ class TestCombineAllocation:
                 capacity_unit=1.0,
             )
         assert net.state is root
-        assert net.netsim_demand_priorities == before
+        assert net.ngraph_sim_demand_priorities == before
 
     def test_strict_rejects_untranslated_options(self):
         graph = diamond_stub()
@@ -531,13 +531,13 @@ def test_metadata_survives_a_post_commit_observer_error():
             capacity_unit=1.0,
         )
     assert net.state.demands['p:0:R1>R4'].priority == -9  # the commit stood
-    assert net.netsim_demand_priorities['p:0:R1>R4'] == 9  # and so does the label
+    assert net.ngraph_sim_demand_priorities['p:0:R1>R4'] == 9  # and so does the label
 
 
 def test_fork_detaches_nested_adapter_metadata():
     graph = diamond_stub()
     net = adapter.from_network(graph)
-    net.netsim_failure_parameters[('device', 'R1')] = {'mtbf': 10, 'mttr': 1}
+    net.ngraph_sim_failure_parameters[('device', 'R1')] = {'mtbf': 10, 'mttr': 1}
     fork = net.fork()
-    fork.netsim_failure_parameters[('device', 'R1')]['mtbf'] = 2
-    assert net.netsim_failure_parameters[('device', 'R1')]['mtbf'] == 10
+    fork.ngraph_sim_failure_parameters[('device', 'R1')]['mtbf'] = 2
+    assert net.ngraph_sim_failure_parameters[('device', 'R1')]['mtbf'] == 10

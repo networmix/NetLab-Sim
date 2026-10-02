@@ -21,10 +21,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from netsim import Environment  # noqa: E402
-from netsim.model import contracts as c  # noqa: E402
-from netsim.model.network import Network  # noqa: E402
-from netsim.runtime import simulation  # noqa: E402
+from ngraph_sim import Environment  # noqa: E402
+from ngraph_sim.model import contracts as c  # noqa: E402
+from ngraph_sim.model.network import Network  # noqa: E402
+from ngraph_sim.runtime import simulation  # noqa: E402
 
 
 class Ticker:
@@ -68,7 +68,7 @@ def main():
         source = subprocess.check_output(
             ['git', 'show', f'{args.runtime_ref}:netsim/runtime/agents.py'], text=True
         )
-        module = types.ModuleType('netsim.runtime._s0_benchmark_agents')
+        module = types.ModuleType('ngraph_sim.runtime._s0_benchmark_agents')
         sys.modules[module.__name__] = module
         exec(compile(source, f'{args.runtime_ref}:agents.py', 'exec'), module.__dict__)
         simulation.AgentRuntime = module.AgentRuntime

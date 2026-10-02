@@ -1,13 +1,13 @@
 import pytest
 
-import netsim
-from netsim.model import forwarding as fw
-from netsim.model.addressing import IPV4, to_int
-from netsim.model.contracts import STATIC
-from netsim.model.interfaces import OperState, StateReason
-from netsim.model.packets import PacketTemplate
-from netsim.runtime import Simulation
-from netsim.runtime.pipeline import ConvergenceError
+import ngraph_sim
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model.addressing import IPV4, to_int
+from ngraph_sim.model.contracts import STATIC
+from ngraph_sim.model.interfaces import OperState, StateReason
+from ngraph_sim.model.packets import PacketTemplate
+from ngraph_sim.runtime import Simulation
+from ngraph_sim.runtime.pipeline import ConvergenceError
 from tests.model.test_flows import WIRE, _loads
 from tests.model.test_network import build_diamond
 
@@ -20,7 +20,7 @@ def bound(min_links=2, demand=True, **kw):
     net, R = build_diamond(min_links=min_links, **kw)
     if demand:
         net.add_demand('d1', 'R1', '10.0.0.4', 100e6)
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
     sim = Simulation(env, net)
     return env, net, R, sim
 
@@ -195,12 +195,12 @@ def test_round_bookkeeping_does_not_grow_with_time():
 def test_kind_that_dirties_itself_runs_again_in_a_successor_round():
     import dataclasses
 
-    from netsim.model.network import Network
-    from netsim.runtime.pipeline import COALESCE, Kind, Pipeline
+    from ngraph_sim.model.network import Network
+    from ngraph_sim.runtime.pipeline import COALESCE, Kind, Pipeline
 
     net = Network()
     net.add_device('A')
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
     runs = []
 
     def run(state, now, entities):
@@ -235,14 +235,14 @@ def test_observer_failure_after_commit_does_not_re_execute_the_run():
     retry() has nothing to re-run and the committed state stands."""
     import dataclasses
 
-    from netsim.model import derive
-    from netsim.model.network import Network, published_failure
-    from netsim.runtime.pipeline import COALESCE, Kind, Pipeline
+    from ngraph_sim.model import derive
+    from ngraph_sim.model.network import Network, published_failure
+    from ngraph_sim.runtime.pipeline import COALESCE, Kind, Pipeline
 
     net = Network()
     net.add_device('R')
     net.converge()
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
     runs = []
 
     def run(root, now, due):

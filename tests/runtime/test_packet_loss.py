@@ -7,12 +7,12 @@ from collections import Counter
 
 import pytest
 
-import netsim
-from netsim.model import forwarding as fw
-from netsim.model.addressing import IPV4, to_int
-from netsim.model.network import Network
-from netsim.model.packets import PacketTemplate
-from netsim.runtime import Simulation
+import ngraph_sim
+from ngraph_sim.model import forwarding as fw
+from ngraph_sim.model.addressing import IPV4, to_int
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.packets import PacketTemplate
+from ngraph_sim.runtime import Simulation
 
 FAIL, RESTORE = 0.500, 0.550  # 50 ms outage
 
@@ -39,7 +39,7 @@ def build(links: int, **dev):
 
 def send_train(net, n=100, spacing=0.01, offset=0.005, **kw):
     """*n* packets, distinct flows, one every *spacing* s; returns traces by send time."""
-    env = netsim.Environment()
+    env = ngraph_sim.Environment()
     sim = Simulation(env, net)
     link0 = net.links['R1:eth0--R2:eth0']
     sim.at(FAIL, link0.fail)
@@ -127,7 +127,7 @@ class TestPlacementAgrees:
         for ff, expect_drop in ((False, True), (True, False)):
             net = build(2, fib_delay=0.1, fast_failover=ff)
             net.add_demand('d', 'R1', '10.0.0.2', 100e6)
-            env = netsim.Environment()
+            env = ngraph_sim.Environment()
             sim = Simulation(env, net)
             sim.at(FAIL, net.links['R1:eth0--R2:eth0'].fail)
             sim.run_until(0.52)  # inside the outage, before the FIB reacts

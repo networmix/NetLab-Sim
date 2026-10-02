@@ -4,11 +4,11 @@ from dataclasses import replace
 
 import pytest
 
-from netsim.model import srv6 as sr
-from netsim.model.contracts import STATIC
-from netsim.model.igp import oracle_igp
-from netsim.model.network import Network
-from netsim.model.routing import Nexthop, RibState
+from ngraph_sim.model import srv6 as sr
+from ngraph_sim.model.contracts import STATIC
+from ngraph_sim.model.igp import oracle_igp
+from ngraph_sim.model.network import Network
+from ngraph_sim.model.routing import Nexthop, RibState
 from tests.model.test_network import A
 from tests.model.test_policies import diamond, state_of
 from tests.model.test_srdb_source import literal_policy

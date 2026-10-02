@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from netsim.model import contracts as c
+from ngraph_sim.model import contracts as c
 from tests.runtime.test_agents import Plugin, fixture
 
 
