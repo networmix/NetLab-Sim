@@ -1,9 +1,9 @@
 import pytest
 
-from ngraph_sim.model import flows
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model.addressing import to_int
-from ngraph_sim.model.flows import HASH, LOSSY, UNCONSTRAINED
+from netlab_sim.model import flows
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model.addressing import to_int
+from netlab_sim.model.flows import HASH, LOSSY, UNCONSTRAINED
 from tests.model.test_network import build_diamond
 
 
@@ -148,7 +148,7 @@ class TestHash:
         assert r.demands['h'].delivered == pytest.approx(100e6)
 
     def test_hash_ttl_drop(self):
-        from ngraph_sim.model.packets import PacketTemplate
+        from netlab_sim.model.packets import PacketTemplate
 
         net, R = build_diamond()
         t = PacketTemplate(4, A('10.0.0.1'), A('10.0.0.4'), ttl=1)
@@ -241,12 +241,12 @@ class TestPerDemandAccounting:
         assert rep.max_utilization() == 0.0
 
     def test_removing_the_last_demand_timed(self):
-        import ngraph_sim
-        from ngraph_sim.runtime import Simulation
+        import netlab_sim
+        from netlab_sim.runtime import Simulation
 
         net, R = build_diamond(min_links=2)
         net.add_demand('d1', 'R1', '10.0.0.4', 100e6)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(5, lambda: net.remove_demand('d1'))
         sim.run_until(6)
@@ -294,7 +294,7 @@ class TestReviewRegressions:
         ) == pytest.approx(200e6)
 
     def test_numeric_device_names_are_not_edges(self):
-        from ngraph_sim.model.network import Network
+        from netlab_sim.model.network import Network
 
         net = Network()
         a, b = net.add_device('123'), net.add_device('R2')

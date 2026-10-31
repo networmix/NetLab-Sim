@@ -10,13 +10,13 @@ from ipaddress import IPv6Address
 
 import pytest
 
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model import srv6 as sr
-from ngraph_sim.model.contracts import SRV6_LOCAL, STATIC
-from ngraph_sim.model.hashing import flow_label_for
-from ngraph_sim.model.igp import oracle_igp
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.packets import (
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model import srv6 as sr
+from netlab_sim.model.contracts import SRV6_LOCAL, STATIC
+from netlab_sim.model.hashing import flow_label_for
+from netlab_sim.model.igp import oracle_igp
+from netlab_sim.model.network import Network
+from netlab_sim.model.packets import (
     ORIGINATED,
     TRANSIT,
     FlowKey,
@@ -24,9 +24,9 @@ from ngraph_sim.model.packets import (
     encapsulate,
     frame_bytes,
 )
-from ngraph_sim.model.routing import Nexthop
-from ngraph_sim.model.srv6_compress import compress, csid_arg
-from ngraph_sim.model.state import validate_immutable
+from netlab_sim.model.routing import Nexthop
+from netlab_sim.model.srv6_compress import compress, csid_arg
+from netlab_sim.model.state import validate_immutable
 from tests.model.test_forwarding_srv6 import interpreted_trace
 
 

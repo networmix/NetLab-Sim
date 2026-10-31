@@ -6,10 +6,10 @@ import csv
 
 import pytest
 
-import ngraph_sim
-from ngraph_sim.model.addressing import IPV4
-from ngraph_sim.runtime import Simulation
-from ngraph_sim.runtime.timeline import (
+import netlab_sim
+from netlab_sim.model.addressing import IPV4
+from netlab_sim.runtime import Simulation
+from netlab_sim.runtime.timeline import (
     CarrierRawEvent,
     ConfigEvent,
     DemandEvent,
@@ -33,7 +33,7 @@ LINK = 'R1:eth1--R2:eth1'
 def flap(t_fail=10, t_restore=None, **sim_kw):
     net, R = build_diamond(min_links=2)
     net.add_demand('d1', 'R1', '10.0.0.4', 100e6)
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
     sim = Simulation(env, net, **sim_kw)
     link = net.links[LINK]
     sim.at(t_fail, link.fail)
@@ -84,7 +84,7 @@ class TestEvents:
     def test_earlier_raising_hook_cannot_hide_committed_outage(self, batched):
         from contextlib import nullcontext
 
-        from ngraph_sim.model.interfaces import OperState
+        from netlab_sim.model.interfaces import OperState
 
         net, devices = build_diamond()
         link = net.links[LINK]
@@ -95,7 +95,7 @@ class TestEvents:
                 raise error
 
         net.on_delta.append(fail_on_link_change)
-        sim = Simulation(ngraph_sim.Environment(), net)
+        sim = Simulation(netlab_sim.Environment(), net)
 
         def fail():
             with net.batch() if batched else nullcontext():
@@ -162,7 +162,7 @@ class TestEvents:
     def test_carrier_debounce_is_two_events(self):
         net, R = build_diamond(min_links=2)
         R['R1'].interface('eth1').configure(carrier_delay_down=0.5)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(10, net.links[LINK].fail)
         sim.run_until(20)
@@ -225,7 +225,7 @@ class TestSeries:
         tl = Timeline(keep_reports=True)
         net, R = build_diamond(min_links=2)
         net.add_demand('d1', 'R1', '10.0.0.4', 100e6)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.timeline = tl
         sim.at(10, net.links[LINK].fail)
@@ -338,7 +338,7 @@ class TestPlacementCache:
         net, R = build_diamond(min_links=1)
         R['R1'].interface('eth3').configure(carrier_delay_down=5)
         net.add_demand('d1', 'R1', '10.0.0.3', 100e6)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         before = net.state.placement
         key = next(iter(before.classes))
@@ -373,11 +373,11 @@ class TestReviewRegressions:
     """Defects found by the logging review, each pinned here."""
 
     def test_fib_event_when_only_group_weights_change(self):
-        from ngraph_sim.model.addressing import to_int
-        from ngraph_sim.model.routing import Nexthop
+        from netlab_sim.model.addressing import to_int
+        from netlab_sim.model.routing import Nexthop
 
         net, R = build_diamond(min_links=2)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         h13, _ = to_int('10.1.13.1')
         h12, _ = to_int('10.1.12.1')
@@ -411,7 +411,7 @@ class TestReviewRegressions:
 
     def test_distinct_rows_have_distinct_route_events(self):
         net, R = build_diamond(min_links=2)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(
             5,
@@ -436,7 +436,7 @@ class TestReviewRegressions:
 
         net, R = build_diamond(min_links=2)
         net.add_device('R9')  # standalone: nothing references it
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(5, lambda: net.links[LINK].configure(capacity=5e6, delay=0.001))
         sim.at(
@@ -463,7 +463,7 @@ class TestReviewRegressions:
 
     def test_config_events_carry_values(self):
         net, R = build_diamond(min_links=2)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(5, lambda: R['R1'].interface('eth3').configure(mtu=1400, metric=7))
         sim.run_until(6)
@@ -475,7 +475,7 @@ class TestReviewRegressions:
 
     def test_demand_events_carry_endpoints(self):
         net, R = build_diamond(min_links=2)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(5, lambda: net.add_demand('d9', 'R1', '10.0.0.4', 5e6))
         sim.run_until(6)
@@ -500,7 +500,7 @@ class TestReviewRegressions:
         net, R = build_diamond(min_links=2)
         net.add_demand('d1', 'R1', '10.0.0.4', 100e6)
         net.converge()
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         tl = sim.timeline
         assert [r.origin for r in tl.records] == [Origin('init', 'baseline')]
@@ -511,7 +511,7 @@ class TestReviewRegressions:
         net, R = build_diamond(min_links=2)
         net.add_demand('d1', 'R1', '10.0.0.4', 100e6)
         net.add_demand('d2', 'R3', '10.0.0.4', 10e6)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         sim.at(5, lambda: net.remove_demand('d2'))
         sim.at(
@@ -534,7 +534,7 @@ class TestReviewRegressions:
 
     def test_settled_delivery_without_a_round(self):
         net, R = build_diamond(min_links=2)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         seen = []
         sim.bus.subscribe(lambda t, o, d, root: seen.append((t, o)))
@@ -550,7 +550,7 @@ class TestReviewRegressions:
 
     def test_kind_generation_is_the_round(self):
         net, R = build_diamond(min_links=2)
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
 
         # a settled delivery that writes opens a second round at the same time
@@ -568,7 +568,7 @@ class TestReviewRegressions:
 
 def test_event_and_record_budgets_bound_a_long_run():
     net, R = build_diamond(min_links=2)
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
     sim = Simulation(
         env, net, keep_events=200, keep_records=50, keep_roots=1, keep_deltas=0
     )

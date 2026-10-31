@@ -4,8 +4,8 @@ import sys
 
 import pytest
 
-from ngraph_sim.runtime import Draws, FailureSet, Process, Schedule
-from ngraph_sim.study import Study
+from netlab_sim.runtime import Draws, FailureSet, Process, Schedule
+from netlab_sim.study import Study
 from tests.model.test_network import build_diamond
 
 
@@ -114,7 +114,7 @@ def test_enumerate_replay_retention_and_empty_cases(tmp_path):
     assert study.iterations([]).flow_results == []
     assert study.process(Process({}), 1).sim['per_demand']['d']['unavailability'] == 0
     empty = Study(
-        __import__('ngraph_sim.model.network', fromlist=['Network']).Network()
+        __import__('netlab_sim.model.network', fromlist=['Network']).Network()
     )
     assert (
         empty.iterations([FailureSet()]).flow_results[0]['summary']['overall_ratio']
@@ -145,8 +145,8 @@ def test_core_import_and_native_study_without_site_packages():
             sys.executable,
             '-S',
             '-c',
-            'import sys; from ngraph_sim.study import Study; '
-            'from ngraph_sim.runtime import Process; '
+            'import sys; from netlab_sim.study import Study; '
+            'from netlab_sim.runtime import Process; '
             'assert not any(m == "ngraph" or m.startswith("ngraph.") for m in sys.modules)',
         ],
         capture_output=True,
@@ -157,7 +157,7 @@ def test_core_import_and_native_study_without_site_packages():
 
 def test_cli_missing_optional_dependency():
     result = subprocess.run(
-        [sys.executable, '-S', '-m', 'ngraph_sim', 'run', 'unused.yaml'],
+        [sys.executable, '-S', '-m', 'netlab_sim', 'run', 'unused.yaml'],
         capture_output=True,
         text=True,
     )
@@ -166,7 +166,7 @@ def test_cli_missing_optional_dependency():
 
 
 def two_rate_network(rates=(15, 7)):
-    from ngraph_sim.model.network import Network
+    from netlab_sim.model.network import Network
 
     net = Network()
     with net.batch():
@@ -201,9 +201,9 @@ def test_healthy_roundoff_is_not_loss_or_downtime():
 def test_metrics_visit_delivery_tuples_linearly(size):
     from dataclasses import replace
 
-    from ngraph_sim import Environment
-    from ngraph_sim.runtime import Simulation
-    from ngraph_sim.runtime.timeline import PlacementEvent
+    from netlab_sim import Environment
+    from netlab_sim.runtime import Simulation
+    from netlab_sim.runtime.timeline import PlacementEvent
 
     class Visits:
         def __init__(self, pairs):
@@ -276,7 +276,7 @@ def test_same_shortfall_tolerance_for_exports_and_integrals(
 ):
     from dataclasses import replace
 
-    from ngraph_sim.study import _DeliveryIntegrals
+    from netlab_sim.study import _DeliveryIntegrals
 
     study = Study(two_rate_network([rate]))
     study.capacity_unit = capacity_unit
@@ -303,7 +303,7 @@ def test_same_shortfall_tolerance_for_exports_and_integrals(
 
 
 def test_integrals_timestamp_coalescing_missing_demand_and_window_edges():
-    from ngraph_sim.study import _DeliveryIntegrals
+    from netlab_sim.study import _DeliveryIntegrals
 
     integral = _DeliveryIntegrals({'large': 1e12, 'small': 1}, 1)
     integral.sample(0, [('large', 1e12), ('small', 1)])
@@ -329,9 +329,9 @@ def test_retention_keys_have_no_aliases(key):
 def test_iterations_end_at_the_observation_window_despite_recurring_timers():
     """A periodic timer (a protocol hello) never empties the heap; the
     iteration must stop at t0 + horizon, not drain the queue."""
-    from ngraph_sim.model.network import Network
-    from ngraph_sim.runtime.failures import FailureSet
-    from ngraph_sim.study import Study
+    from netlab_sim.model.network import Network
+    from netlab_sim.runtime.failures import FailureSet
+    from netlab_sim.study import Study
 
     net = Network()
     net.add_device('R')

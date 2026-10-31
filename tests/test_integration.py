@@ -1,12 +1,12 @@
 """Integration tests: multi-process interactions and complex scenarios."""
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestProducerConsumerThroughStore:
     def test_multi_process_producer_consumer(self):
-        env = ngraph_sim.Environment()
-        store = ngraph_sim.Store(env)
+        env = netlab_sim.Environment()
+        store = netlab_sim.Store(env)
         produced = []
         consumed = []
 
@@ -38,7 +38,7 @@ class TestProducerConsumerThroughStore:
 
 class TestComplexSynchronization:
     def test_allof_anyof_sync(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def task(env, name, duration):
@@ -68,8 +68,8 @@ class TestComplexSynchronization:
 
 class TestInterruptDuringResourceWait:
     def test_interrupt_while_waiting_for_resource(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=1)
         log = []
 
         def holder(env):
@@ -84,7 +84,7 @@ class TestInterruptDuringResourceWait:
             try:
                 yield req
                 log.append(('waiter_acquired', env.now))
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 log.append(('waiter_interrupted', env.now, e.cause))
                 req.cancel()
 
@@ -104,7 +104,7 @@ class TestInterruptDuringResourceWait:
 
 class TestProcessWaitingForProcess:
     def test_yield_process_gets_return_value(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def child1(env):
@@ -133,9 +133,9 @@ class TestProcessWaitingForProcess:
 
 class TestPipelineProcessing:
     def test_multi_stage_pipeline(self):
-        env = ngraph_sim.Environment()
-        stage1_out = ngraph_sim.Store(env)
-        stage2_out = ngraph_sim.Store(env)
+        env = netlab_sim.Environment()
+        stage1_out = netlab_sim.Store(env)
+        stage2_out = netlab_sim.Store(env)
         final_results = []
 
         def stage1(env):
@@ -164,8 +164,8 @@ class TestPipelineProcessing:
 
 class TestResourcePreemptionChain:
     def test_preemption_chain(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.PreemptiveResource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.PreemptiveResource(env, capacity=1)
         log = []
 
         def user(env, name, priority, duration):
@@ -175,7 +175,7 @@ class TestResourcePreemptionChain:
                 log.append((name, 'start', env.now))
                 yield env.timeout(duration)
                 log.append((name, 'finish', env.now))
-            except ngraph_sim.Interrupt:
+            except netlab_sim.Interrupt:
                 log.append((name, 'preempted', env.now))
             finally:
                 res.release(req)

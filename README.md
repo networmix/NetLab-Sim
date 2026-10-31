@@ -1,16 +1,16 @@
-# NetGraph-Sim
+# NetLab-Sim
 
-[![CI](https://github.com/networmix/NetGraph-Sim/actions/workflows/python-test.yml/badge.svg?branch=main)](https://github.com/networmix/NetGraph-Sim/actions/workflows/python-test.yml)
+[![CI](https://github.com/networmix/NetLab-Sim/actions/workflows/python-test.yml/badge.svg?branch=main)](https://github.com/networmix/NetLab-Sim/actions/workflows/python-test.yml)
 
 Discrete-event simulation for IP networks. Zero dependencies. Python 3.11+,
 including free-threaded builds.
 
 Two layers:
 
-- `ngraph_sim` is a small SimPy-style engine: an environment, events,
+- `netlab_sim` is a small SimPy-style engine: an environment, events,
   processes and resources.
-- `ngraph_sim.model`, `ngraph_sim.runtime`, `ngraph_sim.agents` and
-  `ngraph_sim.study` model routers with a RIB and a FIB, interfaces and links
+- `netlab_sim.model`, `netlab_sim.runtime`, `netlab_sim.agents` and
+  `netlab_sim.study` model routers with a RIB and a FIB, interfaces and links
   that fail and recover, static and shortest-path routing with ECMP, SRv6
   policies, flow placement with per-link utilization, protocol agents that
   learn routes by exchanging messages, and failure studies that measure what
@@ -19,18 +19,18 @@ Two layers:
 ## Install
 
 ```bash
-pip install git+https://github.com/networmix/NetGraph-Sim
+pip install git+https://github.com/networmix/NetLab-Sim
 ```
 
-The distribution is `ngraph-sim`, part of the NetGraph family (`ngraph`), and
-the package imports as `ngraph_sim`. It does not depend on NetGraph.
+NetLab-Sim is distributed as `netlab-sim` and imports as `netlab_sim`.
+It does not depend on NetGraph.
 
 ## Engine
 
 ```python
-import ngraph_sim
+import netlab_sim
 
-env = ngraph_sim.Environment()
+env = netlab_sim.Environment()
 
 def producer(env, store):
     for i in range(5):
@@ -42,7 +42,7 @@ def consumer(env, store):
         item = yield store.get()
         print(f't={env.now}: got {item}')
 
-store = ngraph_sim.Store(env)
+store = netlab_sim.Store(env)
 env.process(producer(env, store))
 env.process(consumer(env, store))
 env.run()
@@ -59,7 +59,7 @@ env.run()
 | `Container` | Bulk quantities |
 
 A process interrupts another with `proc.interrupt(cause)`; the target sees
-`ngraph_sim.Interrupt`. Resources are used with
+`netlab_sim.Interrupt`. Resources are used with
 `with resource.request() as req: yield req`. An `Environment` is
 single-threaded and shares nothing with other environments, so independent
 simulations run in parallel threads on a free-threaded build.
@@ -67,9 +67,9 @@ simulations run in parallel threads on a free-threaded build.
 ## Network layer
 
 ```python
-import ngraph_sim
-from ngraph_sim.model.network import Network
-from ngraph_sim.runtime import Simulation
+import netlab_sim
+from netlab_sim.model.network import Network
+from netlab_sim.runtime import Simulation
 
 net = Network()
 r1, r2 = net.add_device('R1'), net.add_device('R2')
@@ -79,7 +79,7 @@ net.add_p2p(r1, 'eth1', r2, 'eth1', ipv4=('10.1.12.0/31', '10.1.12.1/31'), speed
 r1.add_route('10.0.0.2/32', [('eth1', '10.1.12.1')])
 net.add_demand('d1', 'R1', '10.0.0.2', rate=4e9)
 
-sim = Simulation(ngraph_sim.Environment(), net)   # converges at t=0
+sim = Simulation(netlab_sim.Environment(), net)   # converges at t=0
 sim.at(10, net.links['R1:eth1--R2:eth1'].fail)
 sim.run_until(20)
 print(sim.timeline.snapshot_at(10).placement.dropped_by_reason)   # PMap({'NO_ROUTE': 4000000000.0})
@@ -97,7 +97,7 @@ traffic is still sent to a dead leg and dropped.
   `select(kind=EventClass, device=...)`, `interface_series(device, interface)`,
   `utilization_series(edge)`, `rows()`, `to_csv(path)`. By default it keeps the
   latest 10,000 records and 100,000 events.
-- `net.add_source(oracle_igp)`, from `ngraph_sim.model.igp`, installs
+- `net.add_source(oracle_igp)`, from `netlab_sim.model.igp`, installs
   shortest-path ECMP routes without a protocol.
 
 ## Segment routing
@@ -109,9 +109,9 @@ H.Encaps.Red at the headend. Placement follows the encapsulated packet hop
 by hop, so wire load includes the outer headers.
 
 ```python
-from ngraph_sim.model import srv6 as sr
-from ngraph_sim.model.contracts import STATIC
-from ngraph_sim.model.igp import oracle_igp
+from netlab_sim.model import srv6 as sr
+from netlab_sim.model.contracts import STATIC
+from netlab_sim.model.igp import oracle_igp
 
 net = Network()
 with net.batch():
@@ -134,7 +134,7 @@ print(r1.node.srv6_policies.states[policy.key].status)   # UP
 
 Policy state reports validity, the selected path and programming status;
 `srv6.policy_status(state)` adds the delivery observed in placement. See
-`ngraph_sim/model/srv6.py` for the records and `docs/reference.md` for the
+`netlab_sim/model/srv6.py` for the records and `docs/reference.md` for the
 SONiC CONFIG_DB interchange format.
 
 ## Protocol agents
@@ -147,14 +147,14 @@ round and isolates a rejected output from its peers. Datagrams travel over
 link channels that honour physical failure; sessions are ordered reliable
 streams with timeouts.
 
-`ngraph_sim.agents.reference` is a small link-state protocol built on that
+`netlab_sim.agents.reference` is a small link-state protocol built on that
 contract: hello discovery, flooding, SPF, learned SRv6 SIDs. It converges to
 the same routes as the oracle without reading remote state.
 
 ```python
-from ngraph_sim.agents.reference import ReferenceAgent, ReferenceConfig
-from ngraph_sim.model.addressing import to_network
-from ngraph_sim.model.contracts import ClientId
+from netlab_sim.agents.reference import ReferenceAgent, ReferenceConfig
+from netlab_sim.model.addressing import to_network
+from netlab_sim.model.contracts import ClientId
 
 net = Network()
 r1, r2 = net.add_device('R1'), net.add_device('R2')
@@ -163,7 +163,7 @@ r2.add_loopback('lo0', ipv4=['10.0.0.2/32'])
 net.add_p2p(r1, 'eth1', r2, 'eth1', unnumbered=True)
 for name in ('R1', 'R2'):
     net.add_agent(name, ReferenceAgent(ReferenceConfig(hello_interval=0.5, hold_time=1.5)))
-sim = Simulation(ngraph_sim.Environment(), net)
+sim = Simulation(netlab_sim.Environment(), net)
 sim.run_until(5)
 print([str(to_network(*row.prefix, 4)) for row in r1.rib(4).rows_of(ClientId('ref'))])   # ['10.0.0.2/32']
 ```
@@ -171,8 +171,8 @@ print([str(to_network(*row.prefix, 4)) for row in r1.rib(4).rows_of(ClientId('re
 ## Failure studies
 
 ```python
-from ngraph_sim.runtime import Draws, Process
-from ngraph_sim.study import Study
+from netlab_sim.runtime import Draws, Process
+from netlab_sim.study import Study
 
 net = Network()
 r1, r2, r3 = (net.add_device(f'R{i}') for i in (1, 2, 3))
@@ -202,16 +202,16 @@ and the `SimStudy` workflow step reuse NetGraph scenarios, failure
 policies, seeds and the `results.json` format:
 
 ```sh
-ngraph-sim run scenario.yaml --results results.json
+netlab-sim run scenario.yaml --results results.json
 ```
 
 ## Adapters
 
-- `ngraph_sim.adapters.ngraph`: NetGraph scenarios and networks in, per-link
+- `netlab_sim.adapters.ngraph`: NetGraph scenarios and networks in, per-link
   utilization and NetGraph-shaped results out.
-- `ngraph_sim.adapters.core`: links as NetGraph-Core graph arrays
+- `netlab_sim.adapters.core`: links as NetGraph-Core graph arrays
   (`edge_arrays`, `build_graph`), used to cross-check plain-IP placement.
-- `ngraph_sim.adapters.sonic`: SONiC CONFIG_DB load and dump for a bounded
+- `netlab_sim.adapters.sonic`: SONiC CONFIG_DB load and dump for a bounded
   schema.
 
 Details of these formats and the study options are in

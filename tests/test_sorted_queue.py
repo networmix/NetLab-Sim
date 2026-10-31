@@ -2,7 +2,7 @@
 
 import pytest
 
-from ngraph_sim.resources import SortedQueue
+from netlab_sim.resources import SortedQueue
 
 
 class _KeyItem:

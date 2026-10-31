@@ -19,9 +19,9 @@ import random
 import sys
 import time
 
-from ngraph_sim import Environment
-from ngraph_sim.runtime import Draws, FailureSet, Simulation
-from ngraph_sim.study import Study
+from netlab_sim import Environment
+from netlab_sim.runtime import Draws, FailureSet, Simulation
+from netlab_sim.study import Study
 from tests.model.clos import build_clos
 
 

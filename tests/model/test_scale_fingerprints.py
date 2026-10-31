@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from ngraph_sim.model.flows import HASH
-from ngraph_sim.model.state import PMap
+from netlab_sim.model.flows import HASH
+from netlab_sim.model.state import PMap
 from tests.model.clos import build_clos
 from tests.model.test_network import build_diamond
 

@@ -16,9 +16,9 @@ import sys
 from dataclasses import replace
 from time import perf_counter
 
-from ngraph_sim.model import routing
-from ngraph_sim.model.addressing import IPV4
-from ngraph_sim.model.network import Network
+from netlab_sim.model import routing
+from netlab_sim.model.addressing import IPV4
+from netlab_sim.model.network import Network
 
 
 def main() -> None:

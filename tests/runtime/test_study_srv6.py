@@ -4,10 +4,10 @@ import csv
 import json
 from dataclasses import replace
 
-from ngraph_sim.adapters.ngraph import from_scenario
-from ngraph_sim.model import srv6 as sr
-from ngraph_sim.runtime.failures import FailureSet
-from ngraph_sim.study import Study, StudyResult, _policy_rows
+from netlab_sim.adapters.ngraph import from_scenario
+from netlab_sim.model import srv6 as sr
+from netlab_sim.runtime.failures import FailureSet
+from netlab_sim.study import Study, StudyResult, _policy_rows
 from tests.adapters.test_ngraph_srv6 import bundle_scenario
 
 

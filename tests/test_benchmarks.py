@@ -7,13 +7,13 @@ as a smoke test.
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 pytestmark = pytest.mark.benchmark
 
 
 def _timeout_loop(n):
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
 
     def p(env):
         for _ in range(n):
@@ -25,8 +25,8 @@ def _timeout_loop(n):
 
 
 def _store_pingpong(n):
-    env = ngraph_sim.Environment()
-    st = ngraph_sim.Store(env, capacity=1)
+    env = netlab_sim.Environment()
+    st = netlab_sim.Store(env, capacity=1)
 
     def prod(env):
         for i in range(n):
@@ -43,8 +43,8 @@ def _store_pingpong(n):
 
 
 def _resource_backlog(n):
-    env = ngraph_sim.Environment()
-    res = ngraph_sim.Resource(env, capacity=1)
+    env = netlab_sim.Environment()
+    res = netlab_sim.Resource(env, capacity=1)
 
     def u(env):
         with res.request() as r:
@@ -58,8 +58,8 @@ def _resource_backlog(n):
 
 
 def _anyof_timeout(n):
-    env = ngraph_sim.Environment()
-    st = ngraph_sim.Store(env)
+    env = netlab_sim.Environment()
+    st = netlab_sim.Store(env)
 
     def p(env):
         for _ in range(n):
@@ -74,13 +74,13 @@ def _anyof_timeout(n):
 
 
 def _interrupts(n):
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
 
     def victim(env):
         while True:
             try:
                 yield env.timeout(1000)
-            except ngraph_sim.Interrupt:
+            except netlab_sim.Interrupt:
                 pass
 
     def attacker(env, v):
@@ -128,12 +128,12 @@ def _clos_converge(leaves, spines):
 
 
 def _clos_failure_cascade(leaves, spines):
-    import ngraph_sim
-    from ngraph_sim.runtime import Simulation
+    import netlab_sim
+    from netlab_sim.runtime import Simulation
     from tests.model.clos import build_clos
 
     net = build_clos(leaves, spines)
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
     sim = Simulation(env, net)
     links = list(net.links.values())
     for i, link in enumerate(links[:spines]):
@@ -145,7 +145,7 @@ def _clos_failure_cascade(leaves, spines):
 def _lpm_lookups(n):
     import random
 
-    from ngraph_sim.model.lpm import PrefixTable
+    from netlab_sim.model.lpm import PrefixTable
 
     rng = random.Random(1)
     t = PrefixTable(32)
@@ -185,8 +185,8 @@ def test_study_windows(benchmark, fixture):
         pytest.skip('study qualification requires --benchmark-enable')
     from dataclasses import asdict
 
-    from ngraph_sim.runtime import FailureSet
-    from ngraph_sim.study import Study
+    from netlab_sim.runtime import FailureSet
+    from netlab_sim.study import Study
     from tests.model.clos import build_clos
     from tests.runtime.test_study import diamond
 

@@ -3,7 +3,7 @@ requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ngraph-sim"
+name = "netlab-sim"
 version = "0.1.0"
 description = "Discrete-event simulation for IP networks."
 readme = "README.md"
@@ -32,16 +32,16 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Homepage = "https://github.com/networmix/NetGraph-Sim"
-Documentation = "https://github.com/networmix/NetGraph-Sim/blob/main/docs/reference.md"
-Issues = "https://github.com/networmix/NetGraph-Sim/issues"
+Homepage = "https://github.com/networmix/NetLab-Sim"
+Documentation = "https://github.com/networmix/NetLab-Sim/blob/main/docs/reference.md"
+Issues = "https://github.com/networmix/NetLab-Sim/issues"
 
 [project.scripts]
-ngraph-sim = "ngraph_sim.cli:main"
+netlab-sim = "netlab_sim.cli:main"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8",
+    "pytest>=8,<9.2",
     "pytest-cov",
     "pytest-benchmark",
     "pytest-mock",
@@ -54,14 +54,14 @@ dev = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["ngraph_sim*"]
+include = ["netlab_sim*"]
 exclude = ["tests*"]
 
 [tool.setuptools.package-data]
-"ngraph_sim" = ["py.typed"]
+"netlab_sim" = ["py.typed"]
 
 [tool.pytest.ini_options]
-addopts = "--cov=ngraph_sim --cov-fail-under=85 --cov-report term-missing --benchmark-disable --benchmark-disable-gc --benchmark-min-rounds=5 --benchmark-warmup=on"
+addopts = "--cov=netlab_sim --cov-fail-under=85 --cov-report term-missing --benchmark-disable --benchmark-disable-gc --benchmark-min-rounds=5 --benchmark-warmup=on"
 timeout = 60  # a hang guard: shared CI runners take up to 10x longer than a workstation
 markers = [
     "slow: marks tests as slow",
@@ -69,7 +69,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["ngraph_sim"]
+source = ["netlab_sim"]
 omit = ["*/tests/*", "*/test_*"]
 
 [tool.coverage.report]
@@ -89,7 +89,7 @@ select = ["E4", "E7", "E9", "F", "B", "I"]
 fixable = ["ALL"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["ngraph_sim"]
+known-first-party = ["netlab_sim"]
 
 [tool.ruff.format]
 quote-style = "single"

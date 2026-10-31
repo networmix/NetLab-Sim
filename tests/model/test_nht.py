@@ -4,10 +4,10 @@ from dataclasses import replace
 
 import pytest
 
-import ngraph_sim
-from ngraph_sim.model import nht
-from ngraph_sim.model.addressing import IPV4, IPV6, prefix_to_int
-from ngraph_sim.model.contracts import (
+import netlab_sim
+from netlab_sim.model import nht
+from netlab_sim.model.addressing import IPV4, IPV6, prefix_to_int
+from netlab_sim.model.contracts import (
     IGP,
     LOCAL,
     STATIC,
@@ -15,10 +15,10 @@ from ngraph_sim.model.contracts import (
     ClientProfile,
     NhtKey,
 )
-from ngraph_sim.model.derive import DeviceContext, derive_fib
-from ngraph_sim.model.routing import Nexthop, ResolutionPolicy, Route
-from ngraph_sim.model.state import PMap, StateDelta, validate_immutable
-from ngraph_sim.runtime import Simulation
+from netlab_sim.model.derive import DeviceContext, derive_fib
+from netlab_sim.model.routing import Nexthop, ResolutionPolicy, Route
+from netlab_sim.model.state import PMap, StateDelta, validate_immutable
+from netlab_sim.runtime import Simulation
 from tests.model.test_network import A, build_diamond
 
 
@@ -238,7 +238,7 @@ def test_cost_only_change_keeps_identical_fib_but_new_result(diamond):
 
 def test_delayed_fib_rib_and_installed_are_separate(diamond):
     net, dev = diamond
-    sim = Simulation(ngraph_sim.Environment(), net)
+    sim = Simulation(netlab_sim.Environment(), net)
     dev.configure(fib_delay=2)
     sim.run_until(3)
     client, k = dev.nht_client(), key('192.0.2.1')
@@ -428,8 +428,8 @@ def test_scoped_installed_answer_and_unregistered_client(diamond):
 def test_bounded_prefix_probes_on_large_rib(diamond):
     from collections.abc import Mapping
 
-    from ngraph_sim.model.lpm import FrozenPrefixTable
-    from ngraph_sim.model.routing import RibState, rib_apply
+    from netlab_sim.model.lpm import FrozenPrefixTable
+    from netlab_sim.model.routing import RibState, rib_apply
 
     net, dev = diamond
     base = A('198.18.0.0')
@@ -485,8 +485,8 @@ def benchmark_refresh():
     import statistics
     import time
 
-    from ngraph_sim.model.contracts import NhtTable
-    from ngraph_sim.model.routing import RibState, rib_apply
+    from netlab_sim.model.contracts import NhtTable
+    from netlab_sim.model.routing import RibState, rib_apply
 
     net, routers = build_diamond()
     net.converge()

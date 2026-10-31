@@ -2,13 +2,13 @@
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import flows
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model import srv6 as sr
-from ngraph_sim.model.hashing import flow_label_for
-from ngraph_sim.model.packets import FlowKey, frame_bytes
-from ngraph_sim.runtime import Simulation
+from netlab_sim import Environment
+from netlab_sim.model import flows
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model import srv6 as sr
+from netlab_sim.model.hashing import flow_label_for
+from netlab_sim.model.packets import FlowKey, frame_bytes
+from netlab_sim.runtime import Simulation
 from tests.model.test_usid import (
     diamond,
     form_path,

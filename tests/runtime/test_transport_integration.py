@@ -4,14 +4,14 @@ from dataclasses import dataclass, field, replace
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.addressing import MacAddress
-from ngraph_sim.model.interfaces import OperState
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.state import StateDelta, validate_immutable
-from ngraph_sim.runtime.agents import AgentRuntime
-from ngraph_sim.runtime.simulation import Simulation
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model.addressing import MacAddress
+from netlab_sim.model.interfaces import OperState
+from netlab_sim.model.network import Network
+from netlab_sim.model.state import StateDelta, validate_immutable
+from netlab_sim.runtime.agents import AgentRuntime
+from netlab_sim.runtime.simulation import Simulation
 from tests.model.test_network import A, build_diamond
 
 

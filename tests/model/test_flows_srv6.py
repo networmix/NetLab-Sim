@@ -5,13 +5,13 @@ from fractions import Fraction
 
 import pytest
 
-from ngraph_sim.model import flows
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model.addressing import to_int
-from ngraph_sim.model.igp import oracle_igp
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.packets import SRH, IPv6Packet, PacketTemplate
-from ngraph_sim.model.srv6 import PolicyRef
+from netlab_sim.model import flows
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model.addressing import to_int
+from netlab_sim.model.igp import oracle_igp
+from netlab_sim.model.network import Network
+from netlab_sim.model.packets import SRH, IPv6Packet, PacketTemplate
+from netlab_sim.model.srv6 import PolicyRef
 
 
 def _chain():

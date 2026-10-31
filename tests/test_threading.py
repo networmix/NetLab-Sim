@@ -11,13 +11,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 
 def _simulate(seed, n=2000):
-    env = ngraph_sim.Environment()
-    store = ngraph_sim.Store(env, capacity=3)
-    res = ngraph_sim.PreemptiveResource(env, capacity=1)
+    env = netlab_sim.Environment()
+    store = netlab_sim.Store(env, capacity=3)
+    res = netlab_sim.PreemptiveResource(env, capacity=1)
     log = []
 
     def producer(env):
@@ -33,7 +33,7 @@ def _simulate(seed, n=2000):
                 yield req
                 yield env.timeout(1 + (i * seed) % 3)
                 total += i * (seed + 1)
-            except ngraph_sim.Interrupt:
+            except netlab_sim.Interrupt:
                 log.append(env.now)
             finally:
                 res.release(req)

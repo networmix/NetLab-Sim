@@ -1,5 +1,5 @@
 {
-  "script": "\nimport json\nfrom ngraph_sim.model.prng import Prng\nstate = None\noutput = []\nfor run in range(100):\n    r = Prng.for_agent(17, -9, 'module:β', 2) if state is None else Prng.restore(state)\n    items = list(range(8))\n    r.stream('shuffle').shuffle(items)\n    output.append([r.random(), r.randrange(-10, 12, 3), r.choice('abc'),\n                   r.sample(range(30), 4), r.getrandbits(101),\n                   r.stream('jitter').uniform(1, 5), r.randint(-4, 8), items])\n    state = r.getstate()\nprint(json.dumps([output, state], sort_keys=True))\n",
+  "script": "\nimport json\nfrom netlab_sim.model.prng import Prng\nstate = None\noutput = []\nfor run in range(100):\n    r = Prng.for_agent(17, -9, 'module:β', 2) if state is None else Prng.restore(state)\n    items = list(range(8))\n    r.stream('shuffle').shuffle(items)\n    output.append([r.random(), r.randrange(-10, 12, 3), r.choice('abc'),\n                   r.sample(range(30), 4), r.getrandbits(101),\n                   r.stream('jitter').uniform(1, 5), r.randint(-4, 8), items])\n    state = r.getstate()\nprint(json.dumps([output, state], sort_keys=True))\n",
   "results": [
     {
       "python": "venv/bin/python",

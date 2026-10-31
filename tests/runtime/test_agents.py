@@ -4,12 +4,12 @@ from dataclasses import dataclass, replace
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model import routing
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.routing import Nexthop, Route
-from ngraph_sim.runtime.simulation import Simulation
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model import routing
+from netlab_sim.model.network import Network
+from netlab_sim.model.routing import Nexthop, Route
+from netlab_sim.runtime.simulation import Simulation
 from tests.runtime.inbox import deliver_now, stamped
 
 
@@ -64,8 +64,8 @@ def test_registration_after_binding_indexes_before_commit_dispatch():
 
 
 def test_partial_failure_retry_and_captured_prefix(monkeypatch):
-    from ngraph_sim.runtime.agents import AgentBatchError
-    from ngraph_sim.runtime.timeline import AgentRunEvent
+    from netlab_sim.runtime.agents import AgentBatchError
+    from netlab_sim.runtime.timeline import AgentRunEvent
 
     calls = []
     sent = []
@@ -172,8 +172,8 @@ def test_messages_only_output_is_published_and_transport_rejects_explicitly():
 def test_subscriptions_refine_fields_families_and_ancestors():
     from dataclasses import replace
 
-    from ngraph_sim.model.state import StateDelta
-    from ngraph_sim.runtime.subscriptions import SubscriptionIndex
+    from netlab_sim.model.state import StateDelta
+    from netlab_sim.runtime.subscriptions import SubscriptionIndex
 
     sim = fixture()
     r = sim.network.device('r')
@@ -217,9 +217,9 @@ def test_context_is_detached_read_only_and_immutable_projections():
     import dataclasses
     import random
 
-    from ngraph_sim.model.entities import Device
-    from ngraph_sim.model.network import _View
-    from ngraph_sim.model.state import NetworkState, PMap, validate_immutable
+    from netlab_sim.model.entities import Device
+    from netlab_sim.model.network import _View
+    from netlab_sim.model.state import NetworkState, PMap, validate_immutable
 
     contexts = []
     sim = fixture(
@@ -297,8 +297,8 @@ def test_timers_reset_removal_and_stale_generation(monkeypatch):
 
 
 def test_same_time_loop_and_positive_delay_event_budget():
-    from ngraph_sim.runtime.pipeline import ConvergenceError
-    from ngraph_sim.runtime.simulation import BudgetExceeded
+    from netlab_sim.runtime.pipeline import ConvergenceError
+    from netlab_sim.runtime.simulation import BudgetExceeded
 
     loop = Plugin(paths=(('agents', 'test', 'state'),))
     sim = fixture(loop, max_rounds_per_timestamp=3)
@@ -315,7 +315,7 @@ def test_same_time_loop_and_positive_delay_event_budget():
 
 
 def test_inbox_limit_and_float_deadlines():
-    from ngraph_sim.runtime.agents import AgentBatchError, AgentInboxOverflow
+    from netlab_sim.runtime.agents import AgentBatchError, AgentInboxOverflow
 
     sim = fixture(Plugin(config=c.AgentConfig(run_delay=1, inbox_limit=1)))
     sim.settle()
@@ -407,8 +407,8 @@ def test_successor_round_order_and_one_delta_per_round():
     'bad', ['owner', 'family', 'mutable', 'callback', 'allocation']
 )
 def test_invalid_output_rolls_back_only_its_journal(bad, monkeypatch):
-    from ngraph_sim.model import srv6
-    from ngraph_sim.runtime.agents import AgentBatchError
+    from netlab_sim.model import srv6
+    from netlab_sim.runtime.agents import AgentBatchError
 
     def callback(ctx):
         ctx.rng.random()
@@ -469,8 +469,8 @@ def test_invalid_output_rolls_back_only_its_journal(bad, monkeypatch):
 
 
 def test_nht_sid_results_routes_causes_and_purge():
-    from ngraph_sim.model import srv6
-    from ngraph_sim.model.state import PMap
+    from netlab_sim.model import srv6
+    from netlab_sim.model.state import PMap
 
     contexts = []
 
@@ -594,8 +594,8 @@ def test_device_removal_cancels_registered_agents():
 
 
 def test_policy_ops_and_purge_keep_other_client():
-    from ngraph_sim.model import srv6
-    from ngraph_sim.model.srv6 import ipv6
+    from netlab_sim.model import srv6
+    from netlab_sim.model.srv6 import ipv6
 
     sim = fixture(Plugin())
     sim.settle()
@@ -648,8 +648,8 @@ def test_policy_ops_and_purge_keep_other_client():
 
 
 def test_link_neighbor_and_connection_projections(monkeypatch):
-    from ngraph_sim.model.addressing import MacAddress
-    from ngraph_sim.model.state import PMap
+    from netlab_sim.model.addressing import MacAddress
+    from netlab_sim.model.state import PMap
 
     net = Network()
     a, b = net.add_device('a'), net.add_device('b')
@@ -769,7 +769,7 @@ def test_remove_agent_and_device_in_aborted_batch_restore_registries():
 
 
 def test_retry_at_later_time_captures_same_prefix_with_fresh_due_work():
-    from ngraph_sim.runtime.agents import AgentBatchError
+    from netlab_sim.runtime.agents import AgentBatchError
 
     seen = []
     bad = [True]
@@ -795,7 +795,7 @@ def test_retry_at_later_time_captures_same_prefix_with_fresh_due_work():
 
 @pytest.mark.parametrize('method', ['settle', 'run_derivations', 'run'])
 def test_event_budget_all_drivers(method):
-    from ngraph_sim.runtime.simulation import BudgetExceeded
+    from netlab_sim.runtime.simulation import BudgetExceeded
 
     sim = fixture(Plugin(), event_budget=0)
     with pytest.raises(BudgetExceeded):
@@ -804,7 +804,7 @@ def test_event_budget_all_drivers(method):
 
 
 def test_replacement_invalidates_descendant_subscription_even_equal_values():
-    from ngraph_sim.runtime.subscriptions import SubscriptionIndex
+    from netlab_sim.runtime.subscriptions import SubscriptionIndex
 
     sim = fixture()
     sim.network.device('r').add_ethernet('eth')
@@ -842,7 +842,7 @@ def test_all_inbox_prefixes_are_captured_before_any_callback():
 
 
 def test_immediate_partial_retry_uses_successor_round():
-    from ngraph_sim.runtime.agents import AgentBatchError
+    from netlab_sim.runtime.agents import AgentBatchError
 
     bad = [True]
 

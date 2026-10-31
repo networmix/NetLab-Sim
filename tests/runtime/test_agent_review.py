@@ -6,16 +6,16 @@ from dataclasses import dataclass, replace
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model import nht, srv6
-from ngraph_sim.model.network import published_failure
-from ngraph_sim.model.routing import Nexthop, Route
-from ngraph_sim.model.state import NetworkState, PMap, StateDelta
-from ngraph_sim.runtime import agents
-from ngraph_sim.runtime.events import Stats
-from ngraph_sim.runtime.pipeline import ConvergenceError
-from ngraph_sim.runtime.simulation import Simulation
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model import nht, srv6
+from netlab_sim.model.network import published_failure
+from netlab_sim.model.routing import Nexthop, Route
+from netlab_sim.model.state import NetworkState, PMap, StateDelta
+from netlab_sim.runtime import agents
+from netlab_sim.runtime.events import Stats
+from netlab_sim.runtime.pipeline import ConvergenceError
+from netlab_sim.runtime.simulation import Simulation
 from tests.model.test_network import A, build_diamond
 from tests.model.test_policies import diamond, policy
 from tests.runtime.inbox import deliver_now, stamped
@@ -604,7 +604,7 @@ def _mutable_values():
 def test_validators_are_fail_closed(name):
     """RC3 finding 1: C-level containers, mutable PMap keys and scalar
     subclasses with instance attributes are rejected by both validators."""
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     value = _mutable_values()[name]
     with pytest.raises(TypeError):
@@ -676,8 +676,8 @@ def test_causes_arriving_while_parked_get_a_run_after_retry():
 def test_nht_cost_change_while_parked_is_delivered_after_retry():
     from dataclasses import replace
 
-    from ngraph_sim import Environment
-    from ngraph_sim.runtime import Simulation
+    from netlab_sim import Environment
+    from netlab_sim.runtime import Simulation
     from tests.model.test_network import A, build_diamond
     from tests.model.test_nht import route
 
@@ -782,7 +782,7 @@ def _round4_cases():
 )
 def test_classifier_rejects_storage_carrying_subclasses_and_enum_values(name):
     """RC4: absence of __dict__ is not immutability; enum values are walked."""
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     value = _round4_cases()[name]
     with pytest.raises(TypeError):
@@ -804,8 +804,8 @@ def test_classifier_accepts_audited_leaves_records_and_named_tuples():
     from fractions import Fraction
     from typing import NamedTuple
 
-    from ngraph_sim.model.addressing import MacAddress
-    from ngraph_sim.model.state import FloatArray, validate_admitted, validate_immutable
+    from netlab_sim.model.addressing import MacAddress
+    from netlab_sim.model.state import FloatArray, validate_admitted, validate_immutable
 
     class Pair(NamedTuple):
         a: int
@@ -830,8 +830,8 @@ def test_classifier_accepts_audited_leaves_records_and_named_tuples():
 
 def test_prefix_table_owns_exact_keys_and_float_array_exact_bytes():
     """RC4: keys and array bytes never alias caller subclasses."""
-    from ngraph_sim.model.lpm import FrozenPrefixTable, PrefixTable
-    from ngraph_sim.model.state import FloatArray, validate_immutable
+    from netlab_sim.model.lpm import FrozenPrefixTable, PrefixTable
+    from netlab_sim.model.state import FloatArray, validate_immutable
 
     class Net(int):
         pass
@@ -953,7 +953,7 @@ def _round5_cases():
 def test_classifier_reads_real_storage_and_components(name):
     """RC5: enum instance attributes, Fraction components and descriptor-level
     slot storage are checked; a __slots__ declaration alone is not trusted."""
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     value = _round5_cases()[name]
     if callable(value):
@@ -973,8 +973,8 @@ def test_classifier_reads_real_storage_and_components(name):
 
 
 def test_prefix_table_bits_and_float_array_bytes_are_owned():
-    from ngraph_sim.model.lpm import PrefixTable
-    from ngraph_sim.model.state import FloatArray, validate_immutable
+    from netlab_sim.model.lpm import PrefixTable
+    from netlab_sim.model.state import FloatArray, validate_immutable
 
     class Number(int):
         pass
@@ -999,8 +999,8 @@ def test_prefix_table_bits_and_float_array_bytes_are_owned():
 def test_plain_enums_remain_admitted():
     from enum import Enum, IntEnum
 
-    from ngraph_sim.model.interfaces import OperState
-    from ngraph_sim.model.state import validate_immutable
+    from netlab_sim.model.interfaces import OperState
+    from netlab_sim.model.state import validate_immutable
 
     class Kind(IntEnum):
         ONE = 1
@@ -1051,7 +1051,7 @@ def _round6_cases():
 def test_classifier_composes_fraction_and_enum_rules(name):
     """RC6: component checks apply to every Fraction, enum values go through
     the classifier, and enum slot storage counts as instance attributes."""
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     value = _round6_cases()[name]
     if callable(value):
@@ -1073,8 +1073,8 @@ def test_classifier_composes_fraction_and_enum_rules(name):
 
 
 def test_prefix_table_metadata_is_exact_even_for_empty_shards():
-    from ngraph_sim.model.lpm import FrozenPrefixTable
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.lpm import FrozenPrefixTable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     class Length(int):
         pass
@@ -1137,7 +1137,7 @@ def _round7_cases():
 )
 def test_records_admit_only_field_storage(name):
     """RC7: a frozen record's instance storage must be its walked fields."""
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     value = _round7_cases()[name]
     with pytest.raises(TypeError):
@@ -1159,7 +1159,7 @@ def test_records_admit_only_field_storage(name):
 def test_legitimate_record_inheritance_still_validates():
     from typing import Generic, TypeVar
 
-    from ngraph_sim.model.state import record, validate_admitted, validate_immutable
+    from netlab_sim.model.state import record, validate_admitted, validate_immutable
 
     T = TypeVar('T')
 
@@ -1219,7 +1219,7 @@ def _round8_cases():
 @pytest.mark.parametrize('name', ['initvar-shadow', 'classvar-shadow'])
 def test_inherited_slots_must_be_effective_fields(name):
     """RC8: a slot left behind by a redeclared field is unvisited storage."""
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     value = _round8_cases()[name]
     assert dataclasses.fields(value) == () and value.pending == [1]
@@ -1240,7 +1240,7 @@ def test_inherited_slots_must_be_effective_fields(name):
 
 
 def test_slotted_record_inheritance_with_kept_fields_validates():
-    from ngraph_sim.model.state import validate_admitted, validate_immutable
+    from netlab_sim.model.state import validate_admitted, validate_immutable
 
     @dataclass(frozen=True, slots=True)
     class Base:

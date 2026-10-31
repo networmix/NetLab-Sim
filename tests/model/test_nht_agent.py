@@ -3,12 +3,12 @@
 from dataclasses import dataclass, replace
 from ipaddress import IPv6Address
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model import srv6 as sr
-from ngraph_sim.model.routing import Nexthop, Route
-from ngraph_sim.model.state import validate_immutable
-from ngraph_sim.runtime import Simulation
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model import srv6 as sr
+from netlab_sim.model.routing import Nexthop, Route
+from netlab_sim.model.state import validate_immutable
+from netlab_sim.runtime import Simulation
 from tests.model.test_network import A, build_diamond
 from tests.model.test_nht import route
 from tests.model.test_nht_context import scoped_pair

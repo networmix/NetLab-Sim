@@ -8,14 +8,21 @@ disagrees with them, the report is out of date.
 
 The project was called NetSim, with the package `netsim`, until 2026-10-02,
 when it became NetGraph-Sim (`ngraph-sim`, imported as `ngraph_sim`). The
-reports keep the old names. Benchmark scripts now import `ngraph_sim`, so a
-comparison against a revision from before the rename needs the script from
-that revision.
+reports keep the old names. On 2026-10-31 the project became NetLab-Sim
+(`netlab-sim`, imported as `netlab_sim`). Benchmark scripts now import
+`netlab_sim`, so a comparison against a revision from before the rename
+needs the script from that revision.
 
 Gate A is the plain-IP simulator, Gate B adds SRv6 and Gate C adds protocol
 agents. The T slices are scale fixes made after Gate A. S0 is scale hygiene
 before the Open/R and BGP work. Benchmark scripts and raw results are in
 [`benchmarks/`](../../benchmarks).
+
+## Project identity, 2026-10-31
+
+| Report | Topic |
+| --- | --- |
+| [Rename](rename-project-identity.md) | NetLab-Sim package, distribution and command names |
 
 ## Scale fixes after Gate A, 2026-09-20
 

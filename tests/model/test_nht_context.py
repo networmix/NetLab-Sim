@@ -5,17 +5,17 @@ from dataclasses import fields, is_dataclass, replace
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import nht
-from ngraph_sim.model import srv6 as sr
-from ngraph_sim.model.addressing import MacAddress
-from ngraph_sim.model.contracts import STATIC, NhtKey
-from ngraph_sim.model.derive import DeviceContext
-from ngraph_sim.model.entities import Device
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.routing import Nexthop, ResolutionPolicy
-from ngraph_sim.model.state import DeviceState, NetworkState, validate_immutable
-from ngraph_sim.runtime import Simulation
+from netlab_sim import Environment
+from netlab_sim.model import nht
+from netlab_sim.model import srv6 as sr
+from netlab_sim.model.addressing import MacAddress
+from netlab_sim.model.contracts import STATIC, NhtKey
+from netlab_sim.model.derive import DeviceContext
+from netlab_sim.model.entities import Device
+from netlab_sim.model.network import Network
+from netlab_sim.model.routing import Nexthop, ResolutionPolicy
+from netlab_sim.model.state import DeviceState, NetworkState, validate_immutable
+from netlab_sim.runtime import Simulation
 from tests.model.test_network import A, build_diamond
 from tests.model.test_policies import diamond, policy
 

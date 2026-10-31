@@ -2,9 +2,9 @@
 
 import pytest
 
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.addressing import MacAddress
-from ngraph_sim.model.network import Network
+from netlab_sim.model import contracts as c
+from netlab_sim.model.addressing import MacAddress
+from netlab_sim.model.network import Network
 from tests.runtime.inbox import deliver_now
 from tests.runtime.test_transport import bind, deliveries, register
 
@@ -41,8 +41,8 @@ def test_link_local_control_datagram_on_numbered_interfaces(numbered_v6):
 @pytest.mark.parametrize('numbered', [False, True])
 @pytest.mark.parametrize('families', [(4,), (6,), (4, 6)])
 def test_cold_start_oracle_twin(numbered, families):
-    from ngraph_sim.agents.reference import Hello, LsUpdate
-    from ngraph_sim.model.state import validate_immutable
+    from netlab_sim.agents.reference import Hello, LsUpdate
+    from netlab_sim.model.state import validate_immutable
     from tests.agents.fixtures import assert_equivalent, state, twins
 
     sim, oracle = twins(numbered=numbered, families=families)
@@ -70,8 +70,8 @@ def test_cold_start_oracle_twin(numbered, families):
 
 
 def test_rfc8950_ipv4_only_link_resolves_scoped_eui64():
-    from ngraph_sim.model import forwarding as fw
-    from ngraph_sim.model.routing import Nexthop
+    from netlab_sim.model import forwarding as fw
+    from netlab_sim.model.routing import Nexthop
 
     net = Network()
     a, b = net.add_device('a'), net.add_device('b')
@@ -115,7 +115,7 @@ def test_heartbeat_and_sequence_refresh_do_not_run_spf_fib_or_placement():
 
 
 def test_local_down_at_ten_is_immediate_and_floods_oracle_result():
-    from ngraph_sim.agents import ReferenceConfig
+    from netlab_sim.agents import ReferenceConfig
     from tests.agents.fixtures import assert_equivalent, state, twins
 
     sim, oracle = twins(config=ReferenceConfig(run_delay=0))
@@ -133,7 +133,7 @@ def test_local_down_at_ten_is_immediate_and_floods_oracle_result():
 
 
 def test_muted_hello_channel_uses_hold_not_wire_or_session_rejection():
-    from ngraph_sim.agents import ReferenceConfig
+    from netlab_sim.agents import ReferenceConfig
     from tests.agents.fixtures import state, twins
 
     sim, _ = twins(config=ReferenceConfig(run_delay=0))
@@ -152,7 +152,7 @@ def test_muted_hello_channel_uses_hold_not_wire_or_session_rejection():
 
 
 def test_partition_expiry_and_heal_replace_finite_lsdb():
-    from ngraph_sim.agents import ReferenceConfig
+    from netlab_sim.agents import ReferenceConfig
     from tests.agents.fixtures import assert_equivalent, state, twins
 
     config = ReferenceConfig(max_age=6, refresh_interval=2)
@@ -196,7 +196,7 @@ def test_restart_replaces_stale_lsa_and_resynchronizes():
 
 
 def inject(sim, name, lsas):
-    from ngraph_sim.agents.reference import LsUpdate
+    from netlab_sim.agents.reference import LsUpdate
     from tests.agents.fixtures import state
 
     connection = next(iter(state(sim, name).sessions.values()))
@@ -319,7 +319,7 @@ def test_explicit_empty_body_purge_withdraws_on_every_router():
 
 
 def test_route_publication_initial_sync_small_diff_and_large_sync():
-    from ngraph_sim.agents import ReferenceConfig
+    from netlab_sim.agents import ReferenceConfig
     from tests.agents.fixtures import twins
 
     sim, _ = twins(numbered=False, config=ReferenceConfig(delta_limit=4))
@@ -358,7 +358,7 @@ def test_route_publication_initial_sync_small_diff_and_large_sync():
 
 
 def test_agent_rounds_publish_one_delta_with_all_successful_receipts():
-    from ngraph_sim.runtime.timeline import AgentRunEvent
+    from netlab_sim.runtime.timeline import AgentRunEvent
     from tests.agents.fixtures import twins
 
     sim, _ = twins()
@@ -409,8 +409,8 @@ def test_delayed_fib_exposes_pending_routes_and_transient_placement_drop():
 
 
 def test_learned_sr_claims_and_literal_policy_follow_sid_advertisements():
-    from ngraph_sim.model import srv6 as sr
-    from ngraph_sim.model.addressing import to_int
+    from netlab_sim.model import srv6 as sr
+    from netlab_sim.model.addressing import to_int
     from tests.agents.fixtures import state, twins
 
     sim, oracle = twins(sr=True)
@@ -471,8 +471,8 @@ def test_learned_sr_claims_and_literal_policy_follow_sid_advertisements():
 
 
 def test_fresh_runtime_resynchronizes_reference_fork():
-    from ngraph_sim import Environment
-    from ngraph_sim.runtime import Simulation
+    from netlab_sim import Environment
+    from netlab_sim.runtime import Simulation
     from tests.agents.fixtures import assert_equivalent, twins
 
     sim, oracle = twins()
@@ -513,14 +513,14 @@ def test_64_router_ring_qualification():
     ],
 )
 def test_invalid_configuration(options):
-    from ngraph_sim.agents import ReferenceConfig
+    from netlab_sim.agents import ReferenceConfig
 
     with pytest.raises(ValueError):
         ReferenceConfig(**options)
 
 
 def test_invalid_link_control_family_and_lsa_metadata():
-    from ngraph_sim.agents.reference import Lsa
+    from netlab_sim.agents.reference import Lsa
 
     with pytest.raises(ValueError, match='af=6'):
         c.Datagram('e0', 'hello', af=4, link_local=True)
@@ -533,8 +533,8 @@ def test_invalid_link_control_family_and_lsa_metadata():
 def test_out_of_order_refresh_does_not_extend_absolute_expiry():
     from dataclasses import replace
 
-    from ngraph_sim.agents import ReferenceConfig
-    from ngraph_sim.agents.reference import Prefix
+    from netlab_sim.agents import ReferenceConfig
+    from netlab_sim.agents.reference import Prefix
     from tests.agents.fixtures import state, twins
 
     sim, _ = twins(config=ReferenceConfig(max_age=6, refresh_interval=2))
@@ -560,7 +560,7 @@ def test_out_of_order_refresh_does_not_extend_absolute_expiry():
 def test_three_way_discovery_requires_our_id_in_peer_hello():
     from dataclasses import replace
 
-    from ngraph_sim.agents.reference import Hello
+    from netlab_sim.agents.reference import Hello
     from tests.agents.fixtures import state, twins
 
     sim, _ = twins(size=2, edges=((0, 1),), numbered=False)

@@ -1,14 +1,14 @@
 import pytest
 
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model.addressing import IPV4, to_int
-from ngraph_sim.model.contracts import CONNECTED, LOCAL, STATIC
-from ngraph_sim.model.entities import StaleHandleError
-from ngraph_sim.model.interfaces import OperState, StateReason
-from ngraph_sim.model.links import LINK_FAILED
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.routing import Nexthop
-from ngraph_sim.model.state import PMap
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model.addressing import IPV4, to_int
+from netlab_sim.model.contracts import CONNECTED, LOCAL, STATIC
+from netlab_sim.model.entities import StaleHandleError
+from netlab_sim.model.interfaces import OperState, StateReason
+from netlab_sim.model.links import LINK_FAILED
+from netlab_sim.model.network import Network
+from netlab_sim.model.routing import Nexthop
+from netlab_sim.model.state import PMap
 
 
 def A(text):
@@ -291,7 +291,7 @@ class TestUpdateSemantics:
         assert isinstance(net.state.devices, PMap)
 
     def test_parse_nexthops(self):
-        from ngraph_sim.model.entities import parse_nexthop
+        from netlab_sim.model.entities import parse_nexthop
 
         assert parse_nexthop('10.0.0.2').is_recursive
         assert parse_nexthop('eth3') == Nexthop.via('eth3')

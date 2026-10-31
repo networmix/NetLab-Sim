@@ -2,12 +2,12 @@
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestRunUntilTime:
     def test_run_until_time(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             while True:
@@ -18,7 +18,7 @@ class TestRunUntilTime:
         assert env.now == 10
 
     def test_run_until_time_no_overshoot(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def proc(env):
@@ -33,7 +33,7 @@ class TestRunUntilTime:
 
 class TestRunUntilEvent:
     def test_run_until_event(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             yield env.timeout(5)
@@ -45,7 +45,7 @@ class TestRunUntilEvent:
         assert env.now == 5
 
     def test_run_until_already_processed_event(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         evt = env.event()
         evt.succeed(value='already')
         env.step()  # process it
@@ -55,7 +55,7 @@ class TestRunUntilEvent:
 
 class TestRunUntilEmpty:
     def test_run_until_no_events(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             yield env.timeout(5)
@@ -67,44 +67,44 @@ class TestRunUntilEmpty:
 
 class TestPeek:
     def test_peek_returns_next_event_time(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         env.timeout(5)
         # Timeout is scheduled at now + delay = 0 + 5 = 5
         assert env.peek() == 5
 
     def test_peek_infinity_when_empty(self):
-        env = ngraph_sim.Environment()
-        assert env.peek() == ngraph_sim.Infinity
+        env = netlab_sim.Environment()
+        assert env.peek() == netlab_sim.Infinity
 
 
 class TestStep:
     def test_step_advances_time(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         env.timeout(3)
         env.step()
         assert env.now == 3
 
     def test_empty_schedule_raises(self):
-        env = ngraph_sim.Environment()
-        with pytest.raises(ngraph_sim.EmptySchedule):
+        env = netlab_sim.Environment()
+        with pytest.raises(netlab_sim.EmptySchedule):
             env.step()
 
 
 class TestRunUntilInvalid:
     def test_until_le_now_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError, match='must be >'):
             env.run(until=0)
 
     def test_until_less_than_now_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         env.timeout(5)
         env.step()  # now == 5
         with pytest.raises(ValueError, match='must be >'):
             env.run(until=3)
 
     def test_until_equal_to_now_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         env.timeout(5)
         env.step()
         with pytest.raises(ValueError, match='must be >'):
@@ -113,7 +113,7 @@ class TestRunUntilInvalid:
 
 class TestActiveProcess:
     def test_active_process_during_execution(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         active_procs = []
 
         def proc(env):
@@ -127,13 +127,13 @@ class TestActiveProcess:
         assert active_procs[1] is p
 
     def test_active_process_none_outside(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         assert env.active_process is None
 
 
 class TestInitialTime:
     def test_initial_time(self):
-        env = ngraph_sim.Environment(initial_time=100)
+        env = netlab_sim.Environment(initial_time=100)
         assert env.now == 100
 
         def proc(env):
@@ -148,7 +148,7 @@ class TestRunUntilUntriggeredEventRaises:
     def test_run_until_untriggered_event_raises_runtime_error(self):
         """Create a pending event (never triggered). Run env.run(until=event).
         Assert RuntimeError with 'No scheduled events left'."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         pending = env.event()  # never triggered
         with pytest.raises(RuntimeError, match='No scheduled events left'):
             env.run(until=pending)
@@ -158,7 +158,7 @@ class TestRunUntilFailedEventRaises:
     def test_run_until_failed_event_raises(self):
         """Create a process that raises ValueError. Run env.run(until=process).
         Assert ValueError propagates."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def bad_proc(env):
             yield env.timeout(1)
@@ -173,7 +173,7 @@ class TestRunUntilRunsAllCallbacks:
     def test_stop_does_not_leave_waiters_stranded(self):
         """Stopping at the *until* event must not skip its other callbacks:
         a process that started waiting on it during run() is still resumed."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def worker(env):
@@ -197,7 +197,7 @@ class TestRunUntilRunsAllCallbacks:
     def test_stale_until_event_does_not_stop_a_later_run(self):
         """An *until* event left over from an aborted run() is an ordinary
         event for later runs; only the current call's *until* stops it."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def crasher(env):
             yield env.timeout(1)
@@ -217,7 +217,7 @@ class TestRunUntilRunsAllCallbacks:
 
 class TestRunUntilProcessedFailedEventRaises:
     def test_run_until_processed_failed_event_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         evt = env.event()
         evt.fail(ValueError('boom'))
         evt.defused = True
@@ -227,7 +227,7 @@ class TestRunUntilProcessedFailedEventRaises:
 
     def test_run_until_defused_failed_event_raises(self):
         """Even if a process handles the failure, run(until=evt) reports it."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         evt = env.event()
 
         def handler(env):
@@ -244,20 +244,20 @@ class TestRunUntilProcessedFailedEventRaises:
 
 class TestRunUntilValidation:
     def test_until_nan_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError, match='must be >'):
             env.run(until=float('nan'))
 
     def test_until_event_of_other_env_raises(self):
-        env1 = ngraph_sim.Environment()
-        env2 = ngraph_sim.Environment()
+        env1 = netlab_sim.Environment()
+        env2 = netlab_sim.Environment()
         with pytest.raises(ValueError, match='different environment'):
             env1.run(until=env2.event())
 
 
 class TestStepReturnsEvent:
     def test_step_returns_processed_event(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         t = env.timeout(3, value='x')
         assert env.step() is t
         assert t.processed
@@ -269,8 +269,8 @@ class TestRunMatchesStep:
 
     @staticmethod
     def _scenario(env, trace):
-        store = ngraph_sim.Store(env, capacity=1)
-        res = ngraph_sim.Resource(env, capacity=1)
+        store = netlab_sim.Store(env, capacity=1)
+        res = netlab_sim.Resource(env, capacity=1)
 
         def producer(env):
             for i in range(5):
@@ -289,7 +289,7 @@ class TestRunMatchesStep:
         def victim(env):
             try:
                 yield env.timeout(100)
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 trace.append(('interrupted', e.cause, env.now))
 
         def attacker(env, v):
@@ -302,15 +302,15 @@ class TestRunMatchesStep:
         env.process(attacker(env, v))
 
     def test_run_and_step_loop_produce_identical_traces(self):
-        env_run = ngraph_sim.Environment()
+        env_run = netlab_sim.Environment()
         trace_run = []
         self._scenario(env_run, trace_run)
         env_run.run()
 
-        env_step = ngraph_sim.Environment()
+        env_step = netlab_sim.Environment()
         trace_step = []
         self._scenario(env_step, trace_step)
-        with pytest.raises(ngraph_sim.EmptySchedule):
+        with pytest.raises(netlab_sim.EmptySchedule):
             while True:
                 env_step.step()
 

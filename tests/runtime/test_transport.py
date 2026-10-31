@@ -2,12 +2,12 @@
 
 import pytest
 
-import ngraph_sim
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.addressing import MacAddress
-from ngraph_sim.model.interfaces import OperState
-from ngraph_sim.model.network import Network
-from ngraph_sim.runtime import Simulation
+import netlab_sim
+from netlab_sim.model import contracts as c
+from netlab_sim.model.addressing import MacAddress
+from netlab_sim.model.interfaces import OperState
+from netlab_sim.model.network import Network
+from netlab_sim.runtime import Simulation
 from tests.model.test_agent_contract import Minimal
 from tests.model.test_network import build_diamond
 
@@ -47,7 +47,7 @@ def register(net, device, name='ref', **kwargs):
 
 
 def bind(net):
-    sim = Simulation(ngraph_sim.Environment(), net)
+    sim = Simulation(netlab_sim.Environment(), net)
     sim.agents = Fake(sim)
     return sim
 

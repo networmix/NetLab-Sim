@@ -4,15 +4,15 @@ from dataclasses import replace
 
 import pytest
 
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model.derive import DeviceContext
-from ngraph_sim.model.routing import (
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model.derive import DeviceContext
+from netlab_sim.model.routing import (
     SRV6_LOCAL_NH,
     Nexthop,
     ResolutionPolicy,
     resolve_fib,
 )
-from ngraph_sim.model.srv6 import (
+from netlab_sim.model.srv6 import (
     END,
     END_DT46,
     END_X,
@@ -21,7 +21,7 @@ from ngraph_sim.model.srv6 import (
     LocalSid,
     Srv6Encap,
 )
-from ngraph_sim.model.state import validate_immutable
+from netlab_sim.model.state import validate_immutable
 from tests.model.test_forwarding_srv6 import (
     address,
     inner_packet,
@@ -222,7 +222,7 @@ def test_deterministic_order_for_different_encaps_on_same_adjacency():
 @pytest.mark.parametrize('forwarding_v4', [False, True])
 @pytest.mark.parametrize('behavior', [END_X, END_DT46])
 def test_headend_decap_compilation_respects_inner_family(af, forwarding_v4, behavior):
-    from ngraph_sim.model.srv6 import UNCOMPRESSED, USD
+    from netlab_sim.model.srv6 import UNCOMPRESSED, USD
 
     net, routers, _ = path_network()
     r1 = routers['R1']

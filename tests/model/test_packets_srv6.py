@@ -4,10 +4,10 @@ from dataclasses import replace
 
 import pytest
 
-from ngraph_sim.model import packets as pk
-from ngraph_sim.model.hashing import LoadBalancer, flow_label_for
-from ngraph_sim.model.srv6 import H_ENCAPS, H_ENCAPS_RED
-from ngraph_sim.model.state import validate_immutable
+from netlab_sim.model import packets as pk
+from netlab_sim.model.hashing import LoadBalancer, flow_label_for
+from netlab_sim.model.srv6 import H_ENCAPS, H_ENCAPS_RED
+from netlab_sim.model.state import validate_immutable
 
 
 def inner_packet(af=4, ttl=64):
