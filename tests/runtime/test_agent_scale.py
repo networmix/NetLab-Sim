@@ -11,17 +11,17 @@ from time import perf_counter
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.state import (
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model.network import Network
+from netlab_sim.model.state import (
     Allocators,
     DeviceState,
     NetworkState,
     PMap,
     StateDelta,
 )
-from ngraph_sim.runtime.simulation import Simulation
+from netlab_sim.runtime.simulation import Simulation
 from tests.runtime.test_agents import Plugin
 
 

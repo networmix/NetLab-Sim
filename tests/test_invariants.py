@@ -14,27 +14,27 @@ from collections import deque
 
 import pytest
 
-import ngraph_sim
-from ngraph_sim import core, resources
+import netlab_sim
+from netlab_sim import core, resources
 
 
 def _event_subclasses():
     found = []
     for module in (core, resources):
         for _, cls in inspect.getmembers(module, inspect.isclass):
-            if issubclass(cls, ngraph_sim.Event) and cls.__module__ == module.__name__:
+            if issubclass(cls, netlab_sim.Event) and cls.__module__ == module.__name__:
                 found.append(cls)
     return found
 
 
 def _build_event_instances():
     """One instance of every Event type reachable through the public API."""
-    env = ngraph_sim.Environment()
-    store = ngraph_sim.Store(env)
-    fstore = ngraph_sim.FilterStore(env)
-    res = ngraph_sim.Resource(env)
-    pres = ngraph_sim.PriorityResource(env)
-    cont = ngraph_sim.Container(env, capacity=10, init=5)
+    env = netlab_sim.Environment()
+    store = netlab_sim.Store(env)
+    fstore = netlab_sim.FilterStore(env)
+    res = netlab_sim.Resource(env)
+    pres = netlab_sim.PriorityResource(env)
+    cont = netlab_sim.Container(env, capacity=10, init=5)
 
     def gen(env):
         yield env.timeout(1)
@@ -72,9 +72,9 @@ def _build_event_instances():
         interruption,
         resources.Put(stub),
         resources.Get(stub),
-        ngraph_sim.AllOf(env, [env.event()]),
-        ngraph_sim.AnyOf(env, [env.event()]),
-        ngraph_sim.Condition(env, ngraph_sim.Condition.all_events, []),
+        netlab_sim.AllOf(env, [env.event()]),
+        netlab_sim.AnyOf(env, [env.event()]),
+        netlab_sim.Condition(env, netlab_sim.Condition.all_events, []),
         store.put(1),
         store.get(),
         fstore.get(lambda x: True),
@@ -101,7 +101,7 @@ class TestEventSlots:
         """Constructors inline ``Event.__init__`` for speed; make sure none of
         them forgets a slot (an unset slot raises AttributeError on read)."""
         for evt in _build_event_instances():
-            for slot in ngraph_sim.Event.__slots__:
+            for slot in netlab_sim.Event.__slots__:
                 assert hasattr(evt, slot), f'{type(evt).__name__} missing {slot}'
 
     def test_all_public_event_types_are_covered(self):
@@ -115,17 +115,17 @@ class TestUserExtensibleObjects:
         'factory',
         [
             lambda env: env,
-            lambda env: ngraph_sim.Store(env),
-            lambda env: ngraph_sim.FilterStore(env),
-            lambda env: ngraph_sim.PriorityStore(env),
-            lambda env: ngraph_sim.Resource(env),
-            lambda env: ngraph_sim.PriorityResource(env),
-            lambda env: ngraph_sim.PreemptiveResource(env),
-            lambda env: ngraph_sim.Container(env),
+            lambda env: netlab_sim.Store(env),
+            lambda env: netlab_sim.FilterStore(env),
+            lambda env: netlab_sim.PriorityStore(env),
+            lambda env: netlab_sim.Resource(env),
+            lambda env: netlab_sim.PriorityResource(env),
+            lambda env: netlab_sim.PreemptiveResource(env),
+            lambda env: netlab_sim.Container(env),
         ],
     )
     def test_accepts_arbitrary_attributes(self, factory):
-        obj = factory(ngraph_sim.Environment())
+        obj = factory(netlab_sim.Environment())
         obj.tag = 'x'
         assert obj.tag == 'x'
 
@@ -134,30 +134,30 @@ class TestResourceQueues:
     @pytest.mark.parametrize(
         'factory',
         [
-            lambda env: ngraph_sim.Store(env),
-            lambda env: ngraph_sim.FilterStore(env),
-            lambda env: ngraph_sim.PriorityStore(env),
-            lambda env: ngraph_sim.Resource(env),
-            lambda env: ngraph_sim.Container(env),
+            lambda env: netlab_sim.Store(env),
+            lambda env: netlab_sim.FilterStore(env),
+            lambda env: netlab_sim.PriorityStore(env),
+            lambda env: netlab_sim.Resource(env),
+            lambda env: netlab_sim.Container(env),
         ],
     )
     def test_fifo_queues_are_deques(self, factory):
-        r = factory(ngraph_sim.Environment())
+        r = factory(netlab_sim.Environment())
         assert isinstance(r.put_queue, deque)
         assert isinstance(r.get_queue, deque)
 
     def test_priority_put_queue_is_sorted(self):
-        r = ngraph_sim.PriorityResource(ngraph_sim.Environment())
+        r = netlab_sim.PriorityResource(netlab_sim.Environment())
         assert isinstance(r.put_queue, resources.SortedQueue)
         assert isinstance(r.get_queue, deque)
 
     def test_resource_queue_alias(self):
-        r = ngraph_sim.Resource(ngraph_sim.Environment())
+        r = netlab_sim.Resource(netlab_sim.Environment())
         assert r.queue is r.put_queue
 
     def test_large_backlog_drains_in_fifo_order(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=1)
         order = []
 
         def user(env, i):
@@ -222,7 +222,7 @@ class TestTriggerLoopProtocol:
             return True
 
     def test_non_head_put_is_removed_from_the_middle_of_the_queue(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         store = self._MatchStore(env)
         got = []
         done = []
@@ -248,7 +248,7 @@ class TestTriggerLoopProtocol:
     def test_queue_mutation_inside_do_put_is_detected(self):
         """A ``_do_put`` that reorders the queue under the loop's feet must be
         caught by the invariant guard rather than corrupt the queue."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         class Broken(resources.BaseResource):
             def _do_put(self, event):

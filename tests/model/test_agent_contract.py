@@ -4,8 +4,8 @@ import dataclasses
 
 import pytest
 
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.contracts import (
+from netlab_sim.model import contracts as c
+from netlab_sim.model.contracts import (
     AgentConfig,
     AgentNode,
     AgentOutput,
@@ -18,8 +18,8 @@ from ngraph_sim.model.contracts import (
     SessionOp,
     TimerOp,
 )
-from ngraph_sim.model.routing import Nexthop, Route
-from ngraph_sim.model.state import StateDelta, validate_immutable
+from netlab_sim.model.routing import Nexthop, Route
+from netlab_sim.model.state import StateDelta, validate_immutable
 from tests.model.test_network import build_diamond
 
 REF = ClientId('ref', 0)
@@ -114,7 +114,7 @@ class TestOperationRecords:
         calls = []
 
         class Opaque:
-            __ngraph_sim_immutable__ = True
+            __netlab_sim_immutable__ = True
 
             def __eq__(self, other):
                 calls.append(1)
@@ -330,12 +330,12 @@ class TestRegistration:
 
 class TestRuntimeStubs:
     def test_simulation_binds_runtimes(self):
-        import ngraph_sim
-        from ngraph_sim.runtime import Simulation
+        import netlab_sim
+        from netlab_sim.runtime import Simulation
 
         net, R = build_diamond()
         net.add_agent('R1', Minimal())
-        sim = Simulation(ngraph_sim.Environment(), net)
+        sim = Simulation(netlab_sim.Environment(), net)
         assert sim.agents.generation('R1', 'ref') == (
             net.state.devices['R1'].agents['ref'].generation
         )

@@ -1,7 +1,7 @@
 """Advanced scenario tests exercising complex multi-primitive interactions,
 emergent behavior, and real-world modeling patterns."""
 
-import ngraph_sim
+import netlab_sim
 
 # ---------------------------------------------------------------------------
 # Circuit breaker: disable resource after too many failures
@@ -12,8 +12,8 @@ class TestCircuitBreaker:
     """Monitor failure rate and disable/re-enable a service."""
 
     def test_circuit_breaker_trips_and_recovers(self):
-        env = ngraph_sim.Environment()
-        service = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        service = netlab_sim.Resource(env, capacity=1)
         log = []
         circuit_open = [False]
 
@@ -78,7 +78,7 @@ class TestRetryWithBackoff:
     """Process retries a failing operation with increasing delays."""
 
     def test_retry_succeeds_on_third_attempt(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
         attempt_count = [0]
 
@@ -112,7 +112,7 @@ class TestRetryWithBackoff:
         ]
 
     def test_retry_gives_up(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def always_fails(env):
@@ -144,9 +144,9 @@ class TestMultiPhaseJob:
     """Job has multiple phases; failure mid-way triggers cleanup."""
 
     def test_failure_triggers_cleanup(self):
-        env = ngraph_sim.Environment()
-        res_a = ngraph_sim.Resource(env, capacity=1)
-        res_b = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res_a = netlab_sim.Resource(env, capacity=1)
+        res_b = netlab_sim.Resource(env, capacity=1)
         log = []
 
         def job(env, fail_at_phase):
@@ -185,9 +185,9 @@ class TestMultiPhaseJob:
         assert res_b.count == 0
 
     def test_successful_multi_phase(self):
-        env = ngraph_sim.Environment()
-        res_a = ngraph_sim.Resource(env, capacity=1)
-        res_b = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res_a = netlab_sim.Resource(env, capacity=1)
+        res_b = netlab_sim.Resource(env, capacity=1)
         log = []
 
         def job(env, fail_at_phase):
@@ -230,9 +230,9 @@ class TestWorkStealing:
     """Idle workers steal work from other workers' queues."""
 
     def test_steal_balances_load(self):
-        env = ngraph_sim.Environment()
-        q1 = ngraph_sim.Store(env)
-        q2 = ngraph_sim.Store(env)
+        env = netlab_sim.Environment()
+        q1 = netlab_sim.Store(env)
+        q2 = netlab_sim.Store(env)
         log = []
 
         def worker(env, name, own_queue, other_queue):
@@ -281,8 +281,8 @@ class TestBackpressure:
     """Producer slows down when downstream buffer is nearly full."""
 
     def test_producer_respects_buffer_depth(self):
-        env = ngraph_sim.Environment()
-        buffer = ngraph_sim.Store(env, capacity=5)
+        env = netlab_sim.Environment()
+        buffer = netlab_sim.Store(env, capacity=5)
         log = []
 
         def producer(env):
@@ -354,8 +354,8 @@ class TestMM1Queue:
         import random
 
         random.seed(42)
-        env = ngraph_sim.Environment()
-        server = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        server = netlab_sim.Resource(env, capacity=1)
 
         lam = 0.8  # arrival rate
         mu = 1.0  # service rate
@@ -397,10 +397,10 @@ class TestAssemblyStation:
     """Assembly requires one part from each of N suppliers before proceeding."""
 
     def test_assembly_waits_for_all_parts(self):
-        env = ngraph_sim.Environment()
-        part_a = ngraph_sim.Store(env)
-        part_b = ngraph_sim.Store(env)
-        part_c = ngraph_sim.Store(env)
+        env = netlab_sim.Environment()
+        part_a = netlab_sim.Store(env)
+        part_b = netlab_sim.Store(env)
+        part_c = netlab_sim.Store(env)
         log = []
 
         def supplier(env, store, name, interval):
@@ -442,8 +442,8 @@ class TestTokenBucket:
     Requests exceeding the rate are delayed until tokens are available."""
 
     def test_burst_then_rate_limit(self):
-        env = ngraph_sim.Environment()
-        bucket = ngraph_sim.Container(env, capacity=5, init=5)  # burst of 5
+        env = netlab_sim.Environment()
+        bucket = netlab_sim.Container(env, capacity=5, init=5)  # burst of 5
         log = []
 
         def token_refill(env):
@@ -485,9 +485,9 @@ class TestLinkFailover:
     After repair, traffic returns to primary."""
 
     def test_failover_and_recovery(self):
-        env = ngraph_sim.Environment()
-        primary = ngraph_sim.Store(env, capacity=10)
-        backup = ngraph_sim.Store(env, capacity=10)
+        env = netlab_sim.Environment()
+        primary = netlab_sim.Store(env, capacity=10)
+        backup = netlab_sim.Store(env, capacity=10)
         primary_up = [True]
         log = []
 

@@ -19,9 +19,9 @@ import time
 import types
 from dataclasses import replace
 
-from ngraph_sim import Environment
-from ngraph_sim.runtime import Schedule, Simulation
-from ngraph_sim.study import Study
+from netlab_sim import Environment
+from netlab_sim.runtime import Schedule, Simulation
+from netlab_sim.study import Study
 from tests.runtime.test_study import two_rate_network
 
 
@@ -42,11 +42,11 @@ def main() -> None:
     parser.add_argument('--repeats', type=int, default=20)
     args = parser.parse_args()
     source = subprocess.check_output(
-        ['git', 'show', f'{args.old}:ngraph_sim/study.py'], text=True
+        ['git', 'show', f'{args.old}:netlab_sim/study.py'], text=True
     )
     old = types.ModuleType('_t6b_old_study')
     sys.modules[old.__name__] = old
-    exec(compile(source, f'{args.old}:ngraph_sim/study.py', 'exec'), old.__dict__)
+    exec(compile(source, f'{args.old}:netlab_sim/study.py', 'exec'), old.__dict__)
     print(
         json.dumps(
             {

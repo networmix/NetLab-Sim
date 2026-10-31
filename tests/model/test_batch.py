@@ -2,8 +2,8 @@ from contextlib import nullcontext
 
 import pytest
 
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.state import tree_equal
+from netlab_sim.model.network import Network
+from netlab_sim.model.state import tree_equal
 
 
 def build(net):
@@ -50,7 +50,7 @@ def test_construction_context(batched):
 
 
 def test_abort_restores_allocators_and_permanently_invalidates_handles():
-    from ngraph_sim.model.entities import StaleHandleError
+    from netlab_sim.model.entities import StaleHandleError
 
     net = Network()
     existing = net.add_device('existing')
@@ -126,7 +126,7 @@ def test_empty_and_reverted_batches_preserve_identity():
 
 
 def test_snapshot_reads_are_immutable_and_read_your_writes():
-    from ngraph_sim.model.state import validate_immutable
+    from netlab_sim.model.state import validate_immutable
 
     net = Network()
     with net.batch():
@@ -152,7 +152,7 @@ def test_snapshot_reads_are_immutable_and_read_your_writes():
 
 
 def test_one_validation_delta_and_commit_time(monkeypatch):
-    import ngraph_sim.model.network as module
+    import netlab_sim.model.network as module
 
     net = Network()
     net.debug_validate = True
@@ -198,7 +198,7 @@ def test_nested_batch_rejected_and_outer_aborts():
 
 
 def test_final_validation_failure_aborts(monkeypatch):
-    import ngraph_sim.model.network as module
+    import netlab_sim.model.network as module
 
     net = Network()
     net.debug_validate = True
@@ -253,8 +253,8 @@ def test_caught_operation_failure_does_not_leak_partial_link_or_allocators():
 
 
 def test_bulk_routes_use_one_rib_apply_per_device_family(monkeypatch):
-    import ngraph_sim.model.routing as routing
-    from ngraph_sim.model.addressing import IPV4, IPV6
+    import netlab_sim.model.routing as routing
+    from netlab_sim.model.addressing import IPV4, IPV6
 
     original = routing.rib_apply
     calls = []
@@ -279,8 +279,8 @@ def test_bulk_routes_use_one_rib_apply_per_device_family(monkeypatch):
 def test_routes_sync_delete_upsert_match_sequential():
     from dataclasses import replace
 
-    from ngraph_sim.model.addressing import IPV4
-    from ngraph_sim.model.contracts import IGP
+    from netlab_sim.model.addressing import IPV4
+    from netlab_sim.model.contracts import IGP
 
     def edit(net):
         d = net['a']
@@ -311,7 +311,7 @@ def test_routes_sync_delete_upsert_match_sequential():
 
 
 def test_builders_do_not_use_persistent_set_or_freeze_per_operation(monkeypatch):
-    from ngraph_sim.model.state import PMap, PMapBuilder
+    from netlab_sim.model.state import PMap, PMapBuilder
 
     net = Network()
     with net.batch():
@@ -339,7 +339,7 @@ def test_builders_do_not_use_persistent_set_or_freeze_per_operation(monkeypatch)
 def test_pure_update_receives_immutable_staged_snapshot():
     from dataclasses import replace
 
-    from ngraph_sim.model.state import validate_immutable
+    from netlab_sim.model.state import validate_immutable
 
     net = Network()
     with net.batch():
@@ -357,8 +357,8 @@ def test_pure_update_receives_immutable_staged_snapshot():
 
 
 def test_timed_runtime_sees_one_batch_commit():
-    from ngraph_sim import Environment
-    from ngraph_sim.runtime import Simulation
+    from netlab_sim import Environment
+    from netlab_sim.runtime import Simulation
 
     net = Network()
     build(net)
@@ -380,7 +380,7 @@ def test_timed_runtime_sees_one_batch_commit():
 
 
 def test_update_boundaries_advance_inputs_after_each_staged_change():
-    from ngraph_sim.model.addressing import IPV4
+    from netlab_sim.model.addressing import IPV4
 
     net = Network()
     a = net.add_device('a')
@@ -403,8 +403,8 @@ def test_update_boundaries_advance_inputs_after_each_staged_change():
 @pytest.mark.parametrize('af', [4, 6])
 @pytest.mark.parametrize('method', ['converge', 'place'])
 def test_batch_rejects_derivations_without_changing_staged_inputs(timed, af, method):
-    from ngraph_sim import Environment
-    from ngraph_sim.runtime import Simulation
+    from netlab_sim import Environment
+    from netlab_sim.runtime import Simulation
 
     net = Network()
     a = net.add_device('A')
@@ -471,10 +471,10 @@ def test_uncaught_batch_derivation_aborts_provisional_entities(method):
 def test_batch_update_callback_invalidates_its_changed_inputs(timed, af):
     from dataclasses import replace
 
-    from ngraph_sim import Environment
-    from ngraph_sim.model.routing import rib_apply
-    from ngraph_sim.runtime import Simulation
-    from ngraph_sim.runtime.pipeline import fib_affected
+    from netlab_sim import Environment
+    from netlab_sim.model.routing import rib_apply
+    from netlab_sim.runtime import Simulation
+    from netlab_sim.runtime.pipeline import fib_affected
 
     net = Network()
     a = net.add_device('A', fib_delay=1)
@@ -535,11 +535,11 @@ def test_batch_update_callback_invalidates_its_changed_inputs(timed, af):
 @pytest.mark.parametrize('timed', [False, True])
 @pytest.mark.parametrize('change', ['policy', 'link'])
 def test_reverted_batch_inputs_publish_no_delta(timed, change):
-    from ngraph_sim import Environment
-    from ngraph_sim.model.contracts import STATIC
-    from ngraph_sim.model.interfaces import OperState
-    from ngraph_sim.model.routing import ResolutionPolicy
-    from ngraph_sim.runtime import Simulation
+    from netlab_sim import Environment
+    from netlab_sim.model.contracts import STATIC
+    from netlab_sim.model.interfaces import OperState
+    from netlab_sim.model.routing import ResolutionPolicy
+    from netlab_sim.runtime import Simulation
     from tests.model.test_network import A, build_diamond
 
     net, devices = build_diamond()
@@ -578,8 +578,8 @@ def test_reverted_batch_inputs_publish_no_delta(timed, change):
 def test_rib_snapshots_submit_only_pending_changed_rows(monkeypatch):
     from dataclasses import replace
 
-    import ngraph_sim.model.routing as routing
-    from ngraph_sim.model.addressing import IPV4, IPV6
+    import netlab_sim.model.routing as routing
+    from netlab_sim.model.addressing import IPV4, IPV6
 
     net = Network()
     a = net.add_device('A')
@@ -624,8 +624,8 @@ def test_rib_snapshots_submit_only_pending_changed_rows(monkeypatch):
 
 
 def test_rib_snapshot_add_delete_does_not_enumerate_existing_rows(monkeypatch):
-    from ngraph_sim.model.routing import RibState
-    from ngraph_sim.model.state import PMap
+    from netlab_sim.model.routing import RibState
+    from netlab_sim.model.state import PMap
 
     net = Network()
     a = net.add_device('A')
@@ -691,8 +691,8 @@ def test_route_sync_fold_order_across_clients_matches_sequential(snapshot):
     from dataclasses import replace
     from random import Random
 
-    from ngraph_sim.model.contracts import IGP, STATIC
-    from ngraph_sim.model.routing import BLACKHOLE, Nexthop, Route
+    from netlab_sim.model.contracts import IGP, STATIC
+    from netlab_sim.model.routing import BLACKHOLE, Nexthop, Route
 
     rows = tuple(
         Route((0xC0000200 + i, 32), 4, client, 1, (Nexthop(special=BLACKHOLE),))
@@ -733,18 +733,18 @@ def test_reverted_inputs_inside_a_batch_still_resolve_in_the_timed_pipeline():
     delta carries only the advanced epoch, which must still schedule the FIB."""
     import dataclasses
 
-    import ngraph_sim
-    from ngraph_sim.model.routing import ResolutionPolicy
-    from ngraph_sim.runtime import Simulation
+    import netlab_sim
+    from netlab_sim.model.routing import ResolutionPolicy
+    from netlab_sim.runtime import Simulation
     from tests.model.test_network import build_diamond
 
     net, R = build_diamond()
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
     sim = Simulation(env, net)
     original = net.state.devices['R1'].config.resolution_policy
     fib = R['R1'].fib(4)
     entry = fib.lookup(
-        __import__('ngraph_sim.model.addressing', fromlist=['to_int']).to_int(
+        __import__('netlab_sim.model.addressing', fromlist=['to_int']).to_int(
             '10.0.0.4'
         )[0]
     )
@@ -768,8 +768,8 @@ def test_reverted_inputs_inside_a_batch_still_resolve_in_the_timed_pipeline():
 
     sim.at(5, edit)
     sim.run_until(6)
-    from ngraph_sim.model.addressing import to_int
-    from ngraph_sim.model.contracts import STATIC
+    from netlab_sim.model.addressing import to_int
+    from netlab_sim.model.contracts import STATIC
 
     fib = R['R1'].fib(4)
     entry = fib.lookup(to_int('10.0.0.4')[0])

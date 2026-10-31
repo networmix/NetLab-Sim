@@ -3,11 +3,11 @@
 
 import pytest
 
-import ngraph_sim
-from ngraph_sim.model.addressing import IPV4, IPV6, to_int
-from ngraph_sim.model.igp import oracle_igp
-from ngraph_sim.model.state import tree_equal
-from ngraph_sim.runtime import Simulation
+import netlab_sim
+from netlab_sim.model.addressing import IPV4, IPV6, to_int
+from netlab_sim.model.igp import oracle_igp
+from netlab_sim.model.state import tree_equal
+from netlab_sim.runtime import Simulation
 from tests.model.test_network import build_diamond
 
 
@@ -35,7 +35,7 @@ def test_converge_equals_timed_pipeline(with_igp):
         if with_igp:
             net.add_source(oracle_igp)
     net_a.converge()
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
     sim = Simulation(env, net_b)
     assert tree_equal(net_a.state, net_b.state)
     for i, (op_a, op_b) in enumerate(

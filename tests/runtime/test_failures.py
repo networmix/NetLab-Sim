@@ -4,9 +4,9 @@ import random
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model.network import Network
-from ngraph_sim.runtime import (
+from netlab_sim import Environment
+from netlab_sim.model.network import Network
+from netlab_sim.runtime import (
     Distribution,
     Draws,
     FailureSet,
@@ -15,7 +15,7 @@ from ngraph_sim.runtime import (
     Schedule,
     Simulation,
 )
-from ngraph_sim.runtime.failures import derive_seed, resolve_groups
+from netlab_sim.runtime.failures import derive_seed, resolve_groups
 from tests.model.test_network import build_diamond
 
 
@@ -276,7 +276,7 @@ def test_lease_post_commit_observer_error_preserves_consistency(operation):
 
 @pytest.mark.parametrize('operation', ['acquire', 'release'])
 def test_lease_pre_commit_validation_error_aborts_all_entities(monkeypatch, operation):
-    import ngraph_sim.model.network as network_module
+    import netlab_sim.model.network as network_module
 
     net, lid = small_net()
     sim = Simulation(Environment(), net)
@@ -324,7 +324,7 @@ def test_scheduled_committed_fault_arms_repair_even_when_observer_raises():
 
 
 def test_scheduled_pre_commit_abort_does_not_arm_repair(monkeypatch):
-    import ngraph_sim.model.network as network_module
+    import netlab_sim.model.network as network_module
 
     net, lid = small_net()
     sim = Simulation(Environment(), net)
@@ -382,7 +382,7 @@ def test_lease_change_inside_existing_batch_is_rejected_without_registry_mutatio
 
 @pytest.mark.parametrize('failure', ['abort', 'observer'])
 def test_failed_acquire_preserves_preexisting_overlap(monkeypatch, failure):
-    import ngraph_sim.model.network as network_module
+    import netlab_sim.model.network as network_module
 
     net, lid = small_net()
     sim = Simulation(Environment(), net)

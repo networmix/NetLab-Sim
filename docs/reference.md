@@ -87,7 +87,7 @@ It maps nodes to devices with loopbacks, links to Ethernets (parallel links
 tagged `lag` to a PortChannel), costs to metrics and the demand set to
 demands. `pairwise` demands split the volume over the pairs; `combine`
 demands become one anycast prefix. NetGraph priorities (lower first) map to
-NetGraph-Sim priorities (higher first). The failure policy becomes a
+NetLab-Sim priorities (higher first). The failure policy becomes a
 `FailureSchedule` only when `iterations > 0`; for studies, use
 `Draws.from_policy`. With `srv6=True` every device gets an F3216 locator, uN
 and uDT46, every L3 link end a uA, and a pairwise demand with one explicit
@@ -111,7 +111,7 @@ Per-entity settings are read only from the `attrs.sim` mapping:
 Entities that set both `mtbf` and `mttr` form `Study.failure_parameters`,
 the renewal process of the `SimStudy` process mode.
 
-Importing `ngraph_sim.adapters.ngraph` registers the `SimStudy` workflow step:
+Importing `netlab_sim.adapters.ngraph` registers the `SimStudy` workflow step:
 
 ```yaml
 workflow:
@@ -127,7 +127,7 @@ workflow:
     keep: {roots: 0, deltas: 0, arrays: false, timeline: false}
 ```
 
-`ngraph-sim run scenario.yaml --results results.json` runs the scenario with
+`netlab-sim run scenario.yaml --results results.json` runs the scenario with
 NetGraph and writes the complete results.
 
 ## SONiC adapter

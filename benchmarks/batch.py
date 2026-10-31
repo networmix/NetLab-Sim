@@ -24,9 +24,9 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any
 
-from ngraph_sim.model.lpm import FrozenPrefixTable
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.state import FloatArray, PMap, _is_ignored_field
+from netlab_sim.model.lpm import FrozenPrefixTable
+from netlab_sim.model.network import Network
+from netlab_sim.model.state import FloatArray, PMap, _is_ignored_field
 
 
 def normalized(value: Any) -> Any:
@@ -73,7 +73,7 @@ def main() -> None:
     scenario = None
     adapter = None
     if args.workload == 'scenario':
-        adapter = importlib.import_module('ngraph_sim.adapters.ngraph')
+        adapter = importlib.import_module('netlab_sim.adapters.ngraph')
         Scenario = importlib.import_module('ngraph.scenario').Scenario
         scenario = Scenario.from_yaml(Path(args.scenario).read_text())
     timings = []

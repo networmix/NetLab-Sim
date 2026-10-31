@@ -2,18 +2,18 @@
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestInterruptWaitingProcess:
     def test_interrupt_a_waiting_process(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def victim(env):
             try:
                 yield env.timeout(10)
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 log.append(('interrupted', env.now, e.cause))
 
         def attacker(env, target):
@@ -28,13 +28,13 @@ class TestInterruptWaitingProcess:
 
 class TestInterruptCause:
     def test_cause_accessible(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         causes = []
 
         def victim(env):
             try:
                 yield env.timeout(100)
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 causes.append(e.cause)
 
         def attacker(env, target):
@@ -47,13 +47,13 @@ class TestInterruptCause:
         assert causes == [{'reason': 'test'}]
 
     def test_cause_default_is_none(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         causes = []
 
         def victim(env):
             try:
                 yield env.timeout(100)
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 causes.append(e.cause)
 
         def attacker(env, target):
@@ -68,7 +68,7 @@ class TestInterruptCause:
 
 class TestInterruptDeadProcess:
     def test_interrupt_dead_process_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def short_lived(env):
             yield env.timeout(1)
@@ -81,7 +81,7 @@ class TestInterruptDeadProcess:
 
 class TestSelfInterrupt:
     def test_self_interrupt_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             myself = env.active_process
@@ -98,13 +98,13 @@ class TestConcurrentInterrupts:
         """If two _Interruption events are scheduled before either is
         processed, the second is silently ignored because the victim is
         already dead when the second _Interruption callback fires."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def victim(env):
             try:
                 yield env.timeout(100)
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 log.append(e.cause)
                 return  # Process dies
 
@@ -126,13 +126,13 @@ class TestConcurrentInterrupts:
 class TestDefusedInterrupt:
     def test_defused_interrupt(self):
         """If an interrupt event is defused, it should not propagate."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         log = []
 
         def victim(env):
             try:
                 yield env.timeout(100)
-            except ngraph_sim.Interrupt as e:
+            except netlab_sim.Interrupt as e:
                 log.append(e.cause)
                 yield env.timeout(1)
                 log.append('continued')

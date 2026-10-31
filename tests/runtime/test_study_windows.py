@@ -2,8 +2,8 @@
 
 import pytest
 
-from ngraph_sim.runtime import FailureSet, Schedule
-from ngraph_sim.study import Study
+from netlab_sim.runtime import FailureSet, Schedule
+from netlab_sim.study import Study
 from tests.runtime.test_study import diamond, two_rate_network
 
 
@@ -78,7 +78,7 @@ def test_periodic_normal_timers_do_not_prevent_convergence(selected):
 
 
 def test_quiet_begins_on_output_change_and_includes_deadline_events():
-    from ngraph_sim.study import Stability
+    from netlab_sim.study import Stability
 
     net, _ = diamond(fib_delay=0.25)
     draws = [FailureSet(excluded_links=('R1:eth1--R2:eth1',))]
@@ -179,8 +179,8 @@ def test_process_window_after_warmup_uses_same_failure_clock():
 def test_fresh_agent_runtime_uses_configuration_and_warms_every_iteration(monkeypatch):
     from dataclasses import replace
 
-    from ngraph_sim.model.contracts import TransportState
-    from ngraph_sim.runtime.agents import AgentRuntime
+    from netlab_sim.model.contracts import TransportState
+    from netlab_sim.runtime.agents import AgentRuntime
     from tests.model.test_agent_contract import Minimal
 
     net = two_rate_network()
@@ -322,7 +322,7 @@ def test_repeatability_fingerprint():
     import hashlib
     import json
 
-    from ngraph_sim.runtime import Process
+    from netlab_sim.runtime import Process
 
     def run():
         return Study(two_rate_network(), keep={'events': 1, 'records': 1}).process(
@@ -408,8 +408,8 @@ def test_selected_delivery_and_routing_are_independent():
 def test_programming_requires_installed_policies():
     from dataclasses import replace
 
-    from ngraph_sim.model import srv6
-    from ngraph_sim.study import Stability, _StabilityWindow
+    from netlab_sim.model import srv6
+    from netlab_sim.study import Stability, _StabilityWindow
     from tests.runtime.test_study_srv6 import network
 
     net, _ = network()
@@ -560,7 +560,7 @@ def test_real_initialized_agents_restart_and_warm_repeatably():
 
 
 def test_default_processing_delay_delivers_during_real_agent_warmup():
-    from ngraph_sim.model import contracts as c
+    from netlab_sim.model import contracts as c
     from tests.model.test_agent_contract import Minimal
 
     class Hello(Minimal):
@@ -604,8 +604,8 @@ def test_default_processing_delay_delivers_during_real_agent_warmup():
 def test_reference_baseline_matches_prepared_no_fault_iteration(
     mode, initialized_until
 ):
-    from ngraph_sim import Environment
-    from ngraph_sim.runtime import Simulation
+    from netlab_sim import Environment
+    from netlab_sim.runtime import Simulation
     from tests.agents.fixtures import topology
 
     network = topology(numbered=False)
@@ -686,7 +686,7 @@ def test_agent_baseline_has_independent_budget_and_its_wall_cost_is_included(
     # even when subsequent observation needs another event and exhausts its budget.
     budget = run().baseline['data']['sim']['engine_events']
     times = iter((10.0, 13.0, 20.0, 25.0))
-    monkeypatch.setattr('ngraph_sim.study.perf_counter', lambda: next(times))
+    monkeypatch.setattr('netlab_sim.study.perf_counter', lambda: next(times))
     result = run(budget)
     baseline = result.baseline['data']['sim']
     assert baseline['baseline_complete'] is True

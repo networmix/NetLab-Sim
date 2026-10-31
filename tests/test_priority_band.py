@@ -2,8 +2,8 @@
 work at the same simulation time, including ``NORMAL`` events scheduled
 while that time is being processed."""
 
-import ngraph_sim
-from ngraph_sim import core
+import netlab_sim
+from netlab_sim import core
 
 
 def _deferred_event(env, callback, priority=core.DEFERRED, delay=0):
@@ -20,10 +20,10 @@ def _deferred_event(env, callback, priority=core.DEFERRED, delay=0):
 class TestPriorityBand:
     def test_band_constants_are_ordered(self):
         assert core.URGENT < core.NORMAL < core.DEFERRED
-        assert ngraph_sim.DEFERRED is core.DEFERRED
+        assert netlab_sim.DEFERRED is core.DEFERRED
 
     def test_deferred_runs_after_normal_scheduled_during_processing(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         order = []
 
         def normal_second(ev):
@@ -41,7 +41,7 @@ class TestPriorityBand:
         assert order == ['normal-1', 'normal-2', 'deferred']
 
     def test_deferred_band_is_fifo_by_priority_then_eid(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         order = []
         _deferred_event(env, lambda ev: order.append('b+1'), core.DEFERRED + 1)
         _deferred_event(env, lambda ev: order.append('b+0 first'), core.DEFERRED)
@@ -50,7 +50,7 @@ class TestPriorityBand:
         assert order == ['b+0 first', 'b+0 second', 'b+1']
 
     def test_deferred_at_later_time_does_not_preempt_earlier_normal(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         order = []
         _deferred_event(env, lambda ev: order.append(('deferred', env.now)), delay=1)
         env.timeout(2).callbacks.append(lambda ev: order.append(('normal', env.now)))
@@ -60,7 +60,7 @@ class TestPriorityBand:
     def test_run_until_time_stops_before_deferred_work_at_that_time(self):
         """``run(until=t)`` inserts an URGENT stop event, so deferred work at
         exactly ``t`` has not run when ``run`` returns."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         ran = []
         _deferred_event(env, lambda ev: ran.append(env.now), delay=5)
         env.run(until=5)

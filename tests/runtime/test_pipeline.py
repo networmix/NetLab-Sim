@@ -4,11 +4,11 @@ import dataclasses
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.state import StateDelta
-from ngraph_sim.runtime import pipeline as coordinator
-from ngraph_sim.runtime.pipeline import COALESCE, DEBOUNCE, Kind, Pipeline, build_kinds
+from netlab_sim import Environment
+from netlab_sim.model.network import Network
+from netlab_sim.model.state import StateDelta
+from netlab_sim.runtime import pipeline as coordinator
+from netlab_sim.runtime.pipeline import COALESCE, DEBOUNCE, Kind, Pipeline, build_kinds
 
 
 def pipeline(mode=DEBOUNCE, run=None):

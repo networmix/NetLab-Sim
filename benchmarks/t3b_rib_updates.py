@@ -41,10 +41,10 @@ def main():
     args = parser.parse_args()
     sys.path[:0] = [str(args.source.resolve()), str(project)]
 
-    import ngraph_sim
-    from ngraph_sim.model.addressing import IPV4
-    from ngraph_sim.model.contracts import STATIC
-    from ngraph_sim.model.routing import Nexthop, RibState, Route, rib_apply
+    import netlab_sim
+    from netlab_sim.model.addressing import IPV4
+    from netlab_sim.model.contracts import STATIC
+    from netlab_sim.model.routing import Nexthop, RibState, Route, rib_apply
     from tests.model.test_routing import routing_fingerprints
 
     nh = (Nexthop.blackhole(),)
@@ -65,7 +65,7 @@ def main():
         'label': args.label,
         'python': platform.python_version(),
         'gil': getattr(sys, '_is_gil_enabled', lambda: True)(),
-        'source': ngraph_sim.__file__,
+        'source': netlab_sim.__file__,
         'measurements': {
             name: measure(fn, 1 if name.startswith('sync') else 100)
             for name, fn in operations.items()

@@ -2,13 +2,13 @@
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestResourceRequestRelease:
     def test_request_and_release(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=1)
         log = []
 
         def user(env, name):
@@ -26,8 +26,8 @@ class TestResourceRequestRelease:
 
 class TestResourceQueuing:
     def test_queuing_when_at_capacity(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=1)
         log = []
 
         def user(env, name, hold_time):
@@ -51,8 +51,8 @@ class TestResourceQueuing:
 
 class TestResourceMultipleUsers:
     def test_multiple_users_up_to_capacity(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=2)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=2)
         log = []
 
         def user(env, name, hold_time):
@@ -76,8 +76,8 @@ class TestResourceMultipleUsers:
 
 class TestResourceContextManager:
     def test_context_manager_auto_release(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=1)
         log = []
 
         def user(env, name, hold_time):
@@ -96,8 +96,8 @@ class TestResourceContextManager:
 
 class TestResourceCount:
     def test_count_property(self):
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=2)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=2)
         counts = []
 
         def proc(env):
@@ -121,12 +121,12 @@ class TestResourceReleaseUnknownRequest:
     def test_resource_release_unknown_request(self):
         """Create a Request but don't yield it. Call resource.release(request).
         Should succeed silently (no error)."""
-        env = ngraph_sim.Environment()
-        res = ngraph_sim.Resource(env, capacity=1)
+        env = netlab_sim.Environment()
+        res = netlab_sim.Resource(env, capacity=1)
 
         def proc(env):
             # Create a request without yielding it
-            from ngraph_sim.resources import Request
+            from netlab_sim.resources import Request
 
             req = Request(res)
             # Release it without ever acquiring -- should not error
@@ -140,6 +140,6 @@ class TestResourceReleaseUnknownRequest:
 class TestResourceZeroCapacityRaises:
     def test_resource_zero_capacity_raises(self):
         """Resource(env, capacity=0) raises ValueError."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError):
-            ngraph_sim.Resource(env, capacity=0)
+            netlab_sim.Resource(env, capacity=0)

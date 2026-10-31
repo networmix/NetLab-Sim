@@ -5,10 +5,10 @@ from dataclasses import replace
 
 import pytest
 
-from ngraph_sim.model import network as nw
-from ngraph_sim.model import srv6
-from ngraph_sim.model.contracts import STATIC
-from ngraph_sim.model.state import PMap, validate_immutable
+from netlab_sim.model import network as nw
+from netlab_sim.model import srv6
+from netlab_sim.model.contracts import STATIC
+from netlab_sim.model.state import PMap, validate_immutable
 
 
 @pytest.mark.parametrize('ipv6', [False, True])

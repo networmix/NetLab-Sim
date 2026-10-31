@@ -4,8 +4,8 @@ from types import SimpleNamespace as NS
 
 import pytest
 
-from ngraph_sim.adapters.ngraph import demands_from, from_scenario
-from ngraph_sim.model import srv6 as sr
+from netlab_sim.adapters.ngraph import demands_from, from_scenario
+from netlab_sim.model import srv6 as sr
 from tests.adapters.test_ngraph import (
     DemandSet,
     Link,
@@ -157,14 +157,14 @@ def test_static_path_requires_srv6_and_ipv6():
 
 def test_bad_followup_import_rolls_back_policies_and_metadata():
     net, _, _ = from_scenario(bundle_scenario(), srv6=True)
-    root, metadata = net.state, dict(net.ngraph_sim_demand_destinations)
+    root, metadata = net.state, dict(net.netlab_sim_demand_destinations)
     sc = bundle_scenario()
     good = sc.demand_set.sets['traffic'][0]
     bad = scenario(path=('R1', 'R4')).demand_set.sets['traffic'][0]
     with pytest.raises(ValueError, match='no enabled link'):
         demands_from(sc.network, net, {'new': [good, bad]})
     assert net.state is root
-    assert net.ngraph_sim_demand_destinations == metadata
+    assert net.netlab_sim_demand_destinations == metadata
 
 
 def real_pinned():
@@ -393,7 +393,7 @@ def test_bundle_opt_in_is_per_demand_and_rejected_import_is_atomic():
     with pytest.raises(ValueError, match='allow_bundle_pins'):
         demands_from(sc.network, net, {'rejected': [td]})
     assert net.state is before
-    assert net.ngraph_sim_demand_destinations == {}
+    assert net.netlab_sim_demand_destinations == {}
     td.attrs = {'sim': {'allow_bundle_pins': True}}
     ids = demands_from(sc.network, net, {'accepted': [td]})
     assert net.state.demands[ids[0]].steer is not None

@@ -4,12 +4,12 @@ import sys
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.network import Network
-from ngraph_sim.runtime import Simulation
-from ngraph_sim.runtime.timeline import Timeline
-from ngraph_sim.study import Study
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model.network import Network
+from netlab_sim.runtime import Simulation
+from netlab_sim.runtime.timeline import Timeline
+from netlab_sim.study import Study
 
 
 class _Ticker:

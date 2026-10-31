@@ -5,11 +5,11 @@ from random import Random
 
 import pytest
 
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model import routing as rt
-from ngraph_sim.model.addressing import IPV4, IPV6, prefix_to_int, to_int
-from ngraph_sim.model.contracts import CONNECTED, IGP, STATIC, ClientId, ClientProfile
-from ngraph_sim.model.routing import (
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model import routing as rt
+from netlab_sim.model.addressing import IPV4, IPV6, prefix_to_int, to_int
+from netlab_sim.model.contracts import CONNECTED, IGP, STATIC, ClientId, ClientProfile
+from netlab_sim.model.routing import (
     Nexthop,
     ResolutionPolicy,
     RibState,
@@ -18,7 +18,7 @@ from ngraph_sim.model.routing import (
     rib_apply,
     row_status,
 )
-from ngraph_sim.model.state import PMap, validate_immutable
+from netlab_sim.model.state import PMap, validate_immutable
 
 
 def P(text):
@@ -49,9 +49,9 @@ def routing_fingerprints(kind):
 
     Used by the A/B/A harness too; no versions, object addresses or hashes.
     """
-    import ngraph_sim
-    from ngraph_sim.runtime import Simulation
-    from ngraph_sim.runtime.timeline import RouteEvent
+    import netlab_sim
+    from netlab_sim.runtime import Simulation
+    from netlab_sim.runtime.timeline import RouteEvent
     from tests.model.clos import build_clos
     from tests.model.test_network import build_diamond
 
@@ -62,7 +62,7 @@ def routing_fingerprints(kind):
     else:
         net = build_clos(8, 4)
         lid = sorted(net.links)[0]
-    sim = Simulation(ngraph_sim.Environment(), net)
+    sim = Simulation(netlab_sim.Environment(), net)
     fibs, placements = [], []
     for time, op in ((0, None), (1, net.links[lid].fail), (2, net.links[lid].restore)):
         if op is not None:
@@ -186,7 +186,7 @@ class TestNexthopAndRoute:
 @pytest.mark.parametrize('mixed', [False, True])
 @pytest.mark.parametrize('foreign', [ClientId('bgp', 7), ClientId('static', 1)])
 def test_client_rejects_foreign_deletions_atomically(batched, mixed, foreign):
-    from ngraph_sim.model.network import Network
+    from netlab_sim.model.network import Network
 
     net = Network()
     net.register_client(ClientProfile(foreign, distance=20))
@@ -684,7 +684,7 @@ class TestResolver:
 
 def test_unchanged_inputs_are_not_re_resolved(monkeypatch):
     """A converge with no input change must not resolve any FIB again."""
-    from ngraph_sim.model import derive
+    from netlab_sim.model import derive
     from tests.model.test_network import build_diamond
 
     net, R = build_diamond()
@@ -714,7 +714,7 @@ class TestCrossFamily:
 
     @staticmethod
     def build():
-        from ngraph_sim.model.network import Network
+        from netlab_sim.model.network import Network
 
         net = Network()
         a, b = net.add_device('A'), net.add_device('B')
@@ -750,12 +750,12 @@ class TestCrossFamily:
         assert self.entry(a) is None
 
     def test_timed(self):
-        import ngraph_sim
-        from ngraph_sim.runtime import Simulation
-        from ngraph_sim.runtime.timeline import FibEvent
+        import netlab_sim
+        from netlab_sim.runtime import Simulation
+        from netlab_sim.runtime.timeline import FibEvent
 
         net, a = self.build()
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         sim = Simulation(env, net)
         assert self.entry(a) is not None
         names = [
@@ -772,7 +772,7 @@ class TestCrossFamily:
 
 def test_dependencies_are_per_prefix_not_cumulative():
     """Independent routes must not inherit each other's dependencies."""
-    from ngraph_sim.model import derive
+    from netlab_sim.model import derive
     from tests.model.test_network import build_diamond
 
     net, R = build_diamond()

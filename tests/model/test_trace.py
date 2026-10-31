@@ -1,7 +1,7 @@
-from ngraph_sim.model import forwarding as fw
-from ngraph_sim.model.addressing import IPV4, to_int
-from ngraph_sim.model.igp import oracle_igp
-from ngraph_sim.model.packets import PacketTemplate
+from netlab_sim.model import forwarding as fw
+from netlab_sim.model.addressing import IPV4, to_int
+from netlab_sim.model.igp import oracle_igp
+from netlab_sim.model.packets import PacketTemplate
 from tests.model.test_network import build_diamond
 
 
@@ -71,7 +71,7 @@ class TestTrace:
         net, R = build_diamond()
         net.add_source(oracle_igp)
         net.converge()
-        from ngraph_sim.model.packets import ETHERTYPE_IPV4, EthernetFrame
+        from netlab_sim.model.packets import ETHERTYPE_IPV4, EthernetFrame
 
         view = net.view('R3')
         frame = EthernetFrame(0x1234, 0x5678, ETHERTYPE_IPV4, probe())

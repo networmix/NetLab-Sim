@@ -1,12 +1,12 @@
 """Independent protocol/oracle twins and forwarding-normalized comparisons."""
 
-from ngraph_sim import Environment
-from ngraph_sim.agents import ReferenceAgent, ReferenceConfig
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.addressing import MacAddress
-from ngraph_sim.model.igp import oracle_igp
-from ngraph_sim.model.network import Network
-from ngraph_sim.runtime import Simulation
+from netlab_sim import Environment
+from netlab_sim.agents import ReferenceAgent, ReferenceConfig
+from netlab_sim.model import contracts as c
+from netlab_sim.model.addressing import MacAddress
+from netlab_sim.model.igp import oracle_igp
+from netlab_sim.model.network import Network
+from netlab_sim.runtime import Simulation
 
 
 def topology(
@@ -33,7 +33,7 @@ def topology(
             ipv6=[f'2001:db8::{i + 1}/128'] if 6 in families else (),
         )
         if sr:
-            from ngraph_sim.model import srv6
+            from netlab_sim.model import srv6
 
             dev.add_locator('sr', prefix=f'2001:db8:{i + 1}::/64')
             dev.add_local_sid(srv6.END_DT46, structure=srv6.UNCOMPRESSED)

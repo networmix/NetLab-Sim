@@ -1,6 +1,6 @@
 """Manual deadline benchmark; run old/new/old with the same Python executable.
 
-Save the baseline with ``git show <base>:ngraph_sim/runtime/pipeline.py > /tmp/old.py``.
+Save the baseline with ``git show <base>:netlab_sim/runtime/pipeline.py > /tmp/old.py``.
 Run ``python benchmarks/verify_pending.py --pipeline-source /tmp/old.py``,
 then without that option, then with it again. Add ``--carrier --repeats 1``
 to run the carrier-debounce workload (which also measures derivations,
@@ -19,12 +19,12 @@ import statistics
 import sys
 import time
 
-from ngraph_sim import Environment
-from ngraph_sim.model import derive
-from ngraph_sim.model.lpm import FrozenPrefixTable
-from ngraph_sim.model.network import Network
-from ngraph_sim.model.state import FloatArray, PMap
-from ngraph_sim.runtime import pipeline, simulation
+from netlab_sim import Environment
+from netlab_sim.model import derive
+from netlab_sim.model.lpm import FrozenPrefixTable
+from netlab_sim.model.network import Network
+from netlab_sim.model.state import FloatArray, PMap
+from netlab_sim.runtime import pipeline, simulation
 
 
 def freeze(value):

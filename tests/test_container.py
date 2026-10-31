@@ -2,13 +2,13 @@
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestContainerPutAndGet:
     def test_put_and_get_amounts(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=100, init=0)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=100, init=0)
 
         def proc(env):
             yield tank.put(30)
@@ -22,8 +22,8 @@ class TestContainerPutAndGet:
 
 class TestContainerLevelTracking:
     def test_level_tracks_correctly(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=50, init=20)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=50, init=20)
         assert tank.level == 20
 
         def proc(env):
@@ -38,15 +38,15 @@ class TestContainerLevelTracking:
 
 class TestContainerCapacityLimits:
     def test_capacity_property(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=50)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=50)
         assert tank.capacity == 50
 
 
 class TestContainerBlockingWhenFull:
     def test_blocks_when_full(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=10, init=8)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=10, init=8)
         log = []
 
         def producer(env):
@@ -69,8 +69,8 @@ class TestContainerBlockingWhenFull:
 
 class TestContainerBlockingWhenEmpty:
     def test_blocks_when_empty(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=100, init=0)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=100, init=0)
         log = []
 
         def consumer(env):
@@ -91,52 +91,52 @@ class TestContainerBlockingWhenEmpty:
 
 class TestContainerInitLevel:
     def test_init_level(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=100, init=42)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=100, init=42)
         assert tank.level == 42
 
 
 class TestContainerValidation:
     def test_capacity_zero_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError, match='capacity'):
-            ngraph_sim.Container(env, capacity=0)
+            netlab_sim.Container(env, capacity=0)
 
     def test_capacity_negative_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError, match='capacity'):
-            ngraph_sim.Container(env, capacity=-5)
+            netlab_sim.Container(env, capacity=-5)
 
     def test_init_negative_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError, match='init'):
-            ngraph_sim.Container(env, capacity=10, init=-1)
+            netlab_sim.Container(env, capacity=10, init=-1)
 
     def test_init_exceeds_capacity_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         with pytest.raises(ValueError, match='init'):
-            ngraph_sim.Container(env, capacity=10, init=20)
+            netlab_sim.Container(env, capacity=10, init=20)
 
     def test_amount_zero_put_raises(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=10)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=10)
         with pytest.raises(ValueError, match='amount'):
             tank.put(0)
 
     def test_amount_negative_put_raises(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=10)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=10)
         with pytest.raises(ValueError, match='amount'):
             tank.put(-1)
 
     def test_amount_zero_get_raises(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=10, init=5)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=10, init=5)
         with pytest.raises(ValueError, match='amount'):
             tank.get(0)
 
     def test_amount_negative_get_raises(self):
-        env = ngraph_sim.Environment()
-        tank = ngraph_sim.Container(env, capacity=10, init=5)
+        env = netlab_sim.Environment()
+        tank = netlab_sim.Container(env, capacity=10, init=5)
         with pytest.raises(ValueError, match='amount'):
             tank.get(-1)

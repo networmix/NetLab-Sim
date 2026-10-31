@@ -2,12 +2,12 @@
 
 import pytest
 
-from ngraph_sim import Environment
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.prng import Prng
-from ngraph_sim.model.state import validate_admitted, validate_immutable
-from ngraph_sim.runtime import Simulation
-from ngraph_sim.runtime.agents import AgentBatchError
+from netlab_sim import Environment
+from netlab_sim.model import contracts as c
+from netlab_sim.model.prng import Prng
+from netlab_sim.model.state import validate_admitted, validate_immutable
+from netlab_sim.runtime import Simulation
+from netlab_sim.runtime.agents import AgentBatchError
 from tests.runtime.inbox import deliver_now
 from tests.runtime.test_agents import Plugin, fixture
 

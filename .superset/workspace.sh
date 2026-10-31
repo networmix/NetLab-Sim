@@ -16,7 +16,7 @@ unset PYTHONPATH PYTHONHOME
 if [[ "$mode" == setup ]]; then
     python -m pip install -e '.[dev]'
     python -m pip check
-    python -c 'import ngraph_sim; print("Workspace environment ready")'
+    python -c 'import netlab_sim; print("Workspace environment ready")'
 else
     make check-ci
 fi

@@ -2,12 +2,12 @@
 
 import pytest
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestAllOf:
     def test_all_events_must_trigger(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -26,7 +26,7 @@ class TestAllOf:
 
 class TestAnyOf:
     def test_any_event_triggers(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
         times = []
 
@@ -46,7 +46,7 @@ class TestAnyOf:
 
 class TestNestedConditions:
     def test_nested_all_of(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -65,7 +65,7 @@ class TestNestedConditions:
 
 class TestOperators:
     def test_and_operator(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -79,7 +79,7 @@ class TestOperators:
         assert results == [[10, 20]]
 
     def test_or_operator(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -95,7 +95,7 @@ class TestOperators:
 
 class TestEmptyCondition:
     def test_empty_allof_succeeds_immediately(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -108,7 +108,7 @@ class TestEmptyCondition:
         assert env.now == 0
 
     def test_empty_anyof_succeeds_immediately(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -122,7 +122,7 @@ class TestEmptyCondition:
 
 class TestFailedEventInCondition:
     def test_failed_event_fails_condition(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         caught = []
 
         def proc(env):
@@ -142,7 +142,7 @@ class TestFailedEventInCondition:
 
 class TestConditionValue:
     def test_keys_values_items(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = {}
 
         def proc(env):
@@ -159,10 +159,10 @@ class TestConditionValue:
         assert results['values'] == ['a', 'b']
         assert len(results['items']) == 2
         for evt, _val in results['items']:
-            assert isinstance(evt, ngraph_sim.Event)
+            assert isinstance(evt, netlab_sim.Event)
 
     def test_getitem(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             e1 = env.timeout(1, value='hello')
@@ -175,7 +175,7 @@ class TestConditionValue:
         env.run()
 
     def test_getitem_missing_key_raises(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             e1 = env.timeout(1, value='a')
@@ -188,7 +188,7 @@ class TestConditionValue:
         env.run()
 
     def test_contains(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
 
         def proc(env):
             e1 = env.timeout(1, value='a')
@@ -201,7 +201,7 @@ class TestConditionValue:
         env.run()
 
     def test_todict(self):
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         result = {}
 
         def proc(env):
@@ -219,19 +219,19 @@ class TestConditionValue:
 
 class TestMixedEnvironmentsRaises:
     def test_mixed_environments_raises(self):
-        env1 = ngraph_sim.Environment()
-        env2 = ngraph_sim.Environment()
+        env1 = netlab_sim.Environment()
+        env2 = netlab_sim.Environment()
         e1 = env1.event()
         e2 = env2.event()
         with pytest.raises(ValueError, match='different environments'):
-            ngraph_sim.AllOf(env1, [e1, e2])
+            netlab_sim.AllOf(env1, [e1, e2])
 
 
 class TestConditionCheckSkipsAfterAlreadyTriggered:
     def test_condition_check_skips_after_already_triggered(self):
         """AnyOf with two events. Trigger both. The second _check call should
         be a no-op (no error, condition value unchanged)."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -251,7 +251,7 @@ class TestConditionCheckSkipsAfterAlreadyTriggered:
 class TestConditionValueEqWithDict:
     def test_condition_value_eq_with_dict(self):
         """cv == cv.todict() should be True."""
-        env = ngraph_sim.Environment()
+        env = netlab_sim.Environment()
         results = []
 
         def proc(env):
@@ -268,9 +268,9 @@ class TestConditionValueEqWithDict:
 class TestConditionValueEqWithAnotherCV:
     def test_condition_value_eq_with_another_cv(self):
         """Two CVs with same events should be equal."""
-        cv1 = ngraph_sim.ConditionValue()
-        cv2 = ngraph_sim.ConditionValue()
-        env = ngraph_sim.Environment()
+        cv1 = netlab_sim.ConditionValue()
+        cv2 = netlab_sim.ConditionValue()
+        env = netlab_sim.Environment()
         e = env.event()
         e.succeed(value=42)
         cv1.events.append(e)
@@ -281,15 +281,15 @@ class TestConditionValueEqWithAnotherCV:
 class TestConditionValueEqWithUnrelatedType:
     def test_condition_value_eq_with_unrelated_type(self):
         """cv.__eq__(42) returns NotImplemented."""
-        cv = ngraph_sim.ConditionValue()
+        cv = netlab_sim.ConditionValue()
         assert cv.__eq__(42) is NotImplemented
 
 
 class TestConditionValueIter:
     def test_condition_value_iter(self):
         """list(cv) should return the events."""
-        cv = ngraph_sim.ConditionValue()
-        env = ngraph_sim.Environment()
+        cv = netlab_sim.ConditionValue()
+        env = netlab_sim.Environment()
         e1 = env.event()
         e2 = env.event()
         cv.events.append(e1)

@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from ngraph_sim.model import contracts as c
+from netlab_sim.model import contracts as c
 from tests.runtime.inbox import deliver_now
 from tests.runtime.test_agents import Plugin, fixture
 

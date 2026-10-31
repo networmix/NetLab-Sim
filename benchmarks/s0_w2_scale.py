@@ -24,7 +24,7 @@ from pathlib import Path
 
 
 def lookup():
-    from ngraph_sim.model.lpm import PrefixTable
+    from netlab_sim.model.lpm import PrefixTable
 
     results = {}
     for bits in (32, 128):
@@ -91,7 +91,7 @@ def lookup():
 def converge():
     import tracemalloc
 
-    from ngraph_sim.model.network import Network
+    from netlab_sim.model.network import Network
 
     count = 2000
     net = Network(seed=1)
@@ -145,11 +145,11 @@ def main():
     if args.case:
         assert args.source is not None
         sys.path.insert(0, str(args.source))
-        # No NetGraph-Sim import is allowed before selecting the source snapshot.
+        # No NetLab-Sim import is allowed before selecting the source snapshot.
         data = lookup() if args.case == 'lookup' else converge()
-        import ngraph_sim
+        import netlab_sim
 
-        print(json.dumps({'source': ngraph_sim.__file__, 'data': data}))
+        print(json.dumps({'source': netlab_sim.__file__, 'data': data}))
         return
     assert args.output is not None, '--output is required for the comparison'
     repo = Path(__file__).resolve().parents[1]
@@ -157,12 +157,12 @@ def main():
         ['git', 'rev-parse', args.baseline], cwd=repo, text=True
     ).strip()
     archive = subprocess.check_output(
-        ['git', 'archive', '--format=tar', baseline, 'ngraph_sim'], cwd=repo
+        ['git', 'archive', '--format=tar', baseline, 'netlab_sim'], cwd=repo
     )
     result: dict[str, object] = {'baseline': baseline, 'python': sys.version}
     runs = []
     result['runs'] = runs
-    with tempfile.TemporaryDirectory(prefix='ngraph-sim-s0-w2-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='netlab-sim-s0-w2-') as temporary:
         old = Path(temporary)
         with tarfile.open(fileobj=io.BytesIO(archive)) as source:
             source.extractall(old, filter='data')

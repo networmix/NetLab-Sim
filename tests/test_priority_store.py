@@ -1,12 +1,12 @@
 """Tests for PriorityStore and PriorityItem."""
 
-import ngraph_sim
+import netlab_sim
 
 
 class TestPriorityStoreOrder:
     def test_items_retrieved_in_priority_order(self):
-        env = ngraph_sim.Environment()
-        store = ngraph_sim.PriorityStore(env)
+        env = netlab_sim.Environment()
+        store = netlab_sim.PriorityStore(env)
         results = []
 
         def producer(env):
@@ -29,15 +29,15 @@ class TestPriorityStoreOrder:
 class TestPriorityItem:
     def test_priority_item_for_unorderable_items(self):
         """PriorityItem wraps unorderable items so they can be stored."""
-        env = ngraph_sim.Environment()
-        store = ngraph_sim.PriorityStore(env)
+        env = netlab_sim.Environment()
+        store = netlab_sim.PriorityStore(env)
         results = []
 
         # Dicts are not orderable, so we wrap them in PriorityItem
         def producer(env):
-            yield store.put(ngraph_sim.PriorityItem(3, {'name': 'c'}))
-            yield store.put(ngraph_sim.PriorityItem(1, {'name': 'a'}))
-            yield store.put(ngraph_sim.PriorityItem(2, {'name': 'b'}))
+            yield store.put(netlab_sim.PriorityItem(3, {'name': 'c'}))
+            yield store.put(netlab_sim.PriorityItem(1, {'name': 'a'}))
+            yield store.put(netlab_sim.PriorityItem(2, {'name': 'b'}))
 
         def consumer(env):
             yield env.timeout(1)
@@ -51,8 +51,8 @@ class TestPriorityItem:
         assert results == ['a', 'b', 'c']
 
     def test_priority_item_comparison(self):
-        a = ngraph_sim.PriorityItem(1, 'x')
-        b = ngraph_sim.PriorityItem(2, 'y')
+        a = netlab_sim.PriorityItem(1, 'x')
+        b = netlab_sim.PriorityItem(2, 'y')
         assert a < b
         assert not b < a
 
@@ -61,9 +61,9 @@ class TestPriorityItemAllComparisons:
     def test_priority_item_all_comparisons(self):
         """Test that __lt__, __le__, __gt__, __ge__, __eq__ all compare by
         priority only (not by item)."""
-        a = ngraph_sim.PriorityItem(1, 'aaa')
-        b = ngraph_sim.PriorityItem(2, 'bbb')
-        c = ngraph_sim.PriorityItem(1, 'zzz')  # same priority as a, different item
+        a = netlab_sim.PriorityItem(1, 'aaa')
+        b = netlab_sim.PriorityItem(2, 'bbb')
+        c = netlab_sim.PriorityItem(1, 'zzz')  # same priority as a, different item
 
         # __lt__
         assert a < b

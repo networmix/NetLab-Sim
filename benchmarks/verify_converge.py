@@ -2,11 +2,11 @@
 
 import time
 
-import ngraph_sim
-from ngraph_sim.model.igp import oracle_igp
-from ngraph_sim.model.lpm import PrefixTable
-from ngraph_sim.model.network import Network
-from ngraph_sim.runtime import Simulation
+import netlab_sim
+from netlab_sim.model.igp import oracle_igp
+from netlab_sim.model.lpm import PrefixTable
+from netlab_sim.model.network import Network
+from netlab_sim.runtime import Simulation
 
 
 def timed(fn):
@@ -50,7 +50,7 @@ for n in (32, 64, 128, 256):
     t_build, net = timed(lambda n=n: ring(n))
     t_init, _ = timed(net.converge)
     t_noop, _ = timed(net.converge)
-    env = ngraph_sim.Environment()
+    env = netlab_sim.Environment()
     t_sim, sim = timed(lambda env=env, net=net: Simulation(env, net))
     lid = sorted(net.links)[3]
     sim.at(1, net.links[lid].fail)

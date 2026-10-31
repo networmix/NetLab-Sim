@@ -4,9 +4,9 @@ from dataclasses import replace
 
 import pytest
 
-from ngraph_sim.model import contracts as c
-from ngraph_sim.model.interfaces import OperState
-from ngraph_sim.model.state import PMap, StateDelta
+from netlab_sim.model import contracts as c
+from netlab_sim.model.interfaces import OperState
+from netlab_sim.model.state import PMap, StateDelta
 from tests.runtime.inbox import deliver_now
 from tests.runtime.test_sessions import message, open_pair
 from tests.runtime.test_transport import pair, send
@@ -400,7 +400,7 @@ def test_data_drop_is_counted_even_when_sender_control_allowance_is_exhausted():
 
 
 def test_listener_cleanup_uses_the_supplied_snapshot():
-    from ngraph_sim.runtime.transport import _key
+    from netlab_sim.runtime.transport import _key
     from tests.runtime.test_transport_integration import local
 
     sim = session()

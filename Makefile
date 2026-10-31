@@ -1,4 +1,4 @@
-# NetGraph-Sim Development Makefile
+# NetLab-Sim Development Makefile
 
 .PHONY: help venv clean-venv dev install check check-ci lint format test qt venv-ft check-ft build clean check-dist publish-test publish info hooks check-python
 
@@ -24,7 +24,7 @@ PRECOMMIT := $(PYTHON) -m pre_commit
 # Help
 # --------------------------------------------------------------------------
 help:
-	@echo "NetGraph-Sim Development Commands"
+	@echo "NetLab-Sim Development Commands"
 	@echo ""
 	@echo "Setup:"
 	@echo "  make venv          - Create virtual environment (./venv)"
@@ -147,7 +147,7 @@ build:
 	@$(PYTHON) -m build
 
 clean:
-	@rm -rf build/ dist/ *.egg-info/ ngraph_sim.egg-info/
+	@rm -rf build/ dist/ *.egg-info/ netlab_sim.egg-info/
 
 check-dist:
 	@$(PYTHON) -m twine check dist/*
