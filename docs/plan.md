@@ -26,7 +26,7 @@ deployment shapes the design names.
 - The plan adds behaviour. Scenarios a slice does not affect keep the
   behaviour the [README](../README.md) and [reference](reference.md) describe.
   A slice may change an existing answer only as its contract states: to
-  correct a demonstrated defect, with the reproducer reviewed (F1a's
+  correct a demonstrated defect, with the reproducer reviewed (the resolver
   [examples](design/protocols.md#two-separating-examples)), or as a documented
   interface change with its intended differences reviewed (for example, X's
   group timeline events).
@@ -82,8 +82,9 @@ changes in the commit that changes the product.
 ## Slices
 
 The protocol design's authoritative slice table, with its later amendments of
-edges, applied. `X` is the integration boundary F1b + F2b + F8, which lands as
-one change.
+edges, applied, preceded by the stabilization slices RV, NG-026 and FX. `MS`
+in the Needs column is the whole [MS milestone](#milestones). `X` is the
+integration boundary F1b + F2b + F8, which lands as one change.
 
 | ID | Work | Needs | Contract | Implementation | Evidence |
 |---|---|---|---|---|---|
@@ -91,15 +92,18 @@ one change.
 | Gate B | SRv6: SIDs and micro-SIDs, SR policies and steering, NEXT-C-SID, packet chains, SONiC subset | – | [—](../README.md#segment-routing) | implemented | Landed `ecd32d6`…`02c9fbb`; no history report |
 | Gate C | Agent contract, NHT, transport and sessions, reference link-state agent, study windows | – | [—](../README.md#protocol-agents) | implemented | Landed `9032ea8`…`380691a`; reports [C2](history/c2-nht.md), [C2F](history/c2f-nht-runtime-seams.md), [C2R](history/c2r-nht-detached-queries.md), [C4](history/c4-reference-agent.md), [C5](history/c5-study-windows.md) |
 | S0 | Scale hygiene: locator index, SRv6 consumer index without copy, arithmetic masks, bounded retention defaults, compact PRNG | – | [—](reference.md) | implemented | Landed `27e92cd`…`b10be0e`, seed lifecycle fix `9d53746`; reports [W1](history/s0-w1-locator-index.md), [W2](history/s0-w2-masks-retention.md), [W3](history/s0-w3-prng.md) |
-| S1a | `PMap` changed-key certificate | S0 | [pending](design/protocols.md#s1a-and-s1b-certificates-and-packed-tables) | planned | |
-| S1b | `PackedTable`, append-only first version, and its index gate | S0 | [pending](design/protocols.md#s1a-and-s1b-certificates-and-packed-tables) | planned | |
-| F0 | Additive contract records: commands, views, persistent state, RIB feed, `RowNotice`, NHT modes, transport options, settings root field with delta, labels, packed-table and programming record types, records F1 and F2 share | – | [pending](design/protocols.md#f0-contract-additions) | planned | Known gap: [client profiles are network-wide](design/protocols.md#per-node-client-profiles) |
+| RV | Review of Gate A, Gate B, Gate C and S0: graded findings with reproducers and owners | – | [pending](design/stabilization.md#rv-review-of-the-implemented-product) | planned | |
+| NG-026 | Port the NetGraph and NetGraph-Core adapters and the `netlab-sim run` CLI to the public interfaces of NetGraph 0.26 and the NetGraph-Core release it requires, with pinned versions | – | [pending](design/stabilization.md#ng-026-netgraph-026-port) | planned | |
+| FX | Fixes of confirmed defects in the implemented product outside NG-026, including today's resolver cycle, depth and order defects, with regressions and independent confirmation | RV | [pending](design/stabilization.md#fx-confirmed-defect-fixes) | planned | |
+| S1a | `PMap` changed-key certificate | S0, MS | [pending](design/protocols.md#s1a-and-s1b-certificates-and-packed-tables) | planned | |
+| S1b | `PackedTable`, append-only first version, and its index gate | S0, MS | [pending](design/protocols.md#s1a-and-s1b-certificates-and-packed-tables) | planned | |
+| F0 | Additive contract records: commands, views, persistent state, RIB feed, `RowNotice`, NHT modes, transport options, settings root field with delta, labels, packed-table and programming record types, records F1 and F2 share | MS | [pending](design/protocols.md#f0-contract-additions) | planned | Known gap: [client profiles are network-wide](design/protocols.md#per-node-client-profiles) |
 | C6 | Zero-commit publication and off-tree runtime bookkeeping | F0 | [pending](design/protocols.md#c6-zero-commit-publication) | planned | Known gap: [an idle agent run still commits](design/protocols.md#current-behaviour) |
-| F1a | Order-independent resolver with the per-leg cycle rule; extended fingerprints | F0 | [pending](design/protocols.md#f1a-order-independent-resolver) | planned | Known defect: [answers depend on unrelated routes and order](design/protocols.md#two-separating-examples) |
+| F1a | Order-independent resolver with the per-leg cycle rule; extended fingerprints | F0 | [pending](design/protocols.md#f1a-order-independent-resolver) | planned | Known defect: [answers depend on unrelated routes and order](design/protocols.md#two-separating-examples); FX owns its correction for current inputs |
 | F2a | Delivery of F0 records: commands, configuration, views, change keys | F0, C6 | [pending](design/protocols.md#pending-contracts) | planned | |
 | F3 | Transport: scoped accept identity, TTL, GTSM, wildcard listeners | F0 | [pending](design/protocols.md#pending-contracts) | planned | |
 | F4 | Domain-scoped oracle IGP, materialized | F0 | [pending](design/protocols.md#pending-contracts) | planned | |
-| F5 | Protocol toolkit: SPF, timers on a shared persistent priority structure, route operations, sizes, references, test harness | – | [pending](design/protocols.md#f5-protocol-toolkit) | planned | |
+| F5 | Protocol toolkit: SPF, timers on a shared persistent priority structure, route operations, sizes, references, test harness | MS | [pending](design/protocols.md#f5-protocol-toolkit) | planned | |
 | F7a | Settings: schema, dialects and profiles as data, device layer, transaction and action plan, root delta, minimal provenance | F0 | [pending](design/protocols.md#pending-contracts) | planned | |
 | RP1 | Route-policy language and evaluator | F0, F7a | [pending](design/routing-policy.md) | planned | |
 | X | F1b + F2b + F8: persistent packed FIB with group versions; RIB submission boundary; RIB feed and owner notifications; NHT installed mode; programming contract with ERROR completion and sync completion | S1a, S1b, F1a, F2a | [pending](design/protocols.md#pending-contracts) | planned | |
@@ -126,6 +130,11 @@ one change.
 
 ## Milestones
 
+- **MS**: RV, NG-026, FX. RV and NG-026 proceed independently; FX starts
+  from RV's findings and also fixes findings of NG-026 while the port is in
+  progress. MS closes when all three are done and every blocker they found,
+  including late port findings, is fixed and confirmed. The remaining M0
+  work, and every new foundation slice, waits for MS.
 - **M0**: S0, F0, F5. Open: F0 and F5 are planned.
 - **M1**: S1a, the S1b gate, C6, F1a, F2a, F3, F4, F7a, RP1.
 - **M2**: X, then F1c, F2c, RP3, A1.
@@ -149,9 +158,10 @@ these slices as stated in [routing-policy](design/routing-policy.md#slices).
 - C6 starts with its publication-seam design and tests. F3, F4, F5 and F7a do
   not wait for `PackedTable`.
 - S1a and S1b change the same state layer and land as one coordinated series,
-  not as independent parallel edits. C6 alone changes the agent publication
-  path in `netlab_sim/runtime/agents.py`, `netlab_sim/runtime/pipeline.py` and
-  `netlab_sim/model/network.py` and the runtime receipt events.
+  not as independent parallel edits. Among the protocol slices, C6 alone
+  changes the agent publication path in `netlab_sim/runtime/agents.py`,
+  `netlab_sim/runtime/pipeline.py` and `netlab_sim/model/network.py` and the
+  runtime receipt events.
 - F0 owns the root settings-delta integration; F7a owns settings resolution and
   the action planner.
 - X lands as one change against one reviewed storage and programming contract:
@@ -160,18 +170,13 @@ these slices as stated in [routing-policy](design/routing-policy.md#slices).
   F2c consumes S1 and X.
 - BG2 owns the temporary `rib`-mode session registration; BG3 owns path
   tracking.
-
-## Backlog outside the protocol plan
-
-Identified work with a stable ID, not part of the slice table or its
-dependencies, and not scheduled:
-
-- **NG-026**: port the `netlab-sim run` CLI to NetGraph 0.26.
-  `netlab_sim/cli.py` calls `Scenario.run()`; NetGraph 0.26 replaced that
-  pattern with `ngraph.prepare(...)` and `ngraph.run(...)`
-  ([NetGraph 0.26 API, Results and export](https://github.com/networmix/NetGraph/blob/v0.26.0/docs/reference/api.md#results-and-export)).
-  Whether the optional NetGraph adapter needs other changes is part of the
-  port.
+- NG-026 owns fixes local to the NetGraph and NetGraph-Core adapters and the
+  CLI; FX owns every other confirmed defect of the implemented product (code,
+  tests, documentation, the SONiC adapter), including those the port exposes.
+  An FX change that delivers part of F1a (such as the extended fingerprints or
+  the resolver correction for current inputs) updates F1a's row to that
+  subset, with its evidence; F1a keeps its F0 dependency and delivers only the
+  remaining guarantees.
 
 ## Optional and deferred
 

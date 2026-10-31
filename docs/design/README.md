@@ -1,8 +1,10 @@
 # Design
 
 These pages specify behaviour NetLab-Sim does not have yet: the foundation for
-Open/R and BGP, and the shared route-policy language. They are for maintainers
-who implement or review that work.
+Open/R and BGP, and the shared route-policy language. The stabilization page
+also states what the review, the NetGraph 0.26 port and the defect fixes of
+the implemented product must guarantee. They are for maintainers who implement
+or review that work.
 
 ## Which document decides what
 
@@ -19,6 +21,9 @@ the archive and a design page disagree, the design page wins.
 
 ## Pages
 
+- [Stabilization](stabilization.md): the review of the implemented product,
+  the NetGraph 0.26 port and the fixes of confirmed defects, including today's
+  resolver defects.
 - [Protocol foundation](protocols.md): the common design decisions, the
   contracts for F0 and F5, the requirements for F1a, C6, S1a and S1b, and the
   list of pending contracts with their archived sources.
