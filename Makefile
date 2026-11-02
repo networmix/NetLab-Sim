@@ -7,7 +7,7 @@
 # --------------------------------------------------------------------------
 # Python interpreter detection
 # --------------------------------------------------------------------------
-VENV_BIN := $(PWD)/venv/bin
+VENV_BIN := $(CURDIR)/venv/bin
 
 PY_BEST := $(shell for v in 3.14 3.13 3.12 3.11; do command -v python$$v >/dev/null 2>&1 && { echo python$$v; exit 0; }; done; command -v python3 2>/dev/null || command -v python 2>/dev/null)
 
@@ -138,7 +138,7 @@ venv-ft:
 
 check-ft:
 	@[ -x venv-ft/bin/python ] || { echo "Run 'make venv-ft' first."; exit 1; }
-	@$(MAKE) check-ci PYTHON=$(PWD)/venv-ft/bin/python
+	@$(MAKE) check-ci PYTHON=$(CURDIR)/venv-ft/bin/python
 
 # --------------------------------------------------------------------------
 # Build & Publish
