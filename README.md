@@ -231,6 +231,11 @@ CI runs Python 3.11 to 3.14 and the free-threaded 3.14t build. Reports on
 each development slice, with their evidence and measurements, are in
 [docs/history](docs/history/README.md).
 
+Planned work (stabilization of the current product, then the Open/R and BGP
+foundation and the shared route-policy language) is ordered in the roadmap, [docs/plan.md](docs/plan.md). Its
+contracts are in [docs/design](docs/design/README.md); they describe future
+behaviour, not features available today.
+
 ## License
 
 MIT
