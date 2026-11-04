@@ -22,6 +22,8 @@ on the same quiet machine. Local checks do not replace CI.
 
 - `README.md` and `docs/reference.md` are the user documentation. Change
   them in the same commit as the behaviour they describe.
+- `docs/roadmap.md` holds planned and deferred work and its state. A change
+  that delivers or changes an item updates its row in the same commit.
 - Docstrings and comments state behaviour. They do not cite plans, reviews
   or milestones that live outside this repository.
 - A slice's report goes in `docs/history/` as `<slice>-<topic>.md`, with a

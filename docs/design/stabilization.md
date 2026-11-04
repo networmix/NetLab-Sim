@@ -3,7 +3,7 @@
 This page states what the stabilization work must guarantee: a review of the
 implemented product (RV), the port to NetGraph 0.26 and the NetGraph-Core
 release it requires (NG-026), and the fixes for confirmed defects (FX). Order,
-ownership and state are in [docs/plan.md](../plan.md).
+ownership and state are in [docs/roadmap.md](../roadmap.md).
 
 ## What counts as a defect
 
@@ -66,7 +66,7 @@ export"):
 ## FX: confirmed defect fixes
 
 - FX fixes and confirms the blockers found by RV or NG-026 that the
-  [roadmap](../plan.md#landing-rules) assigns to it. Each fix has a regression
+  [roadmap](../roadmap.md#landing-rules) assigns to it. Each fix has a regression
   test that fails on the old code and an independent confirmation of the fix
   and of its intended differences.
 - A deferred finding that does not block names its owning slice and the

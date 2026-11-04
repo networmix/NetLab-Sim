@@ -5,7 +5,7 @@ evaluator, shared by BGP, Open/R route injection and the device's RIB, FIB and
 resolver hooks. This page is the contract for that language, its attachment
 points, per-node configuration, lifecycle and acceptance examples. It is a
 planned feature: none of the records or names below exist in the package yet.
-Order and state are in [docs/plan.md](../plan.md), and the slices that deliver
+Order and state are in [docs/roadmap.md](../roadmap.md), and the slices that deliver
 this page are listed under [Slices](#slices).
 
 The page carries the reviewed routing-policy design (revision 4 of 27 September
@@ -586,7 +586,7 @@ binding = RoutePolicyBinding(
 ## Slices
 
 The route-policy work is delivered inside the slices of
-[docs/plan.md](../plan.md), which orders them. The device-side hooks are part of
+[docs/roadmap.md](../roadmap.md), which orders them. The device-side hooks are part of
 the first complete delivery, not optional.
 
 | Part | Delivered in | Content | Exit evidence |

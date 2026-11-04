@@ -3,7 +3,7 @@
 Frozen copies of the design documents written before the plan moved into this
 repository. They are kept byte for byte as they were last revised, so that
 every requirement can be traced to its source. They are not current rules: the
-[design pages](../README.md) and [docs/plan.md](../../plan.md) override them,
+[design pages](../README.md) and [docs/roadmap.md](../../roadmap.md) override them,
 and their status statements (what is implemented, what can start, test counts,
 review outcomes, measurements) describe their own date and older commits.
 

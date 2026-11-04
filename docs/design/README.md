@@ -12,7 +12,7 @@ or review that work.
 |---|---|
 | What the code does now | The code and its tests, then the [README](../../README.md) and the [reference](../reference.md). [History reports](../history/README.md) record what each delivered slice changed and how it was checked, as of their date |
 | What future work must guarantee | The design pages below. Each statement is a requirement for planned code, or an internal guarantee or decision that implemented code still keeps; neither is user documentation |
-| What is planned, in which order, and its state | The [roadmap](../plan.md), the only place with status |
+| What is planned, in which order, and its state | The [roadmap](../roadmap.md), the only place with status |
 | Where a requirement came from | The [archive](archive/README.md): frozen design documents kept for extraction and provenance. They are not current rules and do not override anything above |
 
 When a design page and the code disagree, the code describes today and the
@@ -34,7 +34,7 @@ the archive and a design page disagree, the design page wins.
 ## Pending contracts
 
 The roadmap records whether a slice's contract is ready
-([status values](../plan.md#status-values)). Reconciling a pending contract
+([status values](../roadmap.md#status-values)). Reconciling a pending contract
 means: collect every requirement from the archived sections and from all later
 amendments of them, write them as exact rules with the examples and tests that
 check them, and resolve or record each conflict. A pending contract is
@@ -57,4 +57,4 @@ Rules for these pages:
   that is no longer true or no longer binding is removed.
 
 How the roadmap is kept current is under
-[Maintaining the roadmap](../plan.md#maintaining-the-roadmap).
+[Maintaining the roadmap](../roadmap.md#maintaining-the-roadmap).

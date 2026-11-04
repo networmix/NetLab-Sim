@@ -33,53 +33,41 @@ deployment shapes the design names.
 - Contracts live in [docs/design](design/README.md). This page holds order and
   state, not requirements.
 - Functional and performance gates are separate for every protocol slice.
-- Items listed under [Optional and deferred](#optional-and-deferred) are not
+- Items listed under [Deferred](#deferred) are not
   scheduled.
 
 ## Status values
 
 **Contract**
 
-- `pending`: requirements exist but are not yet reconciled and reviewed into a
-  contract an implementation can start from. The link names the current
-  source: a design page, or an archived plan section listed on it.
-- `ready`: the linked design page holds a reviewed contract for this slice.
-- `—`: delivered before this roadmap; the current code and user documentation
-  define the behaviour.
+- `pending`: the item needs a reviewed design before work starts; the link names the current source.
+- `ready`: the linked design holds a reviewed contract for the item.
+- `not needed`: the Work cell states the change completely.
+- `—`: delivered before this roadmap; the code and user documentation define the behaviour.
 
 **Implementation**
 
-- `planned`: none of the slice is in the product.
-- `partly implemented`: part of the slice is in the product; the evidence
-  names which part.
-- `implemented`: the slice is in the product.
-
-## What this page records
-
-The rows state product facts: what the slice is, what it depends on, whether
-its contract is ready and how much of it the product contains, with in-repo
-witnesses (tests, history reports, user documentation). They do not record
-how the work is run: an effort's plan revision, task acceptance, reviews and
-CI results live in that effort's own records, outside the repository. Items
-that landed before this roadmap keep their known landing commits as history.
+- `planned`: none of the item is in the product.
+- `partly implemented`: part of it is; the evidence names which part.
+- `implemented`: the item is in the product.
 
 ## Maintaining the roadmap
 
-- One row per slice. IDs never change and are never reused; a split gets new
-  IDs (S1 became S1a and S1b) and the old ID disappears from the table.
-- Change a row in the same commit that changes the slice's scope or
-  dependencies, makes its contract ready, or lands part or all of its
-  implementation. Its evidence names the in-repo witnesses of that change; a
-  row never tries to name the commit that changes it.
-- Status words live only in this table. Design pages state requirements, and
-  history reports and the archive keep the facts of their date.
-- When this table and a design page disagree on order or dependencies, this
-  table wins; when they disagree on behaviour, the design page wins.
+- One row per planned item. IDs never change and are never reused; a split gets new IDs and the old one leaves the
+  table. A need in another repository is written `<repository>:<ID>`.
+- A row changes in the commit that changes its item: its scope, its needs, its contract or its implementation. Its
+  evidence names in-repository witnesses (tests, documents, reports); a row never names the commit that changes it.
+- An implemented row may leave the table once a release has shipped it and no row needs it; the changelog keeps it.
+- Status words live only on this page. Designs state requirements; the changelog says what each release shipped.
+  When this page and a design disagree on order or needs, this page wins; on behaviour, the design wins.
+- The page records product facts, not how the work is run: an effort's plans, reviews and CI results stay in its own
+  records.
+- An item moves from Deferred to Planned on the maintainer's decision, and gets its ID then.
 
-The rows were assessed at commit `4514276` (31 October 2026); each later row
-changes in the commit that changes the product.
+## Planned
 
-## Slices
+The rows were assessed at commit `4514276` (31 October 2026); items that landed before this roadmap keep
+their known landing commits as history.
 
 The protocol design's authoritative slice table, with its later amendments of
 edges, applied, preceded by the stabilization slices RV, NG-026 and FX. `MS`
@@ -178,9 +166,9 @@ these slices as stated in [routing-policy](design/routing-policy.md#slices).
   subset, with its evidence; F1a keeps its F0 dependency and delivers only the
   remaining guarantees.
 
-## Optional and deferred
+## Deferred
 
-Not in the table, and not scheduled:
+Not scheduled. One entry per item: what it is, and why it is not scheduled or what would make it worth doing.
 
 - **F6**, downstream invalidation narrowed by FIB diffs: optional, only if
   integration profiles show the conservative scans dominating
@@ -202,3 +190,6 @@ Not in the table, and not scheduled:
   BSIDs, midpoint protection, VRFs, runtime checkpoint, in-band transport,
   `loop_model=AMPLIFY`
   ([source](design/archive/network-layer-r17.md#gates-and-phases)).
+- **Publishing trigger instructions**: document package publication from a published GitHub release and the manual Test
+  PyPI path, matching `.github/workflows/publish.yml`; add this when release instructions are prepared so maintainers
+  can distinguish a version tag from publication.

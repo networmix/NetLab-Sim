@@ -6,7 +6,7 @@ holds the common design decisions, the minimum contracts for the next slices
 slices keep their requirements in the archived design and are listed under
 [Pending contracts](#pending-contracts). Nothing here is an available API: the
 records, modules and names below are planned. Order and state are in
-[docs/plan.md](../plan.md); how this page relates to the code and the archive
+[docs/roadmap.md](../roadmap.md); how this page relates to the code and the archive
 is in [the design index](README.md).
 
 Two kinds of statement appear here:
